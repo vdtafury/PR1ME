@@ -6,7 +6,7 @@ import { BRAND } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/admin/login")({
   component: AdminLogin,
-  head: () => ({ meta: [{ title: "Admin login — NOVA" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin login — PR1ME" }, { name: "robots", content: "noindex" }] }),
 });
 
 function AdminLogin() {

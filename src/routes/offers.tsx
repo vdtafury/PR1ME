@@ -9,9 +9,9 @@ export const Route = createFileRoute("/offers")({
   component: OffersPage,
   head: () => ({
     meta: [
-      { title: "Offers & Deals — NOVA" },
-      { name: "description", content: "Current promotions, discounts and bundle deals from NOVA." },
-      { property: "og:title", content: "Offers & Deals — NOVA" },
+      { title: "Offers & Deals — PR1ME" },
+      { name: "description", content: "Current promotions, discounts and bundle deals from PR1ME." },
+      { property: "og:title", content: "Offers & Deals — PR1ME" },
       { property: "og:url", content: "/offers" },
     ],
     links: [{ rel: "canonical", href: "/offers" }],

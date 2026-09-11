@@ -53,7 +53,7 @@ export const useCartStore = create<CartState>()(
       setCartOpen: (isOpen) => set({ isCartOpen: isOpen })
     }),
     {
-      name: 'nova-cart-storage',
+      name: 'pr1me-cart-storage',
       partialize: (state) => ({ items: state.items }), // Persist only items
     }
   )

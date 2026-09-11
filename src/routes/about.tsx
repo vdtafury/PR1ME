@@ -6,9 +6,9 @@ export const Route = createFileRoute("/about")({
   component: AboutPage,
   head: () => ({
     meta: [
-      { title: "About NOVA — Affordable Fashion, Fast Delivery" },
-      { name: "description", content: "Learn about NOVA: who we are, how we ship, and how to order via WhatsApp." },
-      { property: "og:title", content: "About NOVA" },
+      { title: "About PR1ME — Affordable Fashion, Fast Delivery" },
+      { name: "description", content: "Learn about PR1ME: who we are, how we ship, and how to order via WhatsApp." },
+      { property: "og:title", content: "About PR1ME" },
       { property: "og:url", content: "/about" },
     ],
     links: [{ rel: "canonical", href: "/about" }],

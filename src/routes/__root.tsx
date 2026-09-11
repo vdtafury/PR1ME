@@ -51,9 +51,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "NOVA — Affordable Casual Fashion" },
+      { title: "PR1ME — Affordable Casual Fashion" },
       { name: "description", content: "Modern casual clothing for men, women & kids. Order instantly on WhatsApp." },
-      { property: "og:site_name", content: "NOVA" },
+      { property: "og:site_name", content: "PR1ME" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

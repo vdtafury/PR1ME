@@ -9,7 +9,7 @@ import { BRAND, formatPrice } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
-  head: () => ({ meta: [{ title: "Admin — NOVA" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin — PR1ME" }, { name: "robots", content: "noindex" }] }),
 });
 
 type Tab = "products" | "categories" | "offers";

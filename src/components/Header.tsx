@@ -17,7 +17,7 @@ export function Header() {
       <header className="border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center rounded-md bg-foreground text-background font-extrabold">N</div>
+            <div className="grid h-9 w-9 place-items-center rounded-md bg-foreground text-background font-extrabold">P</div>
             <span className="text-lg font-extrabold tracking-tight">{BRAND.name}</span>
           </Link>
           <nav className="hidden items-center gap-8 md:flex">

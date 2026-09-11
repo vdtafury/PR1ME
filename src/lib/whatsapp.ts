@@ -1,5 +1,5 @@
 export const BRAND = {
-  name: "NOVA",
+  name: "PR1ME",
   tagline: "Affordable casual fashion. Delivered fast.",
   whatsappNumber: "201095189259", // no +, country code first
   instagram: "https://instagram.com",

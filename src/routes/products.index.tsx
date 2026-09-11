@@ -18,9 +18,9 @@ export const Route = createFileRoute("/products/")({
   component: ProductsPage,
   head: () => ({
     meta: [
-      { title: "Shop all products — NOVA" },
-      { name: "description", content: "Browse the full NOVA catalog: tees, hoodies, jeans, dresses and more." },
-      { property: "og:title", content: "Shop all products — NOVA" },
+      { title: "Shop all products — PR1ME" },
+      { name: "description", content: "Browse the full PR1ME catalog: tees, hoodies, jeans, dresses and more." },
+      { property: "og:title", content: "Shop all products — PR1ME" },
       { property: "og:url", content: "/products" },
     ],
     links: [{ rel: "canonical", href: "/products" }],

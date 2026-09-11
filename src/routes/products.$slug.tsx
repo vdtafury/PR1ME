@@ -20,7 +20,7 @@ export const Route = createFileRoute("/products/$slug")({
     if (!p) return { meta: [{ title: 'Product Not Found' }] };
     return {
       meta: [
-        { title: `${p.title} | NOVA` },
+        { title: `${p.title} | PR1ME` },
         { name: 'description', content: p.short_description || p.title },
         { property: 'og:title', content: p.title },
         { property: 'og:description', content: p.short_description || p.title },

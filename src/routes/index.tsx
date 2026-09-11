@@ -11,9 +11,9 @@ export const Route = createFileRoute("/")({
   component: HomePage,
   head: () => ({
     meta: [
-      { title: "NOVA — Affordable Casual Fashion, Order on WhatsApp" },
+      { title: "PR1ME — Affordable Casual Fashion, Order on WhatsApp" },
       { name: "description", content: "Shop modern casual clothing for men, women & kids. Fast WhatsApp ordering, nationwide shipping." },
-      { property: "og:title", content: "NOVA — Affordable Casual Fashion" },
+      { property: "og:title", content: "PR1ME — Affordable Casual Fashion" },
       { property: "og:description", content: "Shop modern casual clothing. Order instantly on WhatsApp." },
       { property: "og:url", content: "/" },
     ],
@@ -60,7 +60,7 @@ function HomePage() {
           <div>
             <span className="inline-block rounded-full bg-foreground/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground/70">New Season • Mega Sale</span>
             <h1 className="mt-4 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
-              Nova — Affordable casual fashion.<br />
+              PR1ME — Affordable casual fashion.<br />
               <span className="text-whatsapp">Order in seconds.</span>
             </h1>
             <p className="mt-5 max-w-md text-base text-muted-foreground sm:text-lg">
@@ -82,7 +82,7 @@ function HomePage() {
             </div>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-muted shadow-sm">
-            <img src={heroImg} alt="NOVA casual fashion" width={1600} height={1100} className="h-full w-full object-cover" fetchPriority="high" />
+            <img src={heroImg} alt="PR1ME casual fashion" width={1600} height={1100} className="h-full w-full object-cover" fetchPriority="high" />
           </div>
         </div>
       </section>
@@ -166,7 +166,7 @@ function HomePage() {
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {[
             { name: "Ahmed M.", text: "The quality is amazing for the price. Fits perfectly and arrived in just 2 days! Definitely buying again.", rating: 5 },
-            { name: "Sara H.", text: "I love the dark aesthetic of NOVA. The customer service on WhatsApp was very helpful with sizing.", rating: 5 },
+            { name: "Sara H.", text: "I love the dark aesthetic of PR1ME. The customer service on WhatsApp was very helpful with sizing.", rating: 5 },
             { name: "Omar K.", text: "Great material and the delivery guy let me check everything before paying. Highly recommended.", rating: 5 },
           ].map((review, i) => (
             <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between">

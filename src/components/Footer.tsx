@@ -8,7 +8,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center rounded-md bg-foreground text-background font-extrabold">T</div>
+            <div className="grid h-9 w-9 place-items-center rounded-md bg-foreground text-background font-extrabold">P</div>
             <span className="text-lg font-extrabold">{BRAND.name}</span>
           </div>
           <p className="mt-3 max-w-md text-sm text-muted-foreground">{BRAND.tagline}</p>
