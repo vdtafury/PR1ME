@@ -26,7 +26,7 @@ export function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <article className="group relative flex flex-col border border-[#E5E5E0] bg-white transition-all hover:border-[#0D0D0D]/40">
+    <article className="group relative flex flex-col border border-[#E5E5E0] bg-white transition-colors hover:border-[#0D0D0D]/40">
       {/* Product Image Area */}
       <div className="relative aspect-square w-full overflow-hidden bg-[#F7F7F5]">
         <Link
@@ -40,7 +40,7 @@ export function ProductCard({ product }: { product: Product }) {
                 src={product.main_image}
                 alt={product.title}
                 loading="lazy"
-                className={`h-full w-full object-contain object-center p-3 transition-opacity duration-300 ${
+                className={`h-full w-full object-contain object-center p-2 sm:p-3 transition-opacity duration-300 ${
                   hasGallery ? "group-hover:opacity-0" : ""
                 }`}
               />
@@ -49,7 +49,7 @@ export function ProductCard({ product }: { product: Product }) {
                   src={gallery[0]}
                   alt={product.title}
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-contain object-center p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  className="absolute inset-0 h-full w-full object-contain object-center p-2 sm:p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 />
               )}
             </div>
@@ -60,7 +60,7 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </Link>
 
-        {/* Wishlist Heart Icon (Top Right in RTL) */}
+        {/* Wishlist Heart Icon (Top Right in RTL) - 36px touch target */}
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -71,7 +71,7 @@ export function ProductCard({ product }: { product: Product }) {
                 : `تمت إضافة "${product.title}" إلى المفضلة`
             );
           }}
-          className="absolute top-2.5 right-2.5 z-10 grid h-7 w-7 place-items-center text-[#0D0D0D]/70 hover:text-[#0D0D0D] transition-colors"
+          className="absolute top-1.5 right-1.5 z-10 grid h-8 w-8 place-items-center text-[#0D0D0D]/80 hover:text-[#0D0D0D] transition-colors"
           aria-label="إضافة للمفضلة"
         >
           <Heart
@@ -81,18 +81,18 @@ export function ProductCard({ product }: { product: Product }) {
           />
         </button>
 
-        {/* Sale Badge if applicable */}
+        {/* Sale Badge */}
         {hasSale && (
-          <span className="absolute top-2.5 left-2.5 z-10 bg-[#8B2E2E] px-2 py-0.5 text-[9px] font-bold text-white uppercase">
+          <span className="absolute top-1.5 left-1.5 z-10 bg-[#8B2E2E] px-1.5 py-0.5 text-[9px] font-bold text-white uppercase leading-none">
             خصم {discountPercent}%
           </span>
         )}
       </div>
 
-      {/* Product Information */}
-      <div className="flex flex-1 flex-col p-3.5 text-center">
+      {/* Product Details */}
+      <div className="flex flex-1 flex-col p-2.5 sm:p-3 text-center">
         {/* Title */}
-        <h3 className="line-clamp-1 text-xs font-semibold text-[#0D0D0D]">
+        <h3 className="line-clamp-1 text-[11px] sm:text-xs font-semibold text-[#0D0D0D]">
           <Link
             to="/products/$slug"
             params={{ slug: product.slug }}
@@ -103,8 +103,8 @@ export function ProductCard({ product }: { product: Product }) {
         </h3>
 
         {/* Price */}
-        <div className="mt-1 flex items-center justify-center gap-1.5">
-          <span className="price-display text-xs font-bold text-[#0D0D0D]">
+        <div className="mt-1 flex items-center justify-center gap-1 sm:gap-1.5">
+          <span className="price-display text-xs sm:text-sm font-bold text-[#0D0D0D]">
             {formatPrice(product.price)}
           </span>
           {hasSale && (
@@ -115,32 +115,32 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         {/* Color Swatch Dots */}
-        <div className="mt-2 flex items-center justify-center gap-1.5">
+        <div className="mt-1.5 flex items-center justify-center gap-1.5">
           {product.colors && product.colors.length > 0 ? (
             product.colors.slice(0, 3).map((c) => (
               <span
                 key={c}
                 title={c}
-                className="h-2.5 w-2.5 rounded-full border border-black/20"
+                className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full border border-black/20"
                 style={{ backgroundColor: colorToHex(c) }}
               />
             ))
           ) : (
             <>
-              <span className="h-2.5 w-2.5 rounded-full bg-[#0D0D0D]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#6B6B66]" />
+              <span className="h-2 w-2 rounded-full bg-[#0D0D0D]" />
+              <span className="h-2 w-2 rounded-full bg-[#6B6B66]" />
             </>
           )}
         </div>
 
-        {/* Quick Add Button on Hover */}
-        <div className="mt-3 pt-2 border-t border-[#E5E5E0]">
+        {/* Quick Add Button */}
+        <div className="mt-2.5 pt-2 border-t border-[#E5E5E0]">
           <button
             onClick={handleQuickAdd}
-            className="flex w-full items-center justify-center gap-1.5 bg-[#0D0D0D] py-1.5 text-[11px] font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98"
+            className="flex min-h-[34px] sm:min-h-[36px] w-full items-center justify-center gap-1 bg-[#0D0D0D] py-1 text-[10px] sm:text-[11px] font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98"
           >
-            <ShoppingBag className="h-3 w-3" />
-            <span>أضف إلى السلة</span>
+            <ShoppingBag className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            <span>أضف للسلة</span>
           </button>
         </div>
       </div>

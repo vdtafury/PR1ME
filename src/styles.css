@@ -85,11 +85,13 @@
 @layer base {
   * {
     border-color: var(--color-border);
+    -webkit-tap-highlight-color: transparent;
   }
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    touch-action: manipulation;
   }
   body {
     background-color: var(--color-background);
@@ -97,10 +99,20 @@
     font-family: var(--font-sans);
     font-feature-settings: 'cv02','cv03','cv04','cv11','tnum';
     overflow-x: hidden;
+    min-height: 100dvh;
   }
   h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     letter-spacing: -0.015em;
+  }
+  /* Prevent iOS zoom on input focus while keeping sharp typography */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  @media (min-width: 640px) {
+    input, select, textarea {
+      font-size: 0.875rem;
+    }
   }
 }
 
@@ -110,10 +122,30 @@
   letter-spacing: -0.01em;
 }
 
-/* Subtle image zooms */
-.img-zoom {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+/* Mobile Safe Areas */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
-.img-zoom:hover {
-  transform: scale(1.03);
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Momentum scroll for horizontal containers */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.touch-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Subtle image zooms on non-touch */
+@media (hover: hover) {
+  .img-zoom {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .img-zoom:hover {
+    transform: scale(1.03);
+  }
 }

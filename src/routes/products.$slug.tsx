@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   MessageCircle,
   ChevronLeft,
@@ -13,7 +13,6 @@ import {
   ShieldCheck,
   RotateCcw,
   ShoppingBag,
-  Check,
   HelpCircle,
   AlertCircle,
 } from "lucide-react";
@@ -53,10 +52,10 @@ export const Route = createFileRoute("/products/$slug")({
   notFoundComponent: () => (
     <div className="mx-auto max-w-3xl px-4 py-24 text-center">
       <h1 className="text-2xl font-bold">عفواً، هذا المنتج غير متوفر حالياً</h1>
-      <p className="mt-2 text-xs text-muted-foreground">ربما تم تغيير الرابط أو نفد المخزون.</p>
+      <p className="mt-2 text-xs text-[#6B6B66]">ربما تم تغيير الرابط أو نفد المخزون.</p>
       <Link
         to="/products"
-        className="mt-6 inline-flex items-center gap-2 rounded-xs bg-foreground px-5 py-2.5 text-xs font-bold text-background"
+        className="mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-xs bg-[#0D0D0D] px-5 py-2.5 text-xs font-bold text-[#F7F7F5]"
       >
         <span>العودة لكتالوج المنتجات</span>
         <ChevronLeft className="h-4 w-4" />
@@ -84,14 +83,14 @@ function ProductDetailPage() {
 
   if (productQ.isLoading) {
     return (
-      <div className="mx-auto max-w-6xl animate-pulse px-4 py-12 sm:px-6">
-        <div className="grid gap-10 md:grid-cols-2">
-          <div className="aspect-[4/5] bg-muted/40 border border-border" />
+      <div className="mx-auto max-w-6xl animate-pulse px-4 py-8 sm:px-6">
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="aspect-square bg-white border border-[#E5E5E0]" />
           <div className="space-y-4">
-            <div className="h-8 w-3/4 bg-muted/40" />
-            <div className="h-6 w-1/4 bg-muted/40" />
-            <div className="h-28 w-full bg-muted/40" />
-            <div className="h-12 w-full bg-muted/40" />
+            <div className="h-8 w-3/4 bg-[#E5E5E0]/60" />
+            <div className="h-6 w-1/4 bg-[#E5E5E0]/60" />
+            <div className="h-28 w-full bg-[#E5E5E0]/60" />
+            <div className="h-12 w-full bg-[#E5E5E0]/60" />
           </div>
         </div>
       </div>
@@ -114,7 +113,22 @@ function ProductView({ product: p }: { product: Product }) {
   const [activeTab, setActiveTab] = useState<"details" | "shipping" | "guide">("details");
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
 
-  const [emblaRef] = useEmblaCarousel({ loop: true });
+  // Embla carousel for mobile gestures
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const [selectedEmblaIndex, setSelectedEmblaIndex] = useState(0);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedEmblaIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on("select", onSelect);
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
 
   const addItem = useCartStore((s) => s.addItem);
 
@@ -182,58 +196,80 @@ function ProductView({ product: p }: { product: Product }) {
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-10">
+    <div className="mx-auto max-w-7xl px-3 sm:px-6 py-4 sm:py-10 pb-28 md:pb-12 overflow-x-hidden">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 text-[11px] text-muted-foreground">
-        <Link to="/" className="hover:text-foreground">
+      <nav className="mb-4 sm:mb-6 flex items-center gap-1.5 text-[11px] text-[#6B6B66]">
+        <Link to="/" className="hover:text-[#0D0D0D]">
           الرئيسية
         </Link>
         <span>/</span>
-        <Link to="/products" className="hover:text-foreground">
+        <Link to="/products" className="hover:text-[#0D0D0D]">
           الكتالوج
         </Link>
         <span>/</span>
-        <span className="line-clamp-1 text-foreground font-semibold">{p.title}</span>
+        <span className="line-clamp-1 text-[#0D0D0D] font-semibold">{p.title}</span>
       </nav>
 
       {/* Main Grid */}
-      <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
+      <div className="grid gap-6 lg:grid-cols-12 lg:gap-14">
         {/* Left: Product Imagery */}
         <div className="lg:col-span-7">
-          {/* Mobile Swiper */}
-          <div className="overflow-hidden border border-border bg-muted md:hidden" ref={emblaRef}>
-            <div className="flex touch-pan-y">
-              {allImages.length > 0 ? (
-                allImages.map((src, idx) => (
-                  <div className="relative min-w-0 flex-[0_0_100%] aspect-[4/5]" key={idx}>
-                    <img
-                      src={src}
-                      alt={`${p.title} - ${idx + 1}`}
-                      className="h-full w-full object-cover"
-                    />
-                    <div className="absolute bottom-3 left-3 bg-black/80 px-2 py-0.5 text-[10px] font-mono text-white">
-                      {idx + 1} / {allImages.length}
+          {/* Mobile Swiper with Native App Carousel Gestures */}
+          <div className="md:hidden">
+            <div className="overflow-hidden border border-[#E5E5E0] bg-white relative" ref={emblaRef}>
+              <div className="flex touch-pan-y">
+                {allImages.length > 0 ? (
+                  allImages.map((src, idx) => (
+                    <div className="relative min-w-0 flex-[0_0_100%] aspect-square" key={idx}>
+                      <img
+                        src={src}
+                        alt={`${p.title} - ${idx + 1}`}
+                        className="h-full w-full object-contain p-4"
+                      />
                     </div>
+                  ))
+                ) : (
+                  <div className="grid aspect-square w-full place-items-center text-[#6B6B66]">
+                    لا توجد صورة
                   </div>
-                ))
-              ) : (
-                <div className="grid aspect-[4/5] w-full place-items-center text-muted-foreground">
-                  لا توجد صورة
+                )}
+              </div>
+
+              {/* Mobile Slide Badge */}
+              {allImages.length > 1 && (
+                <div className="absolute bottom-3 left-3 bg-black/75 px-2 py-0.5 text-[10px] font-mono text-white">
+                  {selectedEmblaIndex + 1} / {allImages.length}
                 </div>
               )}
             </div>
+
+            {/* Pagination Dots for Mobile */}
+            {allImages.length > 1 && (
+              <div className="mt-2.5 flex items-center justify-center gap-1.5">
+                {allImages.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => emblaApi?.scrollTo(i)}
+                    className={`h-1.5 rounded-full transition-all ${
+                      i === selectedEmblaIndex ? "w-6 bg-[#0D0D0D]" : "w-1.5 bg-[#E5E5E0]"
+                    }`}
+                    aria-label={`انتقل للصورة ${i + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Desktop Main Image */}
-          <div className="relative hidden aspect-[4/5] overflow-hidden border border-border bg-muted md:block">
+          <div className="relative hidden aspect-square overflow-hidden border border-[#E5E5E0] bg-white md:block">
             {allImages[activeImg] ? (
               <img
                 src={allImages[activeImg]}
                 alt={p.title}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain p-8"
               />
             ) : (
-              <div className="grid h-full w-full place-items-center text-muted-foreground">
+              <div className="grid h-full w-full place-items-center text-[#6B6B66]">
                 لا توجد صورة
               </div>
             )}
@@ -245,7 +281,7 @@ function ProductView({ product: p }: { product: Product }) {
                   onClick={() =>
                     setActiveImg((prev) => (prev - 1 + allImages.length) % allImages.length)
                   }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center bg-background/90 text-foreground border border-border transition-colors hover:bg-background"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center bg-white text-[#0D0D0D] border border-[#E5E5E0] hover:bg-[#F7F7F5]"
                   aria-label="الصورة السابقة"
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -253,7 +289,7 @@ function ProductView({ product: p }: { product: Product }) {
                 <button
                   type="button"
                   onClick={() => setActiveImg((prev) => (prev + 1) % allImages.length)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center bg-background/90 text-foreground border border-border transition-colors hover:bg-background"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center bg-white text-[#0D0D0D] border border-[#E5E5E0] hover:bg-[#F7F7F5]"
                   aria-label="الصورة التالية"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -264,7 +300,7 @@ function ProductView({ product: p }: { product: Product }) {
             {/* Badges */}
             <div className="absolute top-3 right-3 flex flex-col gap-1.5">
               {hasSale && (
-                <span className="rounded-xs bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white uppercase">
+                <span className="rounded-xs bg-[#8B2E2E] px-2.5 py-1 text-[11px] font-bold text-white uppercase">
                   خصم {discountPercent}%
                 </span>
               )}
@@ -278,13 +314,13 @@ function ProductView({ product: p }: { product: Product }) {
                 <button
                   key={i}
                   onClick={() => setActiveImg(i)}
-                  className={`aspect-square overflow-hidden border transition-all ${
+                  className={`aspect-square overflow-hidden border bg-white transition-all ${
                     i === activeImg
-                      ? "border-foreground"
-                      : "border-border opacity-60 hover:opacity-100"
+                      ? "border-[#0D0D0D]"
+                      : "border-[#E5E5E0] opacity-60 hover:opacity-100"
                   }`}
                 >
-                  <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" />
+                  <img src={src} alt="" loading="lazy" className="h-full w-full object-contain p-1" />
                 </button>
               ))}
             </div>
@@ -293,11 +329,11 @@ function ProductView({ product: p }: { product: Product }) {
 
         {/* Right: Product Purchase Controls */}
         <div className="flex flex-col lg:col-span-5">
-          {/* Header & Code */}
-          <div className="border-b border-border pb-5">
-            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-              <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          {/* Header & Availability */}
+          <div className="border-b border-[#E5E5E0] pb-4">
+            <div className="flex items-center justify-between text-[11px] text-[#6B6B66]">
+              <span className="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
                 متوفر للشحن الفوري
               </span>
               {p.product_code && (
@@ -305,27 +341,27 @@ function ProductView({ product: p }: { product: Product }) {
               )}
             </div>
 
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            <h1 className="mt-2 text-xl sm:text-2xl font-bold tracking-tight text-[#0D0D0D]">
               {p.title}
             </h1>
 
             {p.short_description && (
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+              <p className="mt-1.5 text-xs leading-relaxed text-[#6B6B66]">
                 {p.short_description}
               </p>
             )}
 
             {/* Price Area */}
-            <div className="mt-4 flex items-baseline gap-3">
-              <span className="price-display text-3xl font-black text-foreground">
+            <div className="mt-3 flex items-baseline gap-3">
+              <span className="price-display text-2xl sm:text-3xl font-black text-[#0D0D0D]">
                 {formatPrice(p.price)}
               </span>
               {hasSale && (
                 <>
-                  <span className="price-display text-sm text-muted-foreground line-through">
+                  <span className="price-display text-sm text-[#6B6B66] line-through">
                     {formatPrice(p.original_price!)}
                   </span>
-                  <span className="text-xs font-bold text-red-500">
+                  <span className="text-xs font-bold text-[#8B2E2E]">
                     وفر {formatPrice(savings)} ({discountPercent}%)
                   </span>
                 </>
@@ -333,23 +369,23 @@ function ProductView({ product: p }: { product: Product }) {
             </div>
           </div>
 
-          {/* Selection Area */}
-          <div className="py-6 space-y-6 border-b border-border">
+          {/* Touch-Friendly Variant Selection */}
+          <div className="py-4 space-y-4 border-b border-[#E5E5E0]">
             {/* Color Selection */}
             {needsColor && (
               <div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-foreground">اللون:</span>
-                  <span className="text-muted-foreground">
+                  <span className="font-bold text-[#0D0D0D]">اللون:</span>
+                  <span className="text-[#6B6B66]">
                     {selectedColor ? (
-                      <strong className="text-foreground">{selectedColor}</strong>
+                      <strong className="text-[#0D0D0D]">{selectedColor}</strong>
                     ) : (
                       "حدد اللون"
                     )}
                   </span>
                 </div>
 
-                <div className="mt-2.5 flex flex-wrap gap-2">
+                <div className="mt-2 flex flex-wrap gap-2">
                   {p.colors.map((c) => {
                     const isSelected = c === selectedColor;
                     return (
@@ -357,14 +393,14 @@ function ProductView({ product: p }: { product: Product }) {
                         key={c}
                         type="button"
                         onClick={() => setSelectedColor(c)}
-                        className={`flex items-center gap-2 rounded-xs border px-3 py-1.5 text-xs font-semibold transition-all ${
+                        className={`flex min-h-[40px] items-center gap-2 rounded-xs border px-3 py-1.5 text-xs font-semibold transition-all ${
                           isSelected
-                            ? "border-foreground bg-foreground text-background"
-                            : "border-border bg-card text-foreground hover:border-zinc-500"
+                            ? "border-[#0D0D0D] bg-[#0D0D0D] text-[#F7F7F5]"
+                            : "border-[#E5E5E0] bg-white text-[#0D0D0D] hover:border-[#0D0D0D]"
                         }`}
                       >
                         <span
-                          className="h-3 w-3 rounded-full border border-black/30"
+                          className="h-3.5 w-3.5 rounded-full border border-black/20"
                           style={{ backgroundColor: colorToHex(c) }}
                         />
                         <span>{c}</span>
@@ -375,22 +411,22 @@ function ProductView({ product: p }: { product: Product }) {
               </div>
             )}
 
-            {/* Size Selection */}
+            {/* Size Selection with 44px+ touch targets */}
             {needsSize && (
               <div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-foreground">المقاس:</span>
+                  <span className="font-bold text-[#0D0D0D]">المقاس:</span>
                   <button
                     type="button"
                     onClick={() => setSizeGuideOpen(true)}
-                    className="inline-flex items-center gap-1 text-emerald-400 hover:underline"
+                    className="inline-flex min-h-[36px] items-center gap-1 text-[#0D0D0D] underline font-semibold hover:text-[#6B6B66]"
                   >
                     <Ruler className="h-3.5 w-3.5" />
-                    <span>جدول المقاسات والأوزان</span>
+                    <span>جدول المقاسات</span>
                   </button>
                 </div>
 
-                <div className="mt-2.5 flex flex-wrap gap-2">
+                <div className="mt-2 flex flex-wrap gap-2">
                   {p.sizes.map((s) => {
                     const isSelected = s === selectedSize;
                     return (
@@ -398,10 +434,10 @@ function ProductView({ product: p }: { product: Product }) {
                         key={s}
                         type="button"
                         onClick={() => setSelectedSize(s)}
-                        className={`min-w-[3rem] h-10 rounded-xs border font-mono text-xs font-bold transition-all ${
+                        className={`min-w-[3.5rem] h-11 rounded-xs border font-mono text-xs font-bold transition-all ${
                           isSelected
-                            ? "border-foreground bg-foreground text-background"
-                            : "border-border bg-card text-foreground hover:border-zinc-500"
+                            ? "border-[#0D0D0D] bg-[#0D0D0D] text-[#F7F7F5]"
+                            : "border-[#E5E5E0] bg-white text-[#0D0D0D] hover:border-[#0D0D0D]"
                         }`}
                       >
                         {s}
@@ -412,26 +448,26 @@ function ProductView({ product: p }: { product: Product }) {
               </div>
             )}
 
-            {/* Quantity */}
+            {/* Quantity Controls */}
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-foreground">الكمية:</span>
-              <div className="flex items-center border border-border bg-card">
+              <span className="font-bold text-[#0D0D0D]">الكمية:</span>
+              <div className="flex items-center border border-[#E5E5E0] bg-white">
                 <button
                   type="button"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="grid h-8 w-8 place-items-center text-muted-foreground hover:text-foreground"
+                  className="grid h-10 w-10 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
                   aria-label="تقليل الكمية"
                 >
-                  <Minus className="h-3.5 w-3.5" />
+                  <Minus className="h-4 w-4" />
                 </button>
                 <span className="w-8 text-center font-mono text-xs font-bold">{qty}</span>
                 <button
                   type="button"
                   onClick={() => setQty((q) => q + 1)}
-                  className="grid h-8 w-8 place-items-center text-muted-foreground hover:text-foreground"
+                  className="grid h-10 w-10 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
                   aria-label="زيادة الكمية"
                 >
-                  <Plus className="h-3.5 w-3.5" />
+                  <Plus className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -439,51 +475,48 @@ function ProductView({ product: p }: { product: Product }) {
 
           {/* Validation Notice */}
           {!isReadyToOrder && (
-            <div className="my-3 flex items-center gap-2 text-xs text-amber-400 font-medium">
-              <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
-              <span>يرجى اختيار المقاس واللون لمتابعة الطلب.</span>
+            <div className="my-2.5 flex items-center gap-2 text-xs text-[#8B2E2E] font-medium">
+              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              <span>يرجى اختيار المقاس واللون للمتابعة.</span>
             </div>
           )}
 
-          {/* Purchase Actions */}
-          <div className="mt-5 flex flex-col gap-2.5 pb-20 md:pb-0">
-            {/* Direct WhatsApp Order CTA */}
+          {/* Desktop Purchase Actions */}
+          <div className="mt-4 hidden md:flex flex-col gap-2.5">
             <button
               type="button"
               onClick={handleDirectWhatsAppOrder}
               disabled={!isReadyToOrder}
-              className={`flex h-12 w-full items-center justify-center gap-2 rounded-xs text-xs font-bold transition-colors ${
+              className={`flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xs text-xs font-bold transition-colors ${
                 isReadyToOrder
-                  ? "bg-emerald-600 text-white hover:bg-emerald-500"
-                  : "bg-muted text-muted-foreground border border-border cursor-not-allowed opacity-50"
+                  ? "bg-[#0D0D0D] text-[#F7F7F5] hover:bg-[#1F1F1F]"
+                  : "bg-[#E5E5E0] text-[#6B6B66] cursor-not-allowed"
               }`}
             >
-              <MessageCircle className="h-4 w-4" />
+              <MessageCircle className="h-4 w-4 text-emerald-400" />
               <span>اطلب الآن عبر واتساب (دفع كاش عند الاستلام)</span>
             </button>
 
             <div className="flex gap-2.5">
-              {/* Add to Cart */}
               <button
                 type="button"
                 onClick={handleAddToCart}
                 disabled={!isReadyToOrder}
-                className={`flex h-11 flex-1 items-center justify-center gap-1.5 rounded-xs border text-xs font-semibold transition-colors ${
+                className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-xs border text-xs font-semibold transition-colors ${
                   isReadyToOrder
-                    ? "border-foreground bg-foreground text-background hover:bg-zinc-200"
-                    : "border-border bg-card text-muted-foreground cursor-not-allowed opacity-50"
+                    ? "border-[#0D0D0D] bg-white text-[#0D0D0D] hover:bg-[#F7F7F5]"
+                    : "border-[#E5E5E0] bg-white text-[#6B6B66] cursor-not-allowed"
                 }`}
               >
                 <ShoppingBag className="h-3.5 w-3.5" />
                 <span>أضف إلى السلة</span>
               </button>
 
-              {/* Inquiry */}
               <a
-                href={generalContactLink(`مرحباً PR1ME، لدي استفسار عن الموديل: ${p.title}`)}
+                href={generalContactLink(`مرحباً PR1ME، لدي استفسار عن: ${p.title}`)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-11 items-center justify-center gap-1.5 rounded-xs border border-border bg-card px-4 text-xs font-semibold text-muted-foreground hover:text-foreground"
+                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xs border border-[#E5E5E0] bg-white px-4 text-xs font-semibold text-[#6B6B66] hover:text-[#0D0D0D]"
               >
                 <HelpCircle className="h-3.5 w-3.5" />
                 <span>استفسار</span>
@@ -492,31 +525,31 @@ function ProductView({ product: p }: { product: Product }) {
           </div>
 
           {/* Guarantees Box */}
-          <div className="mt-6 border-t border-border pt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] text-muted-foreground">
-            <div className="flex items-center gap-2 border border-border p-2.5 bg-card/40">
-              <ShieldCheck className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+          <div className="mt-5 border-t border-[#E5E5E0] pt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[11px] text-[#6B6B66]">
+            <div className="flex items-center gap-2 border border-[#E5E5E0] p-2 bg-white">
+              <ShieldCheck className="h-4 w-4 text-[#0D0D0D] flex-shrink-0" />
               <span>معاينة وقياس قبل الدفع</span>
             </div>
-            <div className="flex items-center gap-2 border border-border p-2.5 bg-card/40">
-              <Truck className="h-4 w-4 text-emerald-500 flex-shrink-0" />
-              <span>شحن 2-4 أيام لجميع المحافظات</span>
+            <div className="flex items-center gap-2 border border-[#E5E5E0] p-2 bg-white">
+              <Truck className="h-4 w-4 text-[#0D0D0D] flex-shrink-0" />
+              <span>شحن 2-4 أيام للمحافظات</span>
             </div>
-            <div className="flex items-center gap-2 border border-border p-2.5 bg-card/40">
-              <RotateCcw className="h-4 w-4 text-emerald-500 flex-shrink-0" />
-              <span>استبدال المقاس خلال 14 يوم</span>
+            <div className="flex items-center gap-2 border border-[#E5E5E0] p-2 bg-white">
+              <RotateCcw className="h-4 w-4 text-[#0D0D0D] flex-shrink-0" />
+              <span>استبدال مقاس خلال 14 يوم</span>
             </div>
           </div>
 
           {/* Product Details Tabs */}
-          <div className="mt-8 border-t border-border pt-6">
-            <div className="flex gap-6 border-b border-border pb-2 text-xs font-bold">
+          <div className="mt-6 border-t border-[#E5E5E0] pt-4">
+            <div className="flex gap-4 border-b border-[#E5E5E0] pb-2 text-xs font-bold touch-scroll overflow-x-auto">
               <button
                 type="button"
                 onClick={() => setActiveTab("details")}
-                className={`pb-2 transition-colors border-b-2 -mb-2.5 ${
+                className={`pb-2 transition-colors border-b-2 -mb-2.5 whitespace-nowrap min-h-[36px] ${
                   activeTab === "details"
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "border-[#0D0D0D] text-[#0D0D0D]"
+                    : "border-transparent text-[#6B6B66]"
                 }`}
               >
                 تفاصيل القطعة والخامة
@@ -524,10 +557,10 @@ function ProductView({ product: p }: { product: Product }) {
               <button
                 type="button"
                 onClick={() => setActiveTab("shipping")}
-                className={`pb-2 transition-colors border-b-2 -mb-2.5 ${
+                className={`pb-2 transition-colors border-b-2 -mb-2.5 whitespace-nowrap min-h-[36px] ${
                   activeTab === "shipping"
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "border-[#0D0D0D] text-[#0D0D0D]"
+                    : "border-transparent text-[#6B6B66]"
                 }`}
               >
                 الشحن والمعاينة
@@ -535,38 +568,38 @@ function ProductView({ product: p }: { product: Product }) {
               <button
                 type="button"
                 onClick={() => setActiveTab("guide")}
-                className={`pb-2 transition-colors border-b-2 -mb-2.5 ${
+                className={`pb-2 transition-colors border-b-2 -mb-2.5 whitespace-nowrap min-h-[36px] ${
                   activeTab === "guide"
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "border-[#0D0D0D] text-[#0D0D0D]"
+                    : "border-transparent text-[#6B6B66]"
                 }`}
               >
                 سياسة الاستبدال
               </button>
             </div>
 
-            <div className="mt-4 text-xs leading-relaxed text-muted-foreground min-h-[90px]">
+            <div className="mt-3 text-xs leading-relaxed text-[#6B6B66]">
               {activeTab === "details" && (
                 <div className="space-y-2">
                   <p>{p.description || p.short_description || "قطعة كاجوال راقية من PR1ME بخامات قطنية عالية الجودة مصممة للاستخدام اليومي."}</p>
-                  <ul className="list-disc pr-4 space-y-1 text-muted-foreground">
+                  <ul className="list-disc pr-4 space-y-1 text-[#6B6B66]">
                     <li>100% قطن مصري ناعم ومعالج ضد الانكماش.</li>
                     <li>ثبات عالي للألوان مع الغسيل المتكرر.</li>
-                    <li>قَصّة كاجوال عملية مريحة للجسم.</li>
+                    <li>قَصّة كاجوال مريحة مستوحاة من أزياء الشارع.</li>
                   </ul>
                 </div>
               )}
               {activeTab === "shipping" && (
                 <div className="space-y-2">
                   <p>🚚 <strong>مدة الشحن:</strong> التوصيل يتم خلال 2 إلى 4 أيام عمل لجميع أنحاء مصر.</p>
-                  <p>💵 <strong>الدفع:</strong> كاش عند الاستلام. يحق لك فحص القطعة وقياسها قبل الدفع للمندوب.</p>
-                  <p>📦 <strong>الشحن المجاني:</strong> متاح تلقائياً للطلبات التي تزيد قيمتها عن 1,000 ج.م.</p>
+                  <p>💵 <strong>الدفع:</strong> كاش عند الاستلام مع حق فتح الشحنة وقياس القطعة قبل الدفع.</p>
+                  <p>📦 <strong>الشحن المجاني:</strong> متاح تلقائياً للطلبات فوق 1,000 ج.م.</p>
                 </div>
               )}
               {activeTab === "guide" && (
                 <div className="space-y-2">
                   <p>🔄 <strong>تبديل المقاس:</strong> إذا كان المقاس غير مناسب بعد الاستلام، تواصل معنا خلال 14 يوماً وسيصلك المندوب بالمقاس البديل.</p>
-                  <p>✨ <strong>شروط الاستبدال:</strong> الحفاظ على التيكت والحالة الأصلية للمنتج.</p>
+                  <p>✨ <strong>الشروط:</strong> الحفاظ على التيكت والحالة الأصلية للقطعة.</p>
                 </div>
               )}
             </div>
@@ -574,26 +607,27 @@ function ProductView({ product: p }: { product: Product }) {
         </div>
       </div>
 
-      {/* Mobile Sticky Bar */}
-      <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 p-3 backdrop-blur-md md:hidden">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex flex-col">
-            <span className="text-[11px] text-muted-foreground">
-              {selectedSize ? `مقاس ${selectedSize}` : "حدد المقاس"}
+      {/* Sticky Bottom Action Bar on Mobile with Safe-Area Inset */}
+      <div className="fixed bottom-0 inset-x-0 z-40 border-t border-[#E5E5E0] bg-white p-2.5 sm:p-3 pb-safe md:hidden shadow-xl">
+        <div className="flex items-center justify-between gap-2.5">
+          <div className="flex flex-col min-w-0 pr-1">
+            <span className="text-[10px] text-[#6B6B66] truncate font-medium">
+              {selectedSize ? `مقاس: ${selectedSize}` : "حدد المقاس"}
             </span>
-            <span className="price-display text-sm font-black text-foreground">
+            <span className="price-display text-sm font-black text-[#0D0D0D]">
               {formatPrice(p.price * qty)}
             </span>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-2 flex-1 justify-end">
             <button
               type="button"
               onClick={handleAddToCart}
               disabled={!isReadyToOrder}
-              className={`h-10 px-3 rounded-xs border text-xs font-semibold ${
+              className={`h-11 px-3.5 border text-xs font-bold transition-colors ${
                 isReadyToOrder
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-card text-muted-foreground opacity-50"
+                  ? "border-[#0D0D0D] bg-[#F7F7F5] text-[#0D0D0D] active:scale-95"
+                  : "border-[#E5E5E0] bg-white text-[#6B6B66] opacity-60"
               }`}
             >
               السلة
@@ -602,13 +636,14 @@ function ProductView({ product: p }: { product: Product }) {
               type="button"
               onClick={handleDirectWhatsAppOrder}
               disabled={!isReadyToOrder}
-              className={`h-10 px-4 rounded-xs text-xs font-bold ${
+              className={`h-11 flex-1 max-w-[190px] flex items-center justify-center gap-1 text-xs font-bold transition-colors ${
                 isReadyToOrder
-                  ? "bg-emerald-600 text-white"
-                  : "bg-muted text-muted-foreground border border-border opacity-50"
+                  ? "bg-[#0D0D0D] text-[#F7F7F5] active:scale-95"
+                  : "bg-[#E5E5E0] text-[#6B6B66] opacity-60"
               }`}
             >
-              طلب على واتساب
+              <MessageCircle className="h-3.5 w-3.5 text-emerald-400" />
+              <span>اطلب على واتساب</span>
             </button>
           </div>
         </div>
@@ -616,20 +651,20 @@ function ProductView({ product: p }: { product: Product }) {
 
       {/* Related Products */}
       {related.data && related.data.length > 0 && (
-        <section className="mt-16 border-t border-border pt-10">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-foreground">
+        <section className="mt-12 sm:mt-16 border-t border-[#E5E5E0] pt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base sm:text-lg font-bold text-[#0D0D0D]">
               قطع قد تعجبك أيضاً
             </h2>
             <Link
               to="/products"
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1"
+              className="text-xs font-semibold text-[#6B6B66] hover:text-[#0D0D0D] flex items-center gap-1"
             >
               <span>مشاهدة الكل</span>
               <ChevronLeft className="h-3.5 w-3.5" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-4">
             {related.data.map((rp) => (
               <ProductCard key={rp.id} product={rp} />
             ))}
@@ -637,65 +672,65 @@ function ProductView({ product: p }: { product: Product }) {
         </section>
       )}
 
-      {/* Size Guide Modal (Retail Chart) */}
+      {/* Size Guide Modal / Bottom Sheet on Mobile */}
       {isSizeGuideOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/75 backdrop-blur-xs"
             onClick={() => setSizeGuideOpen(false)}
           />
-          <div className="relative w-full max-w-lg border border-border bg-card p-6 shadow-2xl animate-in zoom-in-95 duration-150">
-            <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
+          <div className="relative w-full max-h-[85dvh] sm:max-w-lg border-t sm:border border-[#E5E5E0] bg-white p-4 sm:p-6 shadow-2xl overflow-y-auto pb-safe animate-in slide-in-from-bottom-5 sm:animate-in sm:zoom-in-95 duration-150">
+            <div className="mb-3 flex items-center justify-between border-b border-[#E5E5E0] pb-3">
               <div className="flex items-center gap-2">
-                <Ruler className="h-4 w-4 text-emerald-400" />
-                <h3 className="text-sm font-bold text-foreground">جدول مقاسات وأوزان PR1ME</h3>
+                <Ruler className="h-4 w-4 text-[#0D0D0D]" />
+                <h3 className="text-sm font-bold text-[#0D0D0D]">جدول مقاسات وأوزان PR1ME</h3>
               </div>
               <button
                 onClick={() => setSizeGuideOpen(false)}
-                className="grid h-7 w-7 place-items-center border border-border text-muted-foreground hover:text-foreground"
+                className="grid h-8 w-8 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* Sizing Table */}
-            <div className="overflow-x-auto border border-border">
+            <div className="overflow-x-auto border border-[#E5E5E0]">
               <table className="w-full text-right text-xs">
-                <thead className="bg-muted text-muted-foreground font-semibold">
+                <thead className="bg-[#F7F7F5] text-[#6B6B66] font-semibold">
                   <tr>
                     <th className="px-3 py-2">المقاس</th>
-                    <th className="px-3 py-2">الوزن التقريبي</th>
+                    <th className="px-3 py-2">الوزن</th>
                     <th className="px-3 py-2">عرض الصدر</th>
                     <th className="px-3 py-2">الطول</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="divide-y divide-[#E5E5E0]">
                   <tr>
-                    <td className="px-3 py-2 font-mono font-bold text-foreground">S</td>
+                    <td className="px-3 py-2 font-mono font-bold text-[#0D0D0D]">S</td>
                     <td className="px-3 py-2">50 - 62 كجم</td>
                     <td className="px-3 py-2 font-mono">48 - 50 سم</td>
                     <td className="px-3 py-2 font-mono">68 سم</td>
                   </tr>
                   <tr>
-                    <td className="px-3 py-2 font-mono font-bold text-foreground">M</td>
+                    <td className="px-3 py-2 font-mono font-bold text-[#0D0D0D]">M</td>
                     <td className="px-3 py-2">63 - 74 كجم</td>
                     <td className="px-3 py-2 font-mono">51 - 53 سم</td>
                     <td className="px-3 py-2 font-mono">70 سم</td>
                   </tr>
                   <tr>
-                    <td className="px-3 py-2 font-mono font-bold text-foreground">L</td>
+                    <td className="px-3 py-2 font-mono font-bold text-[#0D0D0D]">L</td>
                     <td className="px-3 py-2">75 - 85 كجم</td>
                     <td className="px-3 py-2 font-mono">54 - 56 سم</td>
                     <td className="px-3 py-2 font-mono">72 سم</td>
                   </tr>
                   <tr>
-                    <td className="px-3 py-2 font-mono font-bold text-foreground">XL</td>
+                    <td className="px-3 py-2 font-mono font-bold text-[#0D0D0D]">XL</td>
                     <td className="px-3 py-2">86 - 97 كجم</td>
                     <td className="px-3 py-2 font-mono">57 - 59 سم</td>
                     <td className="px-3 py-2 font-mono">74 سم</td>
                   </tr>
                   <tr>
-                    <td className="px-3 py-2 font-mono font-bold text-foreground">XXL</td>
+                    <td className="px-3 py-2 font-mono font-bold text-[#0D0D0D]">XXL</td>
                     <td className="px-3 py-2">98 - 110 كجم</td>
                     <td className="px-3 py-2 font-mono">60 - 63 سم</td>
                     <td className="px-3 py-2 font-mono">76 سم</td>
@@ -704,19 +739,19 @@ function ProductView({ product: p }: { product: Product }) {
               </table>
             </div>
 
-            <div className="mt-4 border border-border p-3 text-xs bg-background">
-              <span className="font-bold text-foreground">نصيحة المقاس:</span>
-              <p className="mt-1 text-muted-foreground leading-relaxed">
-                إذا كنت تفضل اللوك الواسع (Oversized)، ننصح باختيار مقاس أكبر من مقاسك المعتاد بدرجة واحدة.
+            <div className="mt-3.5 border border-[#E5E5E0] p-3 text-xs bg-[#F7F7F5]">
+              <span className="font-bold text-[#0D0D0D]">نصيحة المقاس:</span>
+              <p className="mt-1 text-[#6B6B66] leading-relaxed">
+                إذا كنت تفضل اللوك الواسع (Oversized)، اختر مقاساً أكبر بدرجة. المندوب سينتظرك لتجربة القطعة قبل الدفع!
               </p>
               <a
                 href={generalContactLink("مرحباً PR1ME، أود استشارة بخصوص اختيار المقاس")}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center gap-1 font-semibold text-emerald-400 hover:underline"
+                className="mt-2 inline-flex items-center gap-1 font-semibold text-[#0D0D0D] underline"
               >
-                <MessageCircle className="h-3.5 w-3.5" />
-                <span>تحدث مع خبير المقاسات على واتساب</span>
+                <MessageCircle className="h-3.5 w-3.5 text-emerald-600" />
+                <span>استشر خبير المقاسات على واتساب</span>
               </a>
             </div>
           </div>
