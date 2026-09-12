@@ -1,40 +1,15 @@
-import { X, Minus, Plus, ShoppingBag, MessageCircle, ShieldCheck, ArrowRight, Truck, MapPin } from "lucide-react";
+import { X, Minus, Plus, ShoppingBag, MessageCircle, ShieldCheck, ArrowRight, Truck, MapPin, CheckCircle2 } from "lucide-react";
 import { useCartStore } from "@/lib/store";
 import { formatPrice, generalContactLink } from "@/lib/whatsapp";
+import { getShippingFee, generateOrderCode, ALL_GOVERNORATES, SHIPPING_RATES, FREE_SHIPPING_THRESHOLD } from "@/lib/shipping";
+import { supabase } from "@/integrations/supabase/client";
 import { colorToHex } from "@/lib/colors";
 import { resolveImageUrl } from "@/lib/images";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const GOVERNORATES = [
-  "القاهرة",
-  "الجيزة",
-  "الإسكندرية",
-  "القليوبية",
-  "الدقهلية",
-  "الشرقية",
-  "الغربية",
-  "المنوفية",
-  "البحيرة",
-  "الإسماعيلية",
-  "السويس",
-  "بورسعيد",
-  "دمياط",
-  "كفر الشيخ",
-  "الفيوم",
-  "بني سويف",
-  "المنيا",
-  "أسيوط",
-  "سوهاج",
-  "قنا",
-  "الأقصر",
-  "أسوان",
-  "البحر الأحمر",
-  "مطروح",
-];
-
 export function CartDrawer() {
-  const { isCartOpen, setCartOpen, items, updateQuantity, removeItem } = useCartStore();
+  const { isCartOpen, setCartOpen, items, updateQuantity, removeItem, clearCart } = useCartStore();
   const [step, setStep] = useState<"cart" | "checkout">("cart");
 
   // Form State
@@ -44,6 +19,7 @@ export function CartDrawer() {
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handle escape key
   useEffect(() => {
@@ -72,12 +48,14 @@ export function CartDrawer() {
 
   if (!isCartOpen) return null;
 
-  const total = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const freeShippingThreshold = 1000;
-  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - total);
-  const freeShippingPercent = Math.min(100, Math.round((total / freeShippingThreshold) * 100));
+  const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const shippingFee = getShippingFee(governorate, subtotal);
+  const isFreeShipping = shippingFee === 0;
+  const finalTotal = subtotal + shippingFee;
+  const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const freeShippingPercent = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
 
-  const handleFinalSubmit = (e: React.FormEvent) => {
+  const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) return;
 
@@ -95,8 +73,47 @@ export function CartDrawer() {
     }
 
     setErrorMsg("");
+    setIsSubmitting(true);
+    const orderCode = generateOrderCode();
 
-    let message = `مرحباً PR1ME، أود تأكيد طلب أوردر جديد:\n\n`;
+    // 1. Record order in Supabase
+    try {
+      const orderPayload = {
+        order_code: orderCode,
+        customer_name: name.trim(),
+        phone: phone.trim(),
+        governorate,
+        address: address.trim(),
+        notes: notes.trim() || null,
+        items: items.map((item) => ({
+          title: item.product.title,
+          price: item.product.price,
+          quantity: item.quantity,
+          selectedSize: item.selectedSize || null,
+          selectedColor: item.selectedColor || null,
+          product_code: item.product.product_code || null,
+          image: item.product.main_image || null,
+        })),
+        subtotal,
+        shipping_fee: shippingFee,
+        total: finalTotal,
+        status: "جديد",
+      };
+
+      const { error: dbError } = await supabase.from("orders").insert([orderPayload]);
+      if (dbError) {
+        console.warn("Could not insert cart order into Supabase:", dbError.message);
+      }
+    } catch (err) {
+      console.warn("DB insert error caught:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+
+    // 2. Format Arabic WhatsApp message
+    let message = `مرحباً PR1ME، أود تأكيد طلب أوردر جديد:\n`;
+    message += `🔖 *كود الطلب: #${orderCode}*\n\n`;
+
     message += `👤 *بيانات العميل والتوصيل:*\n`;
     message += `▪️ الاسم: ${name.trim()}\n`;
     message += `▪️ الهاتف: ${phone.trim()}\n`;
@@ -106,7 +123,7 @@ export function CartDrawer() {
       message += `▪️ ملاحظات: ${notes.trim()}\n`;
     }
 
-    message += `\n🛍️ *المنتجات المطلوبة:*\n`;
+    message += `\n🛍️ *المنتجات المطلوبة (${items.length}):*\n`;
     items.forEach((item, index) => {
       message += `▪️ ${index + 1}. ${item.product.title}\n`;
       message += `   - الكمية: ${item.quantity}\n`;
@@ -115,13 +132,21 @@ export function CartDrawer() {
       message += `   - السعر: ${formatPrice(item.product.price * item.quantity)}\n`;
     });
 
-    message += `\n💰 *الإجمالي النهائي: ${formatPrice(total)}*\n`;
+    message += `\n💰 *تفاصيل الحساب والفاتورة:*\n`;
+    message += `▪️ سعر المنتجات: ${formatPrice(subtotal)}\n`;
+    message += `▪️ مصاريف الشحن (${governorate}): ${
+      isFreeShipping ? "شحن مجاني ✨ (أكثر من 1000 ج.م)" : formatPrice(shippingFee)
+    }\n`;
+    message += `▪️ *الإجمالي المطلوب عند الاستلام: ${formatPrice(finalTotal)}*\n`;
     message += `📍 طريقة الدفع: كاش عند الاستلام (مع المعاينة والقياس قبل الدفع)\n`;
     message += `\nبرجاء مراجعة الطلب وتأكيد موعد الشحن. شكراً!`;
 
     const url = generalContactLink(message);
     window.open(url, "_blank");
-    toast.success("تم تجهيز رسالة طلبك بنجاح على واتساب!");
+    toast.success(`تم تسجيل طلبك (#${orderCode}) وتجهيز رسالة واتساب!`);
+    clearCart();
+    setStep("cart");
+    setCartOpen(false);
   };
 
   return (
@@ -299,15 +324,41 @@ export function CartDrawer() {
         ) : (
           /* Step 2: Mobile Checkout Form */
           <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 touch-scroll space-y-3.5">
-            {/* Order Summary Strip */}
-            <div className="flex items-center justify-between border border-[#E5E5E0] bg-[#F7F7F5] p-3 text-xs">
-              <div>
-                <span className="font-bold text-[#0D0D0D]">ملخص الطلب:</span>
-                <p className="text-[11px] text-[#6B6B66]">{items.length} قطع مختلفة</p>
+            {/* Order Summary Strip with Itemized Pricing */}
+            <div className="border border-[#E5E5E0] bg-[#F7F7F5] p-3 text-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="font-bold text-[#0D0D0D]">ملخص الطلب:</span>
+                  <p className="text-[11px] text-[#6B6B66]">{items.length} قطع مختلفة</p>
+                </div>
+                <span className="price-display text-sm font-bold text-[#0D0D0D]">
+                  {formatPrice(subtotal)}
+                </span>
               </div>
-              <span className="price-display text-base font-black text-[#0D0D0D]">
-                {formatPrice(total)}
-              </span>
+
+              {/* Bill Breakdown */}
+              <div className="border-t border-[#E5E5E0] pt-2 space-y-1 text-[11px]">
+                <div className="flex items-center justify-between text-[#6B6B66]">
+                  <span>سعر المنتجات:</span>
+                  <span className="font-mono">{formatPrice(subtotal)}</span>
+                </div>
+                <div className="flex items-center justify-between text-[#6B6B66]">
+                  <span className="flex items-center gap-1">
+                    <Truck className="h-3 w-3" />
+                    <span>مصاريف الشحن ({governorate}):</span>
+                  </span>
+                  {isFreeShipping ? (
+                    <span className="text-emerald-600 font-bold flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      شحن مجاني
+                    </span>
+                  ) : (
+                    <span className="font-mono text-[#0D0D0D] font-bold">
+                      +{formatPrice(shippingFee)}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
 
             {errorMsg && (
@@ -329,7 +380,7 @@ export function CartDrawer() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="مثال: محمود علي"
-                  className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none"
+                  className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-base sm:text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none"
                 />
               </div>
 
@@ -346,25 +397,31 @@ export function CartDrawer() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="01xxxxxxxxx"
-                  className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none font-mono"
+                  className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-base sm:text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none font-mono"
                 />
               </div>
 
               {/* Governorate Dropdown */}
               <div>
                 <label className="block text-xs font-bold text-[#0D0D0D] mb-1">
-                  المحافظة <span className="text-[#8B2E2E]">*</span>
+                  المحافظة (حساب الشحن التلقائي) <span className="text-[#8B2E2E]">*</span>
                 </label>
                 <select
                   value={governorate}
                   onChange={(e) => setGovernorate(e.target.value)}
-                  className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                  className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-base sm:text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none cursor-pointer"
                 >
-                  {GOVERNORATES.map((g) => (
-                    <option key={g} value={g}>
-                      {g}
-                    </option>
-                  ))}
+                  {ALL_GOVERNORATES.map((g) => {
+                    const rate = SHIPPING_RATES[g];
+                    const label = isFreeShipping
+                      ? `${g} (شحن مجاني ✨)`
+                      : `${g} (شحن: ${rate} ج.م)`;
+                    return (
+                      <option key={g} value={g}>
+                        {label}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
@@ -405,9 +462,18 @@ export function CartDrawer() {
         {items.length > 0 && (
           <div className="border-t border-[#E5E5E0] bg-white p-3.5 sm:p-4 pb-safe space-y-2.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-[#6B6B66]">الإجمالي:</span>
-              <span className="price-display text-lg font-black text-[#0D0D0D]">
-                {formatPrice(total)}
+              <div className="flex flex-col">
+                <span className="text-[#0D0D0D] font-bold">
+                  {step === "cart" ? "إجمالي المنتجات:" : "الإجمالي عند الاستلام:"}
+                </span>
+                {step === "checkout" && (
+                  <span className="text-[10px] text-[#6B6B66]">
+                    {isFreeShipping ? "شامل الشحن المجاني" : `شامل مصاريف الشحن (${shippingFee} ج.م)`}
+                  </span>
+                )}
+              </div>
+              <span className="price-display text-lg sm:text-xl font-black text-[#0D0D0D]">
+                {formatPrice(step === "cart" ? subtotal : finalTotal)}
               </span>
             </div>
 
@@ -421,7 +487,7 @@ export function CartDrawer() {
             {step === "cart" ? (
               <button
                 onClick={() => setStep("checkout")}
-                className="flex min-h-[50px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98"
+                className="flex min-h-[50px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98 cursor-pointer"
               >
                 <span>متابعة إتمام الطلب (الدفع عند الاستلام)</span>
               </button>
@@ -429,10 +495,11 @@ export function CartDrawer() {
               <button
                 type="submit"
                 form="checkout-form"
-                className="flex min-h-[52px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98"
+                disabled={isSubmitting}
+                className="flex min-h-[52px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98 cursor-pointer disabled:opacity-75"
               >
                 <MessageCircle className="h-4 w-4 text-emerald-400" />
-                <span>تأكيد وإرسال الطلب على واتساب</span>
+                <span>{isSubmitting ? "جاري تسجيل الطلب..." : "تأكيد وإرسال الطلب على واتساب"}</span>
               </button>
             )}
           </div>

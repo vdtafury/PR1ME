@@ -1,36 +1,11 @@
-import { X, MessageCircle, ShieldCheck, ArrowRight } from "lucide-react";
+import { X, MessageCircle, ShieldCheck, ArrowRight, Truck, CheckCircle2 } from "lucide-react";
 import { formatPrice, generalContactLink } from "@/lib/whatsapp";
+import { getShippingFee, generateOrderCode, ALL_GOVERNORATES, FREE_SHIPPING_THRESHOLD, SHIPPING_RATES } from "@/lib/shipping";
+import { supabase } from "@/integrations/supabase/client";
 import type { Product } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
-
-const GOVERNORATES = [
-  "القاهرة",
-  "الجيزة",
-  "الإسكندرية",
-  "القليوبية",
-  "الدقهلية",
-  "الشرقية",
-  "الغربية",
-  "المنوفية",
-  "البحيرة",
-  "الإسماعيلية",
-  "السويس",
-  "بورسعيد",
-  "دمياط",
-  "كفر الشيخ",
-  "الفيوم",
-  "بني سويف",
-  "المنيا",
-  "أسيوط",
-  "سوهاج",
-  "قنا",
-  "الأقصر",
-  "أسوان",
-  "البحر الأحمر",
-  "مطروح",
-];
 
 interface ProductCheckoutDrawerProps {
   isOpen: boolean;
@@ -58,6 +33,13 @@ export function ProductCheckoutDrawer({
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Calculations
+  const subtotal = product.price * quantity;
+  const shippingFee = getShippingFee(governorate, subtotal);
+  const isFreeShipping = shippingFee === 0;
+  const finalTotal = subtotal + shippingFee;
 
   // SSR mount check
   useEffect(() => {
@@ -93,9 +75,7 @@ export function ProductCheckoutDrawer({
 
   if (!mounted || !isOpen) return null;
 
-  const totalPrice = product.price * quantity;
-
-  const handleFinalSubmit = (e: React.FormEvent) => {
+  const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!name.trim()) {
@@ -112,8 +92,50 @@ export function ProductCheckoutDrawer({
     }
 
     setErrorMsg("");
+    setIsSubmitting(true);
 
-    let message = `مرحباً PR1ME، أود تأكيد طلب أوردر جديد:\n\n`;
+    const orderCode = generateOrderCode();
+
+    // 1. Record order in Supabase
+    try {
+      const orderPayload = {
+        order_code: orderCode,
+        customer_name: name.trim(),
+        phone: phone.trim(),
+        governorate,
+        address: address.trim(),
+        notes: notes.trim() || null,
+        items: [
+          {
+            title: product.title,
+            price: product.price,
+            quantity,
+            selectedSize: selectedSize || null,
+            selectedColor: selectedColor || null,
+            product_code: product.product_code || null,
+            image: product.main_image || null,
+          },
+        ],
+        subtotal,
+        shipping_fee: shippingFee,
+        total: finalTotal,
+        status: "جديد",
+      };
+
+      const { error: dbError } = await supabase.from("orders").insert([orderPayload]);
+      if (dbError) {
+        console.warn("Could not insert order into Supabase:", dbError.message);
+      }
+    } catch (err) {
+      console.warn("DB insert error caught:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+
+    // 2. Format Arabic WhatsApp message
+    let message = `مرحباً PR1ME، أود تأكيد طلب أوردر جديد:\n`;
+    message += `🔖 *كود الطلب: #${orderCode}*\n\n`;
+
     message += `👤 *بيانات العميل والتوصيل:*\n`;
     message += `▪️ الاسم: ${name.trim()}\n`;
     message += `▪️ الهاتف: ${phone.trim()}\n`;
@@ -128,19 +150,25 @@ export function ProductCheckoutDrawer({
     message += `   - الكمية: ${quantity}\n`;
     if (selectedSize) message += `   - المقاس: ${selectedSize}\n`;
     if (selectedColor) message += `   - اللون: ${selectedColor}\n`;
-    if (product.product_code) message += `   - كود المنتج: ${product.product_code}\n`;
-    message += `   - السعر: ${formatPrice(totalPrice)}\n`;
+    if (product.product_code) message += `   - كود الموديل: ${product.product_code}\n`;
+    message += `   - سعر القطعة: ${formatPrice(product.price)}\n`;
 
-    message += `\n💰 *الإجمالي النهائي: ${formatPrice(totalPrice)}*\n`;
-    message += `📍 طريقة الدفع: كاش عند الاستلام (مع المعاينة والقياس قبل الدفع)\n`;
+    message += `\n💰 *تفاصيل الحساب والفاتورة:*\n`;
+    message += `▪️ سعر المنتجات: ${formatPrice(subtotal)}\n`;
+    message += `▪️ مصاريف الشحن (${governorate}): ${
+      isFreeShipping ? "شحن مجاني ✨ (أكثر من 1000 ج.م)" : formatPrice(shippingFee)
+    }\n`;
+    message += `▪️ *الإجمالي المطلوب عند الاستلام: ${formatPrice(finalTotal)}*\n`;
+
+    message += `\n📍 طريقة الدفع: كاش عند الاستلام (مع المعاينة والقياس قبل الدفع)\n`;
     if (typeof window !== "undefined" && window.location.href) {
       message += `🔗 رابط المنتج: ${window.location.href}\n`;
     }
-    message += `\nبرجاء مراجعة الطلب وتأكيد موعد الشحن. شكراً!`;
+    message += `\nبرجاء تأكيد الطلب وتحديد موعد خروج الشحنة مع المندوب. شكراً!`;
 
     const url = generalContactLink(message);
     window.open(url, "_blank");
-    toast.success("تم تجهيز رسالة طلبك بنجاح على واتساب!");
+    toast.success(`تم تسجيل طلبك (#${orderCode}) وتجهيز رسالة واتساب!`);
     onClose();
   };
 
@@ -186,32 +214,58 @@ export function ProductCheckoutDrawer({
 
         {/* Scrollable Form Body */}
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 touch-scroll overscroll-contain space-y-3.5">
-          {/* Order Summary Strip */}
-          <div className="flex items-center justify-between border border-[#E5E5E0] bg-[#F7F7F5] p-3 text-xs">
-            <div className="min-w-0 pr-1">
-              <span className="font-bold text-[#0D0D0D] block">ملخص الطلب:</span>
-              <p className="text-[11px] text-[#6B6B66] line-clamp-1 mt-0.5">
-                {product.title}
-              </p>
-              <div className="flex flex-wrap items-center gap-1.5 mt-1.5 text-[10px] text-[#6B6B66]">
-                <span className="font-mono bg-white border border-[#E5E5E0] px-1.5 py-0.5 font-bold text-[#0D0D0D]">
-                  الكمية: {quantity}
-                </span>
-                {selectedSize && (
-                  <span className="border border-[#E5E5E0] bg-white px-1.5 py-0.5 font-mono font-bold text-[#0D0D0D]">
-                    {selectedSize}
+          {/* Order Summary Strip with Itemized Pricing */}
+          <div className="border border-[#E5E5E0] bg-[#F7F7F5] p-3 text-xs space-y-2">
+            <div className="flex items-start justify-between">
+              <div className="min-w-0 pr-1">
+                <span className="font-bold text-[#0D0D0D] block">ملخص الطلب:</span>
+                <p className="text-[11px] text-[#6B6B66] line-clamp-1 mt-0.5 font-medium">
+                  {product.title}
+                </p>
+                <div className="flex flex-wrap items-center gap-1.5 mt-1.5 text-[10px] text-[#6B6B66]">
+                  <span className="font-mono bg-white border border-[#E5E5E0] px-1.5 py-0.5 font-bold text-[#0D0D0D]">
+                    الكمية: {quantity}
                   </span>
-                )}
-                {selectedColor && (
-                  <span className="border border-[#E5E5E0] bg-white px-1.5 py-0.5 font-semibold text-[#0D0D0D]">
-                    {selectedColor}
+                  {selectedSize && (
+                    <span className="border border-[#E5E5E0] bg-white px-1.5 py-0.5 font-mono font-bold text-[#0D0D0D]">
+                      {selectedSize}
+                    </span>
+                  )}
+                  {selectedColor && (
+                    <span className="border border-[#E5E5E0] bg-white px-1.5 py-0.5 font-semibold text-[#0D0D0D]">
+                      {selectedColor}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <span className="price-display text-sm font-bold text-[#0D0D0D] flex-shrink-0 mr-2">
+                {formatPrice(subtotal)}
+              </span>
+            </div>
+
+            {/* Bill Breakdown */}
+            <div className="border-t border-[#E5E5E0] pt-2 space-y-1 text-[11px]">
+              <div className="flex items-center justify-between text-[#6B6B66]">
+                <span>سعر المنتجات:</span>
+                <span className="font-mono">{formatPrice(subtotal)}</span>
+              </div>
+              <div className="flex items-center justify-between text-[#6B6B66]">
+                <span className="flex items-center gap-1">
+                  <Truck className="h-3 w-3" />
+                  <span>مصاريف الشحن ({governorate}):</span>
+                </span>
+                {isFreeShipping ? (
+                  <span className="text-emerald-600 font-bold flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    شحن مجاني
+                  </span>
+                ) : (
+                  <span className="font-mono text-[#0D0D0D] font-bold">
+                    +{formatPrice(shippingFee)}
                   </span>
                 )}
               </div>
             </div>
-            <span className="price-display text-base sm:text-lg font-black text-[#0D0D0D] flex-shrink-0 mr-2">
-              {formatPrice(totalPrice)}
-            </span>
           </div>
 
           {errorMsg && (
@@ -254,21 +308,27 @@ export function ProductCheckoutDrawer({
               />
             </div>
 
-            {/* Governorate Dropdown */}
+            {/* Governorate Dropdown with Live Rate Display */}
             <div>
               <label className="block text-xs font-bold text-[#0D0D0D] mb-1">
-                المحافظة <span className="text-[#8B2E2E]">*</span>
+                المحافظة (حساب الشحن التلقائي) <span className="text-[#8B2E2E]">*</span>
               </label>
               <select
                 value={governorate}
                 onChange={(e) => setGovernorate(e.target.value)}
-                className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-base sm:text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none transition-colors"
+                className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-base sm:text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none transition-colors cursor-pointer"
               >
-                {GOVERNORATES.map((g) => (
-                  <option key={g} value={g}>
-                    {g}
-                  </option>
-                ))}
+                {ALL_GOVERNORATES.map((g) => {
+                  const rate = SHIPPING_RATES[g];
+                  const label = isFreeShipping
+                    ? `${g} (شحن مجاني ✨)`
+                    : `${g} (شحن: ${rate} ج.م)`;
+                  return (
+                    <option key={g} value={g}>
+                      {label}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 
@@ -304,12 +364,17 @@ export function ProductCheckoutDrawer({
           </form>
         </div>
 
-        {/* Footer (Always Fixed at Bottom with Safe-Area for Notch/Home Bar) */}
+        {/* Footer (Always Fixed at Bottom with Safe-Area for Mobile) */}
         <div className="flex-shrink-0 border-t border-[#E5E5E0] bg-white p-3.5 sm:p-4 pb-safe space-y-2.5 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-[#6B6B66] font-medium">الإجمالي:</span>
-            <span className="price-display text-lg sm:text-xl font-black text-[#0D0D0D]">
-              {formatPrice(totalPrice)}
+            <div className="flex flex-col">
+              <span className="text-[#0D0D0D] font-bold">الإجمالي عند الاستلام:</span>
+              <span className="text-[10px] text-[#6B6B66]">
+                {isFreeShipping ? "شامل الشحن المجاني" : `شامل مصاريف الشحن (${shippingFee} ج.م)`}
+              </span>
+            </div>
+            <span className="price-display text-xl sm:text-2xl font-black text-[#0D0D0D]">
+              {formatPrice(finalTotal)}
             </span>
           </div>
 
@@ -323,10 +388,13 @@ export function ProductCheckoutDrawer({
           <button
             type="submit"
             form="product-checkout-form"
-            className="flex min-h-[52px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs sm:text-sm font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98 cursor-pointer"
+            disabled={isSubmitting}
+            className="flex min-h-[52px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs sm:text-sm font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98 cursor-pointer disabled:opacity-75"
           >
             <MessageCircle className="h-4 w-4 text-emerald-400" />
-            <span>تأكيد وإرسال الطلب على واتساب</span>
+            <span>
+              {isSubmitting ? "جاري تسجيل الطلب..." : "تأكيد وإرسال الطلب على واتساب"}
+            </span>
           </button>
         </div>
       </aside>

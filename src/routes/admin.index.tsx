@@ -8,19 +8,20 @@ import type { Category, Product, Offer } from "@/lib/types";
 import { BRAND, formatPrice } from "@/lib/whatsapp";
 
 import { AdminLoginForm } from "@/components/AdminLoginForm";
+import { OrdersAdmin } from "@/components/admin/OrdersAdmin";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
   head: () => ({ meta: [{ title: "Admin — PR1ME" }, { name: "robots", content: "noindex" }] }),
 });
 
-type Tab = "products" | "categories" | "offers";
+type Tab = "orders" | "products" | "categories" | "offers";
 
 function AdminDashboard() {
   const [ready, setReady] = useState(false);
   const [hasSession, setHasSession] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [tab, setTab] = useState<Tab>("products");
+  const [tab, setTab] = useState<Tab>("orders");
 
   const checkAuth = async () => {
     try {
@@ -115,14 +116,27 @@ function AdminDashboard() {
       </header>
 
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        <div className="mb-6 flex gap-2 border-b border-border">
-          {(["products", "categories", "offers"] as Tab[]).map((t) => (
-            <button key={t} onClick={() => setTab(t)}
-              className={`px-4 py-2 text-sm font-semibold capitalize border-b-2 -mb-px ${tab === t ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              {t}
+        <div className="mb-6 flex gap-2 overflow-x-auto border-b border-border pb-px">
+          {[
+            { id: "orders", label: "الطلبات (Orders)" },
+            { id: "products", label: "المنتجات (Products)" },
+            { id: "categories", label: "التصنيفات (Categories)" },
+            { id: "offers", label: "العروض (Offers)" },
+          ].map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id as Tab)}
+              className={`whitespace-nowrap px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
+                tab === t.id
+                  ? "border-foreground text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.label}
             </button>
           ))}
         </div>
+        {tab === "orders" && <OrdersAdmin />}
         {tab === "products" && <ProductsAdmin />}
         {tab === "categories" && <CategoriesAdmin />}
         {tab === "offers" && <OffersAdmin />}

@@ -39,3 +39,33 @@ export interface Offer {
   sort_order: number;
   created_at: string;
 }
+
+export interface OrderCartItem {
+  id?: string;
+  title: string;
+  price: number;
+  quantity: number;
+  selectedSize?: string | null;
+  selectedColor?: string | null;
+  product_code?: string | null;
+  image?: string | null;
+}
+
+export type OrderStatus = "جديد" | "تم التأكيد" | "قيد الشحن" | "تم التسليم" | "ملغي";
+
+export interface Order {
+  id: string;
+  order_code: string;
+  customer_name: string;
+  phone: string;
+  governorate: string;
+  address: string;
+  notes?: string | null;
+  items: OrderCartItem[];
+  subtotal: number;
+  shipping_fee: number;
+  total: number;
+  status: OrderStatus;
+  created_at: string;
+}
+
