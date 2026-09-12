@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { MessageCircle, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { generalContactLink } from "@/lib/whatsapp";
+import { resolveImageUrl } from "@/lib/images";
 import type { Offer } from "@/lib/types";
 
 export const Route = createFileRoute("/offers")({
@@ -63,9 +64,13 @@ function OffersPage() {
           >
             {o.image_url && (
               <img
-                src={o.image_url}
+                src={resolveImageUrl(o.image_url)}
                 alt={o.title}
                 loading="lazy"
+                decoding="async"
+                onError={(e) => {
+                  e.currentTarget.src = "/brand/story-banner.jpg";
+                }}
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-102"
               />
             )}

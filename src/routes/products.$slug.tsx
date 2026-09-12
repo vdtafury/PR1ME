@@ -25,6 +25,7 @@ import type { Product } from "@/lib/types";
 import { useCartStore } from "@/lib/store";
 import useEmblaCarousel from "embla-carousel-react";
 import { toast } from "sonner";
+import { resolveImageUrl } from "@/lib/images";
 
 export const Route = createFileRoute("/products/$slug")({
   loader: async ({ params: { slug } }) => {
@@ -102,7 +103,9 @@ function ProductDetailPage() {
 }
 
 function ProductView({ product: p }: { product: Product }) {
-  const allImages = [p.main_image, ...(p.gallery_images ?? [])].filter(Boolean) as string[];
+  const allImages = [p.main_image, ...(p.gallery_images ?? [])]
+    .filter(Boolean)
+    .map((src) => resolveImageUrl(src as string));
   const [activeImg, setActiveImg] = useState(0);
   const [selectedColor, setSelectedColor] = useState<string | null>(
     p.colors?.length === 1 ? p.colors[0] : null
@@ -228,6 +231,11 @@ function ProductView({ product: p }: { product: Product }) {
                       <img
                         src={src}
                         alt={`${p.title} - ${idx + 1}`}
+                        loading={idx === 0 ? "eager" : "lazy"}
+                        decoding="async"
+                        onError={(e) => {
+                          e.currentTarget.src = "/brand/hero-cairo-streetwear.jpg";
+                        }}
                         className="h-full w-full object-contain p-4"
                       />
                     </div>
@@ -271,6 +279,10 @@ function ProductView({ product: p }: { product: Product }) {
                 key={activeImg}
                 src={allImages[activeImg]}
                 alt={p.title}
+                decoding="async"
+                onError={(e) => {
+                  e.currentTarget.src = "/brand/hero-cairo-streetwear.jpg";
+                }}
                 className="h-full w-full object-contain p-8 animate-in fade-in duration-300"
               />
             ) : (

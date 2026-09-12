@@ -276,6 +276,15 @@
   transform: translateY(0);
 }
 
+/* Mobile Safe Display: ensure all sections and images render immediately on phones */
+@media (max-width: 640px) {
+  .reveal-fade-up {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* Accessibility: Respect Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *,

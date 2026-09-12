@@ -2,6 +2,7 @@ import { X, Minus, Plus, ShoppingBag, MessageCircle, ShieldCheck, ArrowRight, Tr
 import { useCartStore } from "@/lib/store";
 import { formatPrice, generalContactLink } from "@/lib/whatsapp";
 import { colorToHex } from "@/lib/colors";
+import { resolveImageUrl } from "@/lib/images";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -213,8 +214,12 @@ export function CartDrawer() {
                     <div className="h-18 w-16 sm:h-20 sm:w-18 flex-shrink-0 overflow-hidden border border-[#E5E5E0] bg-[#F7F7F5]">
                       {item.product.main_image ? (
                         <img
-                          src={item.product.main_image}
+                          src={resolveImageUrl(item.product.main_image)}
                           alt={item.product.title}
+                          decoding="async"
+                          onError={(e) => {
+                            e.currentTarget.src = "/brand/hero-cairo-streetwear.jpg";
+                          }}
                           className="h-full w-full object-contain p-1"
                         />
                       ) : (

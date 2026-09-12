@@ -3,6 +3,7 @@ import { Heart, ShoppingBag, Check } from "lucide-react";
 import { useState } from "react";
 import { formatPrice } from "@/lib/whatsapp";
 import { colorToHex } from "@/lib/colors";
+import { resolveImageUrl } from "@/lib/images";
 import type { Product } from "@/lib/types";
 import { toast } from "sonner";
 import { useCartStore } from "@/lib/store";
@@ -53,19 +54,27 @@ export function ProductCard({ product }: { product: Product }) {
           {product.main_image ? (
             <div className="relative h-full w-full">
               <img
-                src={product.main_image}
+                src={resolveImageUrl(product.main_image)}
                 alt={product.title}
                 loading="lazy"
+                decoding="async"
+                onError={(e) => {
+                  e.currentTarget.src = "/brand/hero-cairo-streetwear.jpg";
+                }}
                 className={`h-full w-full object-contain object-center p-2.5 sm:p-4 transition-opacity duration-300 ${
-                  hasGallery ? "group-hover:opacity-0" : ""
+                  hasGallery ? "md:group-hover:opacity-0" : ""
                 }`}
               />
               {hasGallery && gallery[0] && (
                 <img
-                  src={gallery[0]}
+                  src={resolveImageUrl(gallery[0])}
                   alt={product.title}
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-contain object-center p-2.5 sm:p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  decoding="async"
+                  onError={(e) => {
+                    e.currentTarget.src = "/brand/hero-cairo-streetwear.jpg";
+                  }}
+                  className="hidden md:block absolute inset-0 h-full w-full object-contain object-center p-2.5 sm:p-4 opacity-0 transition-opacity duration-300 md:group-hover:opacity-100"
                 />
               )}
             </div>

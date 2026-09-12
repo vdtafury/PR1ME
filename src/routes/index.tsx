@@ -145,6 +145,7 @@ function HomePage() {
               src="/brand/bento-accessories.jpg"
               alt="PR1ME Accessories"
               loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-104"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
@@ -167,6 +168,7 @@ function HomePage() {
               src="/brand/bento-collection.jpg"
               alt="Summer 2026 Collection"
               loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-104"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
@@ -188,6 +190,7 @@ function HomePage() {
               src="/brand/bento-fabrics.jpg"
               alt="PR1ME Fabric Quality"
               loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-104"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
@@ -254,6 +257,7 @@ function HomePage() {
                 alt="PR1ME Brand Story - WEAR YOUR STORY"
                 className="h-full w-full object-cover brightness-60 object-center transition-transform duration-700 group-hover:scale-102"
                 loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/40 sm:bg-gradient-to-r sm:from-transparent sm:via-black/50 sm:to-black/90" />
             </div>
