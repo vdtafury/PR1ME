@@ -142,10 +142,10 @@ function HomePage() {
             className="group relative aspect-[16/9] sm:aspect-[4/3] overflow-hidden bg-[#0D0D0D] text-white"
           >
             <img
-              src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&auto=format&fit=crop&q=80"
+              src="/brand/bento-accessories.jpg"
               alt="PR1ME Accessories"
               loading="lazy"
-              className="h-full w-full object-cover brightness-65 transition-transform duration-700 ease-out group-hover:scale-104"
+              className="h-full w-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-104"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
             <div className="absolute bottom-4 right-4 left-4 sm:bottom-5 sm:right-5 sm:left-5">
@@ -164,10 +164,10 @@ function HomePage() {
             className="group relative aspect-[16/9] sm:aspect-[4/3] overflow-hidden bg-[#0D0D0D] text-white"
           >
             <img
-              src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80"
+              src="/brand/bento-collection.jpg"
               alt="Summer 2026 Collection"
               loading="lazy"
-              className="h-full w-full object-cover brightness-65 transition-transform duration-700 ease-out group-hover:scale-104"
+              className="h-full w-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-104"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
             <div className="absolute bottom-4 right-4 left-4 sm:bottom-5 sm:right-5 sm:left-5">
@@ -185,10 +185,10 @@ function HomePage() {
             className="group relative aspect-[16/9] sm:aspect-[4/3] overflow-hidden bg-[#0D0D0D] text-white"
           >
             <img
-              src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&auto=format&fit=crop&q=80"
+              src="/brand/bento-fabrics.jpg"
               alt="PR1ME Fabric Quality"
               loading="lazy"
-              className="h-full w-full object-cover brightness-65 transition-transform duration-700 ease-out group-hover:scale-104"
+              className="h-full w-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-104"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
             <div className="absolute bottom-4 right-4 left-4 sm:bottom-5 sm:right-5 sm:left-5">
@@ -250,7 +250,7 @@ function HomePage() {
             {/* Background Image: Streetwear mural */}
             <div className="absolute inset-0 z-0">
               <img
-                src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&auto=format&fit=crop&q=80"
+                src="/brand/story-banner.jpg"
                 alt="PR1ME Brand Story - WEAR YOUR STORY"
                 className="h-full w-full object-cover brightness-60 object-center transition-transform duration-700 group-hover:scale-102"
                 loading="lazy"

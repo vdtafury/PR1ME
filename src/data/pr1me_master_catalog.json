@@ -1,0 +1,243 @@
+{
+  "brand": {
+    "name": "PR1ME",
+    "legalName": "PR1ME Apparel Co. Egypt",
+    "foundedYear": 2026,
+    "origin": "Cairo, Egypt",
+    "slogans": [
+      "WEAR YOUR STORY",
+      "CAIRO STREETWEAR • 2026",
+      "WEAR THE DIFFERENCE",
+      "LIGHT WARM FREEDOM ALWAYS"
+    ],
+    "palette": {
+      "obsidian": { "hex": "#0D0D0D", "name": "Obsidian Black", "nameAr": "أسود أوبسيديان" },
+      "charcoal": { "hex": "#1F1F1F", "name": "Charcoal Grey", "nameAr": "رمادي فحمي" },
+      "offWhite": { "hex": "#F7F7F5", "name": "Bone Off-White", "nameAr": "أبيض عاجي" },
+      "stone": { "hex": "#E5E5E0", "name": "Concrete Stone", "nameAr": "حجري" },
+      "sandGold": { "hex": "#C9B89A", "name": "Dune Sand Gold", "nameAr": "بيج ذهبي" },
+      "olive": { "hex": "#4A5A44", "name": "Tactical Olive", "nameAr": "زيتي تكتيكي" },
+      "crimson": { "hex": "#8B2E2E", "name": "Signal Crimson", "nameAr": "أحمر إشاري" }
+    },
+    "typography": {
+      "headings": "Changa, Outfit, sans-serif",
+      "body": "Cairo, Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "currency": "EGP",
+    "shipping": {
+      "standardDays": "2 - 4 business days",
+      "freeShippingThresholdEGP": 1000,
+      "previewBeforePay": true,
+      "cashOnDelivery": true,
+      "exchangeWindowDays": 14
+    }
+  },
+  "collections": [
+    {
+      "id": "colder-stories-2026",
+      "slug": "colder-stories",
+      "titleEn": "Colder Stories // Zero Gravity",
+      "titleAr": "قصص الشتاء // انعدام الجاذبية",
+      "season": "Fall/Winter 2026",
+      "conceptEn": "Architectural outerwear and thermal shielding engineered for Cairo's brisk winter nights. Minimal bulk, maximum loft, tactical ergonomics.",
+      "conceptAr": "أزياء خارجية معمارية وعزل حراري متطور مصمم لليالي القاهرة الباردة. خفة فائقة، دفء متين، وحرية حركة مطلقة.",
+      "heroAsset": "/brand/hero-cairo-streetwear.jpg",
+      "colorPalette": ["#0D0D0D", "#1F1F1F", "#C9B89A", "#4A5A44"],
+      "products": [
+        {
+          "code": "PR1-JK-001",
+          "slug": "pr1me-signature-ultra-light-puffer-jacket",
+          "nameEn": "PR1ME Signature Ultra-Light Puffer Jacket",
+          "nameAr": "جاكيت بافر PR1ME الترا لايت فائق الخفة",
+          "category": "jackets",
+          "priceEGP": 1450,
+          "originalPriceEGP": 1950,
+          "fit": "Standard Boxy Architectural",
+          "fabric": {
+            "outer": "100% Micro-Ripstop High-Density Nylon with DWR water-repellent finish",
+            "lining": "100% Breathable Anti-Static Polyester Taffeta",
+            "insulation": "High-Loft Featherlight Micro-Fiber Synthetic Down (Zero Feathers Clumping)"
+          },
+          "details": [
+            "Integral sculpted windbreaker hood ('Zaboot')",
+            "Matte rubberized tonal PR1ME chest patch",
+            "Water-resistant dual reversed coil front zipper with storm baffle",
+            "Hidden fleece-lined thermal handwarmer side pockets",
+            "Internal media zip pocket for smartphone & essentials",
+            "Stretch-bound cuffs and shock-cord hem lock to trap body heat"
+          ],
+          "sizes": ["M", "L", "XL", "XXL"],
+          "colors": [
+            { "nameEn": "Stealth Black", "nameAr": "أسود", "hex": "#0D0D0D" },
+            { "nameEn": "Charcoal Grey", "nameAr": "رمادي", "hex": "#1F1F1F" }
+          ],
+          "assets": {
+            "main": "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/puffer/cover-front.jpg",
+            "gallery": [
+              "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/puffer/cover-back.jpg",
+              "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/puffer/look-side.jpg",
+              "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/puffer/campaign-poster.jpg"
+            ]
+          }
+        },
+        {
+          "code": "PR1-HD-001",
+          "slug": "pr1me-heavyweight-380gsm-oversized-hoodie-sand",
+          "nameEn": "PR1ME Heavyweight 380 GSM Oversized Hoodie — Sand",
+          "nameAr": "هودي أوفرسايز قطن مصري 380 GSM — بيج رملي",
+          "category": "hoodies",
+          "priceEGP": 950,
+          "originalPriceEGP": 1250,
+          "fit": "Relaxed Drop-Shoulder Oversized",
+          "fabric": {
+            "body": "100% Long-Staple Egyptian Combed Cotton, 380 GSM Heavy Loopback French Terry",
+            "ribbing": "95% Cotton / 5% Spandex 2x2 Heavy Rib"
+          },
+          "details": [
+            "Self-standing double-layered architectural hood without cords for clean aesthetic",
+            "High-density tonal embroidered PR1ME chest typographic branding",
+            "Upper back statement embroidery: 'PR1ME / WEAR YOUR STORY • CAIRO 2026'",
+            "Seamless front kangaroo pocket with reinforced bartack stress points",
+            "Enzyme pre-shrunk & silicone-washed for extreme softness and zero pilling"
+          ],
+          "sizes": ["M", "L", "XL", "XXL"],
+          "colors": [
+            { "nameEn": "Dune Sand", "nameAr": "بيج", "hex": "#C9B89A" },
+            { "nameEn": "Obsidian Black", "nameAr": "أسود", "hex": "#0D0D0D" },
+            { "nameEn": "Tactical Olive", "nameAr": "زيتي", "hex": "#4A5A44" }
+          ],
+          "assets": {
+            "main": "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/hoodie/front.jpg",
+            "gallery": [
+              "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/hoodie/back.jpg",
+              "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/hoodie/lifestyle.jpg"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cairo-origins-2026",
+      "slug": "cairo-origins",
+      "titleEn": "Cairo 2026 // Origins",
+      "titleAr": "أصول القاهرة // 2026",
+      "season": "All-Year Streetwear Capsule",
+      "conceptEn": "Rooted in the brutalist concrete structures and desert dust of modern Cairo. Premium Egyptian cotton jersey re-engineered for contemporary metropolitan street life.",
+      "conceptAr": "مستوحاة من العمارة الخرسانية الحديثة وأصالة شوارع القاهرة. قطن مصري فاخر بوزن ثقيل وتصميم بوكسي عصري يواكب نبض المدينة.",
+      "heroAsset": "/brand/bento-collection.jpg",
+      "colorPalette": ["#F7F7F5", "#0D0D0D", "#E5E5E0", "#C9B89A"],
+      "products": [
+        {
+          "code": "PR1-TS-001",
+          "slug": "pr1me-egyptian-cotton-260gsm-boxy-tee-offwhite",
+          "nameEn": "PR1ME Egyptian Cotton 260 GSM Boxy Tee — Off-White",
+          "nameAr": "تيشيرت بوكسي قطن مصري 260 GSM — أبيض عاجي",
+          "category": "t-shirts",
+          "priceEGP": 490,
+          "originalPriceEGP": 650,
+          "fit": "Boxy Oversized Drop-Shoulder",
+          "fabric": {
+            "body": "100% Combed Long-Staple Egyptian Cotton Single Jersey (260 GSM Heavyweight)",
+            "collar": "1.25-inch Heavy Gauge 1x1 Ribbed Collar that will never bacon or sag"
+          },
+          "details": [
+            "Tactile high-density matte silicone PR1ME typographic center chest print",
+            "Woven damask gold & black hem label: 'CAIRO STREETWEAR • 2026'",
+            "Internal shoulder-to-shoulder herringbone taped neck seam for durability",
+            "Twin-needle finished cuffs and straight bottom hem"
+          ],
+          "sizes": ["M", "L", "XL", "XXL"],
+          "colors": [
+            { "nameEn": "Bone Off-White", "nameAr": "أبيض", "hex": "#F7F7F5" },
+            { "nameEn": "Obsidian Black", "nameAr": "أسود", "hex": "#0D0D0D" },
+            { "nameEn": "Heather Grey", "nameAr": "رمادي", "hex": "#A8A8A2" }
+          ],
+          "assets": {
+            "main": "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/tshirt/front.jpg",
+            "gallery": [
+              "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/tshirt/lifestyle.jpg"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "tactical-monochrome",
+      "slug": "tactical-monochrome",
+      "titleEn": "Tactical Monochrome // Movement",
+      "titleAr": "الحركة التكتيكية // أحادية اللون",
+      "season": "Utility Capsule 2026",
+      "conceptEn": "Functional utilitarian garments built with abrasion resistance, modular cargo pocketing, and technical hardware for effortless transition from studio to city streets.",
+      "conceptAr": "قطع وظيفية تكتيكية مجهزة بجيوب متعددة وأقمشة مقاومة للاحتكاك، تجمع بين الطابع العسكري الأنيق وسهولة الحركة اليومية.",
+      "heroAsset": "/brand/bento-accessories.jpg",
+      "colorPalette": ["#1F1F1F", "#0D0D0D", "#4A5A44"],
+      "products": [
+        {
+          "code": "PR1-PT-001",
+          "slug": "pr1me-tactical-utilitarian-cargo-pants-charcoal",
+          "nameEn": "PR1ME Tactical Utilitarian Cargo Pants — Charcoal",
+          "nameAr": "بنطال كارجو تكتيكي ستريتوير — رمادي فحمي",
+          "category": "pants",
+          "priceEGP": 890,
+          "originalPriceEGP": 1150,
+          "fit": "Tapered Relaxed Cargo Fit",
+          "fabric": {
+            "body": "98% Heavy Cotton Twill (320 GSM) / 2% Elastane for dynamic mobility",
+            "hardware": "Matte black reinforced snap closures and custom nylon cord pulls"
+          },
+          "details": [
+            "6 ergonomic multi-compartment pockets with internal divider sleeves",
+            "Tactile matte embossed PR1ME rubber badge on left flap pocket",
+            "Elasticated waistband with military-spec tubular drawcord and metal aglets",
+            "Adjustable bungee ankle drawstrings for custom drape over sneakers",
+            "Articulated pleated knees for zero-restriction natural movement"
+          ],
+          "sizes": ["M", "L", "XL", "XXL"],
+          "colors": [
+            { "nameEn": "Charcoal Grey", "nameAr": "رمادي", "hex": "#1F1F1F" },
+            { "nameEn": "Stealth Black", "nameAr": "أسود", "hex": "#0D0D0D" },
+            { "nameEn": "Tactical Olive", "nameAr": "زيتي", "hex": "#4A5A44" }
+          ],
+          "assets": {
+            "main": "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/cargo/front.jpg",
+            "gallery": [
+              "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/cargo/lifestyle.jpg"
+            ]
+          }
+        },
+        {
+          "code": "PR1-AC-001",
+          "slug": "pr1me-ballistic-nylon-crossbody-utility-bag",
+          "nameEn": "PR1ME Ballistic Nylon Crossbody Utility Bag",
+          "nameAr": "حقيبة كروس تكتيكية نايلون باليستي — أسود",
+          "category": "accessories",
+          "priceEGP": 420,
+          "originalPriceEGP": 550,
+          "fit": "Compact Modular Crossbody / Chest Rig",
+          "fabric": {
+            "shell": "1000D Ballistic Cordura Nylon with PU Waterproof backing",
+            "zippers": "YKK AquaGuard waterproof zippers with hypalon zip pulls"
+          },
+          "details": [
+            "Quick-release alloy tactical quick-lock buckle with laser-engraved PR1ME emblem",
+            "Padded main cavity sized for phone, passport, AirPods, powerbank, and keys",
+            "External modular MOLLE webbing daisy-chain for attaching keychains or pens",
+            "Dense air-mesh breathable back panel preventing sweat build-up",
+            "Adjustable high-density seatbelt nylon webbing shoulder strap"
+          ],
+          "sizes": ["One Size"],
+          "colors": [
+            { "nameEn": "Stealth Black", "nameAr": "أسود", "hex": "#0D0D0D" }
+          ],
+          "assets": {
+            "main": "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/bag/front.jpg",
+            "gallery": [
+              "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/bag/lifestyle.jpg"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
