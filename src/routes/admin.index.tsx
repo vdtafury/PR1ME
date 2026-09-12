@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Category, Product, Offer } from "@/lib/types";
 import { BRAND, formatPrice } from "@/lib/whatsapp";
 
+import { AdminLoginForm } from "@/components/AdminLoginForm";
+
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
   head: () => ({ meta: [{ title: "Admin — PR1ME" }, { name: "robots", content: "noindex" }] }),
@@ -15,40 +17,84 @@ export const Route = createFileRoute("/admin/")({
 type Tab = "products" | "categories" | "offers";
 
 function AdminDashboard() {
-  const navigate = useNavigate();
   const [ready, setReady] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [tab, setTab] = useState<Tab>("products");
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
+  const checkAuth = async () => {
+    try {
       const { data } = await supabase.auth.getSession();
-      if (!data.session) { navigate({ to: "/admin/login" }); return; }
+      if (!data.session) {
+        setHasSession(false);
+        setIsAdmin(false);
+        setReady(true);
+        return;
+      }
+
+      setHasSession(true);
       const { data: roles } = await supabase
-        .from("user_roles").select("role").eq("user_id", data.session.user.id);
-      if (!mounted) return;
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.session.user.id);
+
       const admin = !!roles?.some((r: any) => r.role === "admin");
       setIsAdmin(admin);
       setReady(true);
-      if (!admin) toast.error("You are not an admin. Contact the site owner.");
-    })();
-    return () => { mounted = false; };
-  }, [navigate]);
+      if (!admin) {
+        toast.error("You are not an admin. Contact the site owner.");
+      }
+    } catch (err) {
+      console.error(err);
+      setReady(true);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
+      checkAuth();
+    });
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, []);
 
   async function logout() {
     await supabase.auth.signOut();
-    navigate({ to: "/admin/login" });
+    setHasSession(false);
+    setIsAdmin(false);
   }
 
-  if (!ready) return <div className="grid min-h-screen place-items-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
+  if (!ready) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-[#F7F7F5]">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin text-[#0D0D0D]" />
+          <span className="text-xs uppercase tracking-widest text-[#6B6B66]">Loading Admin...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasSession) {
+    return <AdminLoginForm onLoginSuccess={checkAuth} />;
+  }
 
   if (!isAdmin) {
     return (
-      <div className="grid min-h-screen place-items-center px-4">
-        <div className="text-center">
-          <h1 className="text-xl font-bold">Not authorized</h1>
-          <button onClick={logout} className="mt-4 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Sign out</button>
+      <div className="grid min-h-screen place-items-center bg-[#F7F7F5] px-4">
+        <div className="w-full max-w-sm border border-[#E5E5E0] bg-white p-6 text-center shadow-xs">
+          <h1 className="text-lg font-bold text-[#0D0D0D]">Not authorized</h1>
+          <p className="mt-2 text-xs text-[#6B6B66]">
+            This account does not have admin permissions to manage PR1ME.
+          </p>
+          <button
+            onClick={logout}
+            className="mt-4 w-full bg-[#0D0D0D] py-2.5 text-xs font-bold uppercase tracking-wider text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F]"
+          >
+            Sign out / Switch account
+          </button>
         </div>
       </div>
     );

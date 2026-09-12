@@ -87,10 +87,9 @@ function RootComponent() {
 }
 
 function SiteChrome() {
-  const matchRoute = useMatchRoute();
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
-  const isAdmin = !!matchRoute({ to: "/admin", fuzzy: true }) || !!matchRoute({ to: "/admin/login" });
+  const isAdmin = pathname.startsWith("/admin");
 
   const alreadyDone = typeof window !== "undefined" && Boolean((window as any).__PR1ME_PRELOADER_DONE__);
   const [isPreloaderActive, setIsPreloaderActive] = useState(() => !alreadyDone);
