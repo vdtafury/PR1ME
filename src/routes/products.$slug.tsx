@@ -26,6 +26,7 @@ import { useCartStore } from "@/lib/store";
 import useEmblaCarousel from "embla-carousel-react";
 import { toast } from "sonner";
 import { resolveImageUrl } from "@/lib/images";
+import { ProductCheckoutDrawer } from "@/components/ProductCheckoutDrawer";
 
 export const Route = createFileRoute("/products/$slug")({
   loader: async ({ params: { slug } }) => {
@@ -117,6 +118,7 @@ function ProductView({ product: p }: { product: Product }) {
   const [activeTab, setActiveTab] = useState<"details" | "shipping" | "guide">("details");
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   // Embla carousel for mobile gestures
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
@@ -160,7 +162,16 @@ function ProductView({ product: p }: { product: Product }) {
     toast.success(`تمت إضافة "${p.title}" إلى السلة`);
   };
 
-  // Direct WhatsApp order link
+  // Open shipping & checkout details drawer
+  const handleOpenCheckout = () => {
+    if (!isReadyToOrder) {
+      toast.error("يرجى تحديد المقاس واللون أولاً لمتابعة الطلب");
+      return;
+    }
+    setIsCheckoutOpen(true);
+  };
+
+  // Direct WhatsApp order link (fallback)
   const handleDirectWhatsAppOrder = () => {
     if (!isReadyToOrder) {
       toast.error("يرجى تحديد المقاس واللون أولاً لإتمام طلبك عبر واتساب");
@@ -516,7 +527,7 @@ function ProductView({ product: p }: { product: Product }) {
           <div className="mt-4 flex flex-col gap-2.5">
             <button
               type="button"
-              onClick={handleDirectWhatsAppOrder}
+              onClick={handleOpenCheckout}
               disabled={!isReadyToOrder}
               className={`flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xs text-xs font-bold transition-colors ${
                 isReadyToOrder
@@ -525,7 +536,7 @@ function ProductView({ product: p }: { product: Product }) {
               }`}
             >
               <MessageCircle className="h-4 w-4 text-emerald-400" />
-              <span>اطلب الآن عبر واتساب (دفع كاش عند الاستلام)</span>
+              <span>اطلب الآن (الدفع كاش عند الاستلام)</span>
             </button>
 
             <div className="flex gap-2.5">
@@ -726,7 +737,7 @@ function ProductView({ product: p }: { product: Product }) {
             </button>
             <button
               type="button"
-              onClick={handleDirectWhatsAppOrder}
+              onClick={handleOpenCheckout}
               disabled={!isReadyToOrder}
               className={`h-11 flex-1 max-w-[190px] flex items-center justify-center gap-1 text-xs font-bold transition-colors ${
                 isReadyToOrder
@@ -735,7 +746,7 @@ function ProductView({ product: p }: { product: Product }) {
               }`}
             >
               <MessageCircle className="h-3.5 w-3.5 text-emerald-400" />
-              <span>اطلب على واتساب</span>
+              <span>اطلب الآن</span>
             </button>
           </div>
         </div>
@@ -849,6 +860,15 @@ function ProductView({ product: p }: { product: Product }) {
           </div>
         </div>
       )}
+      {/* Product Quick Checkout Drawer */}
+      <ProductCheckoutDrawer
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        product={p}
+        quantity={qty}
+        selectedSize={selectedSize}
+        selectedColor={selectedColor}
+      />
     </div>
   );
 }
