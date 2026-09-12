@@ -27,6 +27,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { toast } from "sonner";
 import { resolveImageUrl } from "@/lib/images";
 import { ProductCheckoutDrawer } from "@/components/ProductCheckoutDrawer";
+import { SizeGuideModal } from "@/components/SizeGuideModal";
 
 export const Route = createFileRoute("/products/$slug")({
   loader: async ({ params: { slug } }) => {
@@ -775,91 +776,14 @@ function ProductView({ product: p }: { product: Product }) {
         </section>
       )}
 
-      {/* Size Guide Modal / Bottom Sheet on Mobile */}
-      {isSizeGuideOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div
-            className="fixed inset-0 bg-black/75 backdrop-blur-xs"
-            onClick={() => setSizeGuideOpen(false)}
-          />
-          <div className="relative w-full max-h-[85dvh] sm:max-w-lg border-t sm:border border-[#E5E5E0] bg-white p-4 sm:p-6 shadow-2xl overflow-y-auto pb-safe animate-in slide-in-from-bottom-5 sm:animate-in sm:zoom-in-95 duration-150">
-            <div className="mb-3 flex items-center justify-between border-b border-[#E5E5E0] pb-3">
-              <div className="flex items-center gap-2">
-                <Ruler className="h-4 w-4 text-[#0D0D0D]" />
-                <h3 className="text-sm font-bold text-[#0D0D0D]">جدول مقاسات وأوزان PR1ME</h3>
-              </div>
-              <button
-                onClick={() => setSizeGuideOpen(false)}
-                className="grid h-8 w-8 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
+      {/* Responsive Size Guide Modal */}
+      <SizeGuideModal
+        isOpen={isSizeGuideOpen}
+        onClose={() => setSizeGuideOpen(false)}
+        productTitle={p.title}
+        categorySlug={p.category_id}
+      />
 
-            {/* Sizing Table */}
-            <div className="overflow-x-auto border border-[#E5E5E0]">
-              <table className="w-full text-right text-xs">
-                <thead className="bg-[#F7F7F5] text-[#6B6B66] font-semibold">
-                  <tr>
-                    <th className="px-3 py-2">المقاس</th>
-                    <th className="px-3 py-2">الوزن</th>
-                    <th className="px-3 py-2">عرض الصدر</th>
-                    <th className="px-3 py-2">الطول</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#E5E5E0]">
-                  <tr>
-                    <td className="px-3 py-2 font-mono font-bold text-[#0D0D0D]">S</td>
-                    <td className="px-3 py-2">50 - 62 كجم</td>
-                    <td className="px-3 py-2 font-mono">48 - 50 سم</td>
-                    <td className="px-3 py-2 font-mono">68 سم</td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2 font-mono font-bold text-[#0D0D0D]">M</td>
-                    <td className="px-3 py-2">63 - 74 كجم</td>
-                    <td className="px-3 py-2 font-mono">51 - 53 سم</td>
-                    <td className="px-3 py-2 font-mono">70 سم</td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2 font-mono font-bold text-[#0D0D0D]">L</td>
-                    <td className="px-3 py-2">75 - 85 كجم</td>
-                    <td className="px-3 py-2 font-mono">54 - 56 سم</td>
-                    <td className="px-3 py-2 font-mono">72 سم</td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2 font-mono font-bold text-[#0D0D0D]">XL</td>
-                    <td className="px-3 py-2">86 - 97 كجم</td>
-                    <td className="px-3 py-2 font-mono">57 - 59 سم</td>
-                    <td className="px-3 py-2 font-mono">74 سم</td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2 font-mono font-bold text-[#0D0D0D]">XXL</td>
-                    <td className="px-3 py-2">98 - 110 كجم</td>
-                    <td className="px-3 py-2 font-mono">60 - 63 سم</td>
-                    <td className="px-3 py-2 font-mono">76 سم</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div className="mt-3.5 border border-[#E5E5E0] p-3 text-xs bg-[#F7F7F5]">
-              <span className="font-bold text-[#0D0D0D]">نصيحة المقاس:</span>
-              <p className="mt-1 text-[#6B6B66] leading-relaxed">
-                إذا كنت تفضل اللوك الواسع (Oversized)، اختر مقاساً أكبر بدرجة. المندوب سينتظرك لتجربة القطعة قبل الدفع!
-              </p>
-              <a
-                href={generalContactLink("مرحباً PR1ME، أود استشارة بخصوص اختيار المقاس")}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center gap-1 font-semibold text-[#0D0D0D] underline"
-              >
-                <MessageCircle className="h-3.5 w-3.5 text-emerald-600" />
-                <span>استشر خبير المقاسات على واتساب</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
       {/* Product Quick Checkout Drawer */}
       <ProductCheckoutDrawer
         isOpen={isCheckoutOpen}
