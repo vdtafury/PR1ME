@@ -1,25 +1,45 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface BrandLoaderProps {
   onReady?: () => void;
 }
 
 export function BrandLoader({ onReady }: BrandLoaderProps) {
-  // Phase 0: 0ms -> Deep black screen (#0D0D0D)
-  // Phase 1: 200ms -> PR1ME logo fades in (opacity: 0->1, scale: 0.96->1)
-  // Phase 2: 400ms -> Tagline & haute-couture loading progress begin
-  // Phase 3: ~1800ms-2400ms -> Preloader opacity 1->0, onReady triggers page reveal
-  // Phase "done": Preloader unmounted from DOM (~2400ms-2900ms)
-  const [phase, setPhase] = useState<0 | 1 | 2 | 3 | "done">(0);
+  // Check if preloader has already executed for this window session
+  const alreadyDone =
+    typeof window !== "undefined" &&
+    Boolean((window as any).__PR1ME_PRELOADER_DONE__);
+
+  // If already done, initialize as "done" so it never renders again
+  const [phase, setPhase] = useState<0 | 1 | 2 | 3 | "done">(() =>
+    alreadyDone ? "done" : 0
+  );
+
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
+
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
-    // Accessibility check: instant exit if user prefers reduced motion
+    // If already executed or running in this window, exit immediately
     if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      typeof window === "undefined" ||
+      (window as any).__PR1ME_PRELOADER_DONE__ ||
+      hasStartedRef.current
     ) {
       setPhase("done");
-      onReady?.();
+      onReadyRef.current?.();
+      return;
+    }
+
+    // Mark as started and executed for this window lifecycle
+    hasStartedRef.current = true;
+    (window as any).__PR1ME_PRELOADER_DONE__ = true;
+
+    // Accessibility check: instant exit if user prefers reduced motion
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setPhase("done");
+      onReadyRef.current?.();
       return;
     }
 
@@ -42,7 +62,7 @@ export function BrandLoader({ onReady }: BrandLoaderProps) {
       if (isExiting) return;
       isExiting = true;
       setPhase(3);
-      onReady?.();
+      onReadyRef.current?.();
 
       // Complete unmount after 600ms fade duration
       tDone = setTimeout(() => {
@@ -77,7 +97,7 @@ export function BrandLoader({ onReady }: BrandLoaderProps) {
       if (tDone) clearTimeout(tDone);
       window.removeEventListener("load", handleAssetsReady);
     };
-  }, [onReady]);
+  }, []); // Strictly empty dependency array to prevent any re-triggers
 
   if (phase === "done") return null;
 

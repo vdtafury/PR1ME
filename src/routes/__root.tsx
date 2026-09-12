@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -91,7 +91,13 @@ function SiteChrome() {
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
   const isAdmin = !!matchRoute({ to: "/admin", fuzzy: true }) || !!matchRoute({ to: "/admin/login" });
-  const [isPreloaderActive, setIsPreloaderActive] = useState(true);
+
+  const alreadyDone = typeof window !== "undefined" && Boolean((window as any).__PR1ME_PRELOADER_DONE__);
+  const [isPreloaderActive, setIsPreloaderActive] = useState(() => !alreadyDone);
+
+  const handlePreloaderReady = useCallback(() => {
+    setIsPreloaderActive(false);
+  }, []);
 
   if (isAdmin) {
     return (
@@ -103,7 +109,7 @@ function SiteChrome() {
   }
   return (
     <div className="flex min-h-screen flex-col bg-[#F7F7F5]">
-      <BrandLoader onReady={() => setIsPreloaderActive(false)} />
+      <BrandLoader onReady={handlePreloaderReady} />
       <div
         className={`flex min-h-screen flex-col transition-all duration-700 ease-out ${
           isPreloaderActive
