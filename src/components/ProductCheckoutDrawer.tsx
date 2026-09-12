@@ -2,6 +2,7 @@ import { X, MessageCircle, ShieldCheck, ArrowRight } from "lucide-react";
 import { formatPrice, generalContactLink } from "@/lib/whatsapp";
 import type { Product } from "@/lib/types";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
 const GOVERNORATES = [
@@ -48,6 +49,8 @@ export function ProductCheckoutDrawer({
   selectedSize,
   selectedColor,
 }: ProductCheckoutDrawerProps) {
+  const [mounted, setMounted] = useState(false);
+
   // Form State
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -55,6 +58,11 @@ export function ProductCheckoutDrawer({
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+
+  // SSR mount check
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Keyboard escape
   useEffect(() => {
@@ -67,19 +75,23 @@ export function ProductCheckoutDrawer({
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
 
-  // Prevent body scroll when open
+  // Lock body & html scroll when drawer is open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    if (!isOpen) return;
+
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!mounted || !isOpen) return null;
 
   const totalPrice = product.price * quantity;
 
@@ -132,58 +144,72 @@ export function ProductCheckoutDrawer({
     onClose();
   };
 
-  return (
-    <>
+  const drawerElement = (
+    <div className="fixed inset-0 z-[99999] pointer-events-auto select-auto" dir="rtl">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity duration-200"
         onClick={onClose}
+        aria-hidden="true"
       />
 
-      {/* Mobile / Desktop Drawer (100dvh for mobile address bar safety) */}
-      <div className="fixed inset-y-0 left-0 z-50 flex h-[100dvh] w-full sm:max-w-md flex-col bg-white shadow-2xl border-r border-[#E5E5E0] animate-in slide-in-from-left duration-200">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#E5E5E0] p-3.5 sm:p-4">
+      {/* Slide-over Drawer Panel */}
+      <aside
+        className="fixed inset-y-0 left-0 flex h-[100dvh] max-h-[100dvh] w-full sm:max-w-md flex-col bg-white shadow-2xl border-r border-[#E5E5E0] animate-in slide-in-from-left duration-200 overscroll-contain z-10"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="checkout-modal-title"
+      >
+        {/* Header (Always Fixed at Top) */}
+        <div className="flex-shrink-0 flex items-center justify-between border-b border-[#E5E5E0] p-3.5 sm:p-4 bg-white">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="grid h-8 w-8 place-items-center text-[#0D0D0D] hover:bg-black/5 rounded-xs"
+              className="grid h-9 w-9 place-items-center text-[#0D0D0D] hover:bg-black/5 rounded-xs transition-colors"
               title="إلغاء"
             >
               <ArrowRight className="h-4 w-4" />
             </button>
-            <h2 className="text-sm font-bold text-[#0D0D0D]">بيانات الشحن والتوصيل</h2>
+            <h2 id="checkout-modal-title" className="text-sm font-bold text-[#0D0D0D]">
+              بيانات الشحن والتوصيل
+            </h2>
           </div>
           <button
             onClick={onClose}
-            className="grid h-10 w-10 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
+            className="grid h-9 w-9 place-items-center text-[#6B6B66] hover:text-[#0D0D0D] hover:bg-black/5 rounded-xs transition-colors"
             aria-label="إغلاق"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Drawer Body */}
-        <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 touch-scroll space-y-3.5">
+        {/* Scrollable Form Body */}
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 touch-scroll overscroll-contain space-y-3.5">
           {/* Order Summary Strip */}
           <div className="flex items-center justify-between border border-[#E5E5E0] bg-[#F7F7F5] p-3 text-xs">
-            <div>
-              <span className="font-bold text-[#0D0D0D]">ملخص الطلب:</span>
-              <p className="text-[11px] text-[#6B6B66] line-clamp-1">
+            <div className="min-w-0 pr-1">
+              <span className="font-bold text-[#0D0D0D] block">ملخص الطلب:</span>
+              <p className="text-[11px] text-[#6B6B66] line-clamp-1 mt-0.5">
                 {product.title}
               </p>
-              <div className="flex items-center gap-2 mt-1 text-[10px] text-[#6B6B66]">
-                <span className="font-mono">الكمية: {quantity}</span>
+              <div className="flex flex-wrap items-center gap-1.5 mt-1.5 text-[10px] text-[#6B6B66]">
+                <span className="font-mono bg-white border border-[#E5E5E0] px-1.5 py-0.5 font-bold text-[#0D0D0D]">
+                  الكمية: {quantity}
+                </span>
                 {selectedSize && (
-                  <span className="border border-[#E5E5E0] bg-white px-1.5 py-0.2 font-mono">
+                  <span className="border border-[#E5E5E0] bg-white px-1.5 py-0.5 font-mono font-bold text-[#0D0D0D]">
                     {selectedSize}
                   </span>
                 )}
-                {selectedColor && <span>{selectedColor}</span>}
+                {selectedColor && (
+                  <span className="border border-[#E5E5E0] bg-white px-1.5 py-0.5 font-semibold text-[#0D0D0D]">
+                    {selectedColor}
+                  </span>
+                )}
               </div>
             </div>
-            <span className="price-display text-base font-black text-[#0D0D0D] flex-shrink-0 mr-2">
+            <span className="price-display text-base sm:text-lg font-black text-[#0D0D0D] flex-shrink-0 mr-2">
               {formatPrice(totalPrice)}
             </span>
           </div>
@@ -207,7 +233,7 @@ export function ProductCheckoutDrawer({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="مثال: محمود علي"
-                className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none"
+                className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-base sm:text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none transition-colors"
               />
             </div>
 
@@ -224,7 +250,7 @@ export function ProductCheckoutDrawer({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="01xxxxxxxxx"
-                className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none font-mono"
+                className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-base sm:text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none font-mono transition-colors"
               />
             </div>
 
@@ -236,7 +262,7 @@ export function ProductCheckoutDrawer({
               <select
                 value={governorate}
                 onChange={(e) => setGovernorate(e.target.value)}
-                className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none"
+                className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-base sm:text-sm text-[#0D0D0D] focus:border-[#0D0D0D] focus:outline-none transition-colors"
               >
                 {GOVERNORATES.map((g) => (
                   <option key={g} value={g}>
@@ -258,7 +284,7 @@ export function ProductCheckoutDrawer({
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="المنطقة، الشارع، رقم العمارة، رقم الشقة"
-                className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none"
+                className="w-full min-h-[48px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-base sm:text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none transition-colors"
               />
             </div>
 
@@ -272,17 +298,17 @@ export function ProductCheckoutDrawer({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="مثال: الاتصال قبل الوصول بنصف ساعة"
-                className="w-full min-h-[44px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none"
+                className="w-full min-h-[44px] rounded-xs border border-[#E5E5E0] bg-white px-3 text-base sm:text-sm text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none transition-colors"
               />
             </div>
           </form>
         </div>
 
-        {/* Footer with Safe-Area Inset */}
-        <div className="border-t border-[#E5E5E0] bg-white p-3.5 sm:p-4 pb-safe space-y-2.5">
+        {/* Footer (Always Fixed at Bottom with Safe-Area for Notch/Home Bar) */}
+        <div className="flex-shrink-0 border-t border-[#E5E5E0] bg-white p-3.5 sm:p-4 pb-safe space-y-2.5 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-[#6B6B66]">الإجمالي:</span>
-            <span className="price-display text-lg font-black text-[#0D0D0D]">
+            <span className="text-[#6B6B66] font-medium">الإجمالي:</span>
+            <span className="price-display text-lg sm:text-xl font-black text-[#0D0D0D]">
               {formatPrice(totalPrice)}
             </span>
           </div>
@@ -297,13 +323,15 @@ export function ProductCheckoutDrawer({
           <button
             type="submit"
             form="product-checkout-form"
-            className="flex min-h-[52px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98"
+            className="flex min-h-[52px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs sm:text-sm font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98 cursor-pointer"
           >
             <MessageCircle className="h-4 w-4 text-emerald-400" />
             <span>تأكيد وإرسال الطلب على واتساب</span>
           </button>
         </div>
-      </div>
-    </>
+      </aside>
+    </div>
   );
+
+  return createPortal(drawerElement, document.body);
 }
