@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: 'Cairo', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Cairo', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -32,73 +32,157 @@
   --color-whatsapp: var(--whatsapp);
   --color-whatsapp-foreground: var(--whatsapp-foreground);
   --color-whatsapp-hover: var(--whatsapp-hover);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
   --color-price: var(--price);
   --color-sale: var(--sale);
 }
 
 :root {
-  --radius: 0.5rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.15 0 0);
+  --radius: 0.75rem;
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.12 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0 0);
+  --card-foreground: oklch(0.12 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0 0);
-  --primary: oklch(0.18 0 0);
+  --popover-foreground: oklch(0.12 0 0);
+  --primary: oklch(0.14 0 0);
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.18 0 0);
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.96 0 0);
-  --accent-foreground: oklch(0.18 0 0);
+  --secondary: oklch(0.96 0 0);
+  --secondary-foreground: oklch(0.15 0 0);
+  --muted: oklch(0.95 0 0);
+  --muted-foreground: oklch(0.46 0 0);
+  --accent: oklch(0.95 0 0);
+  --accent-foreground: oklch(0.15 0 0);
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.92 0 0);
-  --input: oklch(0.92 0 0);
-  --ring: oklch(0.72 0.17 152);
+  --border: oklch(0.90 0 0);
+  --input: oklch(0.90 0 0);
+  --ring: oklch(0.70 0.17 150);
 
-  /* WhatsApp accent */
-  --whatsapp: oklch(0.72 0.17 152);
+  /* WhatsApp Accent */
+  --whatsapp: oklch(0.68 0.19 148);
   --whatsapp-foreground: oklch(0.99 0 0);
-  --whatsapp-hover: oklch(0.65 0.18 152);
+  --whatsapp-hover: oklch(0.62 0.20 148);
 
-  --price: oklch(0.18 0 0);
-  --sale: oklch(0.6 0.22 27);
+  /* Gold Luxury Accent */
+  --gold: oklch(0.78 0.14 78);
+  --gold-foreground: oklch(0.15 0.05 78);
+
+  --price: oklch(0.14 0 0);
+  --sale: oklch(0.62 0.22 28);
 }
 
 .dark {
-  --background: oklch(0.12 0 0);
+  /* Rich Deep Obsidian */
+  --background: oklch(0.10 0.01 250);
   --foreground: oklch(0.98 0 0);
-  --card: oklch(0.16 0 0);
+  --card: oklch(0.13 0.01 250);
   --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.16 0 0);
+  --popover: oklch(0.14 0.01 250);
   --popover-foreground: oklch(0.98 0 0);
   --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.15 0 0);
-  --secondary: oklch(0.22 0 0);
+  --primary-foreground: oklch(0.10 0 0);
+  --secondary: oklch(0.18 0.01 250);
   --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.22 0 0);
+  --muted: oklch(0.17 0.01 250);
   --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.22 0 0);
+  --accent: oklch(0.19 0.02 250);
   --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.65 0.2 27);
+  --destructive: oklch(0.65 0.22 27);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.25 0 0);
-  --ring: oklch(0.72 0.17 152);
+  --border: oklch(0.22 0.01 250);
+  --input: oklch(0.22 0.01 250);
+  --ring: oklch(0.70 0.19 148);
+
+  /* WhatsApp Accent */
+  --whatsapp: oklch(0.68 0.19 148);
+  --whatsapp-foreground: oklch(0.99 0 0);
+  --whatsapp-hover: oklch(0.62 0.20 148);
+
+  /* Gold Luxury Accent */
+  --gold: oklch(0.82 0.15 78);
+  --gold-foreground: oklch(0.12 0.05 78);
+
   --price: oklch(0.98 0 0);
-  --sale: oklch(0.65 0.2 27);
+  --sale: oklch(0.68 0.22 28);
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-feature-settings: 'cv02','cv03','cv04','cv11';
+    overflow-x: hidden;
   }
-  h1, h2, h3, h4 { font-weight: 700; letter-spacing: -0.02em; }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 800;
+    letter-spacing: -0.025em;
+  }
 }
+
+/* Glassmorphism & Micro-animations */
+.glass-panel {
+  background: oklch(0.13 0.01 250 / 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid oklch(0.25 0.01 250 / 0.6);
+}
+
+.glass-nav {
+  background: oklch(0.10 0.01 250 / 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid oklch(0.22 0.01 250 / 0.7);
+}
+
+.luxury-card {
+  position: relative;
+  background: oklch(0.13 0.01 250 / 0.9);
+  border: 1px solid oklch(0.22 0.01 250);
+  border-radius: var(--radius);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.luxury-card:hover {
+  border-color: oklch(0.35 0.02 250);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.badge-gold {
+  background: linear-gradient(135deg, oklch(0.85 0.14 78), oklch(0.72 0.16 65));
+  color: oklch(0.12 0.05 78);
+  font-weight: 700;
+}
+
+.badge-whatsapp {
+  background: linear-gradient(135deg, oklch(0.72 0.19 148), oklch(0.60 0.18 148));
+  color: #fff;
+  font-weight: 700;
+}
+
+.pulse-dot {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-ring {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.15);
+  }
+}
+
