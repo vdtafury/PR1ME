@@ -1,34 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
-  MessageCircle,
   Truck,
-  ShieldCheck,
+  PackageCheck,
   RotateCcw,
+  Headset,
   ArrowLeft,
-  ChevronLeft,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { BRAND, generalContactLink } from "@/lib/whatsapp";
 import { ProductCard } from "@/components/ProductCard";
-import type { Category, Product, Offer } from "@/lib/types";
+import type { Category, Product } from "@/lib/types";
 import heroImg from "@/assets/hero.jpg";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
   head: () => ({
     meta: [
-      { title: "PR1ME — أزياء كاجوال عصرية في مصر | اطلب عبر واتساب" },
+      { title: "PR1ME — WEAR YOUR STORY | تصاميم كاجوال عصرية" },
       {
         name: "description",
         content:
-          "تسوق أرقى الملابس الكاجوال اليومية من PR1ME. خامات قطنية متينة، شحن سريع لكافة المحافظات، ومعاينة وقياس قبل الدفع كاش عند الاستلام.",
+          "مش مجرد ملابس دي قصتك. تصاميم يومية بخامات مريحة وجودة حقيقية مستوحاة من الشارع المصري. شحن لكافة المحافظات ومعاينة قبل الدفع.",
       },
-      { property: "og:title", content: "PR1ME — أزياء كاجوال عصرية في مصر" },
-      {
-        property: "og:description",
-        content: "ملابس كاجوال بخامات ممتازة مع سهولة الطلب المباشر عبر واتساب والمعاينة قبل الدفع.",
-      },
+      { property: "og:title", content: "PR1ME — WEAR YOUR STORY" },
       { property: "og:url", content: "/" },
     ],
     links: [{ rel: "canonical", href: "/" }],
@@ -55,339 +49,234 @@ function HomePage() {
         .from("products")
         .select("*")
         .eq("is_available", true)
-        .eq("is_featured", true)
         .order("sort_order")
-        .limit(8);
+        .limit(10);
       if (error) throw error;
       return data as Product[];
     },
   });
 
-  const offers = useQuery({
-    queryKey: ["offers-home"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("offers")
-        .select("*")
-        .eq("is_active", true)
-        .order("sort_order")
-        .limit(2);
-      if (error) throw error;
-      return data as Offer[];
-    },
-  });
-
   return (
-    <div className="flex flex-col gap-16 sm:gap-20">
-      {/* Editorial Product-Dominant Hero */}
-      <section className="border-b border-border bg-card/30">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="grid grid-cols-1 items-center gap-10 py-10 md:grid-cols-12 md:py-16">
-            {/* Hero Copy */}
-            <div className="flex flex-col items-start md:col-span-7">
-              <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400">
-                New Season • Drop 2026
-              </span>
+    <div className="flex flex-col gap-12 sm:gap-16 bg-[#F7F7F5] pb-12">
+      {/* 1. Hero Section - Matches Image 1 */}
+      <section className="relative overflow-hidden bg-[#0D0D0D] text-white">
+        <div className="relative min-h-[500px] sm:min-h-[580px] w-full flex items-center">
+          {/* Background Streetwear Imagery */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src={heroImg}
+              alt="PR1ME Streetwear - Good Outfits Better Days"
+              className="h-full w-full object-cover object-center brightness-75"
+              fetchPriority="high"
+            />
+            {/* Soft gradient overlay focusing on the right text panel */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/40 to-black/80 md:to-black/90" />
+          </div>
 
-              <h1 className="mt-3 text-3xl font-black leading-tight text-foreground sm:text-5xl lg:text-6xl tracking-tight">
-                أزياء كاجوال يومية.
+          {/* Hero Content - Aligned Right in RTL */}
+          <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 py-16">
+            <div className="flex flex-col items-start max-w-xl pr-0 md:pr-6">
+              <h1 className="text-3xl font-black leading-tight sm:text-5xl lg:text-6xl text-white tracking-tight">
+                مش مجرد ملابس
                 <br />
-                <span className="text-muted-foreground font-normal">
-                  مصممة لتدوم وتناسب يومك.
-                </span>
+                <span className="text-[#F7F7F5]">دي قصتك.</span>
               </h1>
 
-              <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base">
-                ملابس كاجوال مصنوعة من خامات قطنية معالجة ضد الانكماش وبهتان الألوان.
-                اطلب قطعتك بسهولة في محادثة مباشرة عبر واتساب مع ميزة <strong>المعاينة والقياس بحضور المندوب قبل دفع أي مبلغ كاش</strong>.
+              <p className="mt-4 text-xs sm:text-sm text-white/90 leading-relaxed max-w-md">
+                تصاميم يومية بخامات مريحة وجودة حقيقية مستوحاة من الشارع المصري.
               </p>
 
-              {/* Practical CTAs */}
-              <div className="mt-8 flex flex-wrap items-center gap-3 w-full sm:w-auto">
+              {/* CTAs */}
+              <div className="mt-8 flex items-center gap-3">
                 <Link
                   to="/products"
-                  className="flex flex-1 sm:flex-initial items-center justify-center gap-2 rounded-xs bg-foreground px-6 py-3.5 text-xs font-bold text-background transition-colors hover:bg-zinc-200"
+                  className="inline-flex items-center gap-2 bg-[#F7F7F5] px-6 py-3 text-xs font-bold text-[#0D0D0D] transition-colors hover:bg-white active:scale-98"
                 >
-                  <span>تصفح الكتالوج بالكامل</span>
-                  <ChevronLeft className="h-4 w-4" />
+                  <span>تسوق الآن</span>
+                  <ArrowLeft className="h-3.5 w-3.5" />
                 </Link>
-                <a
-                  href={generalContactLink()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-1 sm:flex-initial items-center justify-center gap-2 rounded-xs border border-emerald-600/50 bg-emerald-950/20 px-5 py-3.5 text-xs font-bold text-emerald-400 transition-colors hover:bg-emerald-900/30"
+                <Link
+                  to="/products"
+                  className="inline-flex items-center border border-white/60 bg-black/30 backdrop-blur-xs px-5 py-3 text-xs font-bold text-white transition-colors hover:bg-white/10 active:scale-98"
                 >
-                  <MessageCircle className="h-4 w-4" />
-                  <span>اطلب عبر واتساب</span>
-                </a>
+                  <span>شاهد الكوليكشن</span>
+                </Link>
               </div>
 
-              {/* Guarantees Micro-Strip */}
-              <div className="mt-10 flex flex-wrap items-center gap-6 border-t border-border pt-6 text-xs text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                  <span>معاينة وقياس قبل الدفع</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Truck className="h-4 w-4 text-emerald-500" />
-                  <span>توصيل 2-4 أيام لكافة المحافظات</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <RotateCcw className="h-4 w-4 text-emerald-500" />
-                  <span>استبدال مقاس خلال 14 يوم</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Hero Visual Area */}
-            <div className="md:col-span-5">
-              <div className="relative aspect-[4/5] w-full overflow-hidden border border-border bg-muted">
-                <img
-                  src={heroImg}
-                  alt="PR1ME Casual Apparel"
-                  width={1600}
-                  height={1100}
-                  className="h-full w-full object-cover"
-                  fetchPriority="high"
-                />
-                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent p-5 text-white">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-300">
-                    PR1ME CORE COLLECTION
-                  </span>
-                  <p className="mt-1 text-xs font-semibold text-white/90">
-                    قطن مصري 100% معالج • قَصّات مريحة وتفاصيل متينة
-                  </p>
-                </div>
+              {/* Pagination Indicator */}
+              <div className="mt-12 flex items-center gap-2 text-xs font-mono text-white/70">
+                <span className="font-bold text-white">01</span>
+                <span className="h-px w-8 bg-white/40" />
+                <span>03</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Curated Categories */}
+      {/* 2. Three Bento Cards Banner Grid - Matches Image 1 */}
       <section className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-        <div className="flex items-end justify-between border-b border-border pb-4">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-              تصفح حسب القسم
-            </h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              اختر الفئة للاطلاع على الموديلات والمقاسات المتوفرة
-            </p>
-          </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {/* Card 1: Accessories */}
           <Link
             to="/products"
-            className="flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground"
+            search={{ category: "accessories" }}
+            className="group relative aspect-[4/3] overflow-hidden bg-[#0D0D0D] text-white"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&auto=format&fit=crop&q=80"
+              alt="PR1ME Accessories"
+              loading="lazy"
+              className="h-full w-full object-cover brightness-60 transition-transform duration-500 group-hover:scale-103"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute bottom-5 right-5 left-5">
+              <h3 className="text-base font-bold sm:text-lg">الإكسسوارات تكمل الإطلالة</h3>
+              <p className="mt-1 flex items-center gap-1 text-xs font-semibold text-white/80 group-hover:text-white">
+                <span>تسوق الآن</span>
+                <ArrowLeft className="h-3 w-3" />
+              </p>
+            </div>
+          </Link>
+
+          {/* Card 2: Summer 2026 Drops */}
+          <Link
+            to="/products"
+            search={{ category: "t-shirts" }}
+            className="group relative aspect-[4/3] overflow-hidden bg-[#0D0D0D] text-white"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80"
+              alt="Summer 2026 Collection"
+              loading="lazy"
+              className="h-full w-full object-cover brightness-60 transition-transform duration-500 group-hover:scale-103"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute bottom-5 right-5 left-5">
+              <h3 className="text-base font-bold sm:text-lg">كوليكشن صيف 2026</h3>
+              <p className="mt-1 flex items-center gap-1 text-xs font-semibold text-white/80 group-hover:text-white">
+                <span>تسوق الآن</span>
+                <ArrowLeft className="h-3 w-3" />
+              </p>
+            </div>
+          </Link>
+
+          {/* Card 3: Quality Egyptian Fabrics */}
+          <Link
+            to="/about"
+            className="group relative aspect-[4/3] overflow-hidden bg-[#0D0D0D] text-white"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&auto=format&fit=crop&q=80"
+              alt="PR1ME Fabric Quality"
+              loading="lazy"
+              className="h-full w-full object-cover brightness-60 transition-transform duration-500 group-hover:scale-103"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute bottom-5 right-5 left-5">
+              <h3 className="text-base font-bold sm:text-lg">خامات مصرية بجودة حقيقية</h3>
+              <p className="mt-1 text-xs font-medium text-white/80">راحة تدوم معك</p>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* 3. Latest Products Section - Matches Image 1 */}
+      <section className="mx-auto w-full max-w-7xl px-4 sm:px-6">
+        <div className="flex items-center justify-between pb-4">
+          <h2 className="text-xl font-bold text-[#0D0D0D] sm:text-2xl">
+            أحدث المنتجات
+          </h2>
+          <Link
+            to="/products"
+            className="flex items-center gap-1 text-xs font-bold text-[#0D0D0D] hover:text-[#6B6B66] transition-colors"
           >
             <span>عرض الكل</span>
-            <ChevronLeft className="h-3.5 w-3.5" />
+            <ArrowLeft className="h-3 w-3" />
           </Link>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {(categories.data ?? []).map((c) => (
-            <Link
-              key={c.id}
-              to="/products"
-              search={{ category: c.slug }}
-              className="group relative block aspect-[3/4] overflow-hidden border border-border bg-card transition-colors hover:border-zinc-600"
-            >
-              {c.image_url ? (
-                <img
-                  src={c.image_url}
-                  alt={c.name}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-103"
-                />
-              ) : (
-                <div className="h-full w-full bg-muted" />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute bottom-3 right-3 left-3">
-                <span className="block text-sm font-bold text-white">{c.name}</span>
-                <span className="text-[10px] font-medium text-white/70">تصفح القطع ←</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Products */}
-      <section className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-        <div className="flex items-end justify-between border-b border-border pb-4">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-              القطع الأكثر طلباً
-            </h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              أحدث الإصدارات والموديلات الجاهزة للشحن الفوري
-            </p>
-          </div>
-          <Link
-            to="/products"
-            className="flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground"
-          >
-            <span>جميع المنتجات ({featured.data?.length ?? 0})</span>
-            <ChevronLeft className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-
-        <div className="mt-6 grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {featured.isLoading
-            ? Array.from({ length: 8 }).map((_, i) => (
+            ? Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
-                  className="aspect-[4/5] animate-pulse border border-border bg-muted/40"
+                  className="aspect-square animate-pulse border border-[#E5E5E0] bg-white"
                 />
               ))
             : (featured.data ?? []).map((p) => <ProductCard key={p.id} product={p} />)}
         </div>
       </section>
 
-      {/* Promotional Spotlight (If Offers Exist) */}
-      {(offers.data?.length ?? 0) > 0 && (
-        <section className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-          <div className="border-b border-border pb-4">
-            <h2 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-              عروض وتخفيضات خاصة
-            </h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              باقات حصرية وخصومات لفترة محدودة على تشكيلات مختارة
-            </p>
-          </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {offers.data!.map((o) => (
-              <a
-                key={o.id}
-                href={
-                  o.link_url ||
-                  generalContactLink(`مرحباً PR1ME، أود الاستفسار عن العرض: ${o.title}`)
-                }
-                target={o.link_url ? "_self" : "_blank"}
-                rel="noopener noreferrer"
-                className="group relative block aspect-[16/9] overflow-hidden border border-border bg-card transition-colors hover:border-zinc-500"
-              >
-                {o.image_url && (
-                  <img
-                    src={o.image_url}
-                    alt={o.title}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-102"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                <div className="absolute inset-0 flex flex-col justify-end p-5 text-white sm:p-7">
-                  {o.badge_text && (
-                    <span className="mb-2 w-fit rounded-xs bg-red-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
-                      {o.badge_text}
-                    </span>
-                  )}
-                  <h3 className="text-xl font-black text-white sm:text-2xl">{o.title}</h3>
-                  {o.description && (
-                    <p className="mt-1.5 max-w-md text-xs text-zinc-300 leading-relaxed">
-                      {o.description}
-                    </p>
-                  )}
-                  <div className="mt-4">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white underline underline-offset-4">
-                      طلب العرض عبر واتساب ←
-                    </span>
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* How Ordering Works (Commercial Clarity) */}
-      <section className="border-y border-border bg-card/20 py-12 sm:py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="max-w-xl">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-              تجربة تسوق سهلة ومريحة
-            </span>
-            <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              كيف تطلب من PR1ME في 3 خطوات؟
-            </h2>
-            <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-              لا داعي لإدخال بطاقات بنكية أو إنشاء حسابات معقدة.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            <div className="border border-border bg-card p-5">
-              <span className="font-mono text-xs font-black text-muted-foreground">01</span>
-              <h3 className="mt-3 text-base font-bold text-foreground">اختر قطعتك ومقاسك</h3>
-              <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-                تصفح الكتالوج، حدد لونك ومقاسك المفضل، واستعن بجدول المقاسات الدقيق لمعرفة الأنسب لوزنك وطولك.
-              </p>
+      {/* 4. Story Banner Section - Matches Image 1 */}
+      <section className="mx-auto w-full max-w-7xl px-4 sm:px-6">
+        <div className="relative overflow-hidden bg-[#0D0D0D] text-white">
+          <div className="relative min-h-[360px] sm:min-h-[420px] flex items-center">
+            {/* Background Image: Model resting with street graffiti */}
+            <div className="absolute inset-0 z-0">
+              <img
+                src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&auto=format&fit=crop&q=80"
+                alt="PR1ME Brand Story - For A Better Version Of You"
+                className="h-full w-full object-cover brightness-65 object-left"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/50 to-black/90" />
             </div>
 
-            <div className="border border-border bg-card p-5">
-              <span className="font-mono text-xs font-black text-emerald-400">02</span>
-              <h3 className="mt-3 text-base font-bold text-foreground">تأكيد الطلب على واتساب</h3>
-              <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-                بضغطة واحدة، تفتح محادثة واتساب مجهزة بكامل بيانات طلبك مع ممثل خدمة العملاء لتأكيد العنوان وموعد الشحن.
+            {/* Story Text Box (Right Side in RTL) */}
+            <div className="relative z-10 mr-auto max-w-md p-6 sm:p-10 text-right">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">
+                مزيد من
+              </span>
+              <h3 className="mt-1 text-2xl font-black text-white sm:text-3xl">
+                قصة PR1ME
+              </h3>
+              <p className="mt-3 text-xs sm:text-sm text-white/90 leading-relaxed">
+                براند مصري مستقل. نؤمن إن الإطلالة مش مجرد ملابس لكن انعكاس لشخصيتك. نصمم لك طقم يومك وترافقك في رحلتك.
               </p>
-            </div>
-
-            <div className="border border-border bg-card p-5">
-              <span className="font-mono text-xs font-black text-muted-foreground">03</span>
-              <h3 className="mt-3 text-base font-bold text-foreground">المعاينة ثم الدفع كاش</h3>
-              <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-                يصلك المندوب خلال 2 إلى 4 أيام. افتح الشحنة وقس القطعة وتأكد من الخامة أولاً قبل دفع أي مليم.
-              </p>
+              <div className="mt-6">
+                <Link
+                  to="/about"
+                  className="inline-flex items-center gap-2 bg-[#F7F7F5] px-5 py-2.5 text-xs font-bold text-[#0D0D0D] transition-colors hover:bg-white"
+                >
+                  <span>تعرف أكثر</span>
+                  <ArrowLeft className="h-3 w-3" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Brand Standards & Direct Sizing Help (Replaces Fake Reviews) */}
+      {/* 5. 4 Trust / Service Features Strip - Matches Image 1 */}
       <section className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-        <div className="grid gap-8 lg:grid-cols-12 items-center">
-          <div className="lg:col-span-7">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400">
-              معايير PR1ME
-            </span>
-            <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              الجودة والراحة في كل تفصيلة
-            </h2>
-            <p className="mt-3 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              في PR1ME، نركز على أساسيات الملابس اليومية: خامات قطنية مصرية فاخرة تعيش طويلاً، قَصّات مريحة لا تعيق حركتك، ومعالجة خاصة ضد الانكماش والبهتان بعد الغسيل المتكرر.
-            </p>
-
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div className="border border-border p-4 bg-card/40">
-                <h4 className="font-bold text-foreground">خامات قطن ممشط 100%</h4>
-                <p className="mt-1 text-muted-foreground">نعومة فائقة على البشرة مع متانة تتحمل الاستخدام اليومي.</p>
-              </div>
-              <div className="border border-border p-4 bg-card/40">
-                <h4 className="font-bold text-foreground">حق المعاينة قبل الاستلام</h4>
-                <p className="mt-1 text-muted-foreground">لك كامل الحق في قياس القطعة وفحص الخياطة قبل الدفع للمندوب.</p>
-              </div>
-            </div>
+        <div className="grid grid-cols-2 gap-4 border border-[#E5E5E0] bg-white p-5 sm:grid-cols-4 sm:p-6 text-center">
+          {/* 1. Fast Shipping */}
+          <div className="flex flex-col items-center">
+            <Truck className="h-6 w-6 text-[#0D0D0D]" />
+            <h4 className="mt-2 text-xs font-bold text-[#0D0D0D]">شحن لجميع المحافظات</h4>
+            <p className="mt-0.5 text-[11px] text-[#6B6B66]">من 2 – 5 أيام</p>
           </div>
 
-          <div className="lg:col-span-5 border border-border bg-card p-6">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-              مساعدة فورية في المقاس
-            </span>
-            <h3 className="mt-2 text-lg font-bold text-foreground">
-              محتار بين مقاسين؟
-            </h3>
-            <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-              أرسل وزنك وطولك لممثل خدمة العملاء وسيقترح لك المقاس المضبوط تماماً بناءً على قَصّة الموديل.
-            </p>
-            <a
-              href={generalContactLink("مرحباً PR1ME، أحتاج مساعدة في اختيار المقاس المناسب لوزني وطولي")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 flex items-center justify-center gap-2 rounded-xs bg-emerald-600 px-5 py-3 text-xs font-bold text-white transition-colors hover:bg-emerald-500 w-full"
-            >
-              <MessageCircle className="h-4 w-4" />
-              <span>استشر خبير المقاسات على واتساب</span>
-            </a>
+          {/* 2. Inspection Before Payment */}
+          <div className="flex flex-col items-center">
+            <PackageCheck className="h-6 w-6 text-[#0D0D0D]" />
+            <h4 className="mt-2 text-xs font-bold text-[#0D0D0D]">معاينة قبل الدفع</h4>
+            <p className="mt-0.5 text-[11px] text-[#6B6B66]">اطلب وجرب براحتك</p>
+          </div>
+
+          {/* 3. Easy Exchange */}
+          <div className="flex flex-col items-center">
+            <RotateCcw className="h-6 w-6 text-[#0D0D0D]" />
+            <h4 className="mt-2 text-xs font-bold text-[#0D0D0D]">استبدال بسهولة</h4>
+            <p className="mt-0.5 text-[11px] text-[#6B6B66]">خلال 14 يوم</p>
+          </div>
+
+          {/* 4. WhatsApp Fast Support */}
+          <div className="flex flex-col items-center">
+            <Headset className="h-6 w-6 text-[#0D0D0D]" />
+            <h4 className="mt-2 text-xs font-bold text-[#0D0D0D]">دعم سريع عبر واتساب</h4>
+            <p className="mt-0.5 text-[11px] text-[#6B6B66]">من 10 ص – 10 م</p>
           </div>
         </div>
       </section>

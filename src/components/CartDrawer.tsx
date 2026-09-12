@@ -221,9 +221,9 @@ export function CartDrawer() {
 
             <button
               onClick={handleCheckout}
-              className="flex w-full items-center justify-center gap-2 bg-emerald-600 py-3 text-xs font-bold text-white transition-colors hover:bg-emerald-500"
+              className="flex w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98"
             >
-              <MessageCircle className="h-4 w-4" />
+              <MessageCircle className="h-4 w-4 text-emerald-400" />
               <span>تأكيد وإرسال الطلب على واتساب</span>
             </button>
           </div>

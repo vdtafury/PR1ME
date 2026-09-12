@@ -1,154 +1,159 @@
-import {
-  Instagram,
-  Facebook,
-  MessageCircle,
-  MapPin,
-  Clock,
-  Truck,
-  ShieldCheck,
-  RotateCcw,
-  CheckCircle,
-} from "lucide-react";
-import { BRAND, generalContactLink } from "@/lib/whatsapp";
 import { Link } from "@tanstack/react-router";
+import { ArrowLeft, Instagram, Facebook, Youtube } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { BRAND } from "@/lib/whatsapp";
 
 export function Footer() {
-  const trustFeatures = [
-    {
-      icon: ShieldCheck,
-      title: "معاينة قبل الاستلام",
-      desc: "قس القطعة وعاين الخامة قبل دفع أي مبلغ للمندوب",
-    },
-    {
-      icon: Truck,
-      title: "شحن سريع لكافة المحافظات",
-      desc: "توصيل خلال 2 إلى 4 أيام عمل لجميع مدن مصر",
-    },
-    {
-      icon: RotateCcw,
-      title: "استبدال مقاس خلال 14 يوماً",
-      desc: "مرونة تامة في تبديل المقاس عبر محادثة واتساب",
-    },
-    {
-      icon: CheckCircle,
-      title: "خامات قطنية 100% معالجة",
-      desc: "ثبات في الألوان ومقاومة للانكماش مع الغسيل",
-    },
-  ];
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      toast.success("شكراً لاشتراكك في نشرتنا البريدية!");
+      setEmail("");
+    }
+  };
 
   return (
-    <footer className="mt-20 border-t border-border bg-card/20">
-      {/* Service Guarantees Strip */}
-      <div className="border-b border-border py-8">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
-          {trustFeatures.map((feat, i) => (
-            <div key={i} className="flex items-start gap-3 text-xs">
-              <feat.icon className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-bold text-foreground">{feat.title}</h4>
-                <p className="mt-0.5 text-muted-foreground leading-relaxed">{feat.desc}</p>
+    <footer className="border-t border-[#E5E5E0] bg-[#F7F7F5] pt-12 pb-8 text-[#0D0D0D]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12 pb-10">
+          {/* Column 1: Brand & Copyright (Far Right in RTL) */}
+          <div className="md:col-span-3 flex flex-col items-start">
+            <Link to="/" className="flex flex-col items-start select-none">
+              <span className="text-2xl font-black tracking-tight text-[#0D0D0D] font-mono leading-none">
+                PR1ME
+              </span>
+              <span className="mt-1 text-[8px] font-bold tracking-[0.25em] text-[#6B6B66] uppercase leading-none">
+                WEAR YOUR STORY
+              </span>
+            </Link>
+            <p className="mt-6 text-[11px] text-[#6B6B66]">
+              جميع الحقوق محفوظة. © {new Date().getFullYear()} {BRAND.name}
+            </p>
+          </div>
+
+          {/* Column 2: Help / مساعدة */}
+          <div className="md:col-span-2">
+            <h4 className="text-xs font-bold text-[#0D0D0D]">مساعدة</h4>
+            <ul className="mt-3 space-y-2 text-xs text-[#6B6B66]">
+              <li>
+                <Link to="/about" className="hover:text-[#0D0D0D] transition-colors">
+                  تتبع طلبك
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className="hover:text-[#0D0D0D] transition-colors">
+                  الأسئلة الشائعة
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className="hover:text-[#0D0D0D] transition-colors">
+                  سياسة الاستبدال والإرجاع
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Quick Links / روابط سريعة */}
+          <div className="md:col-span-2">
+            <h4 className="text-xs font-bold text-[#0D0D0D]">روابط سريعة</h4>
+            <ul className="mt-3 space-y-2 text-xs text-[#6B6B66]">
+              <li>
+                <Link to="/products" className="hover:text-[#0D0D0D] transition-colors">
+                  جميع المنتجات
+                </Link>
+              </li>
+              <li>
+                <Link to="/offers" className="hover:text-[#0D0D0D] transition-colors">
+                  العروض
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className="hover:text-[#0D0D0D] transition-colors">
+                  من نحن
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className="hover:text-[#0D0D0D] transition-colors">
+                  تواصل معنا
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Newsletter & Social (Far Left in RTL) */}
+          <div className="md:col-span-5 flex flex-col items-start md:items-end">
+            <div className="w-full max-w-sm">
+              <h4 className="text-xs font-bold text-[#0D0D0D]">
+                اشترك في نشرتنا البريدية
+              </h4>
+              <p className="mt-1 text-[11px] text-[#6B6B66]">
+                كن أول من يعرف عن العروض والمنتجات الجديدة
+              </p>
+
+              {/* Newsletter Form */}
+              <form onSubmit={handleSubscribe} className="mt-3 flex">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="بريدك الإلكتروني"
+                  className="flex-1 rounded-r-xs border border-[#E5E5E0] bg-white px-3 py-2 text-xs text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  aria-label="اشتراك"
+                  className="flex items-center justify-center rounded-l-xs bg-[#0D0D0D] px-3 text-[#F7F7F5] hover:bg-[#1F1F1F] transition-colors"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+              </form>
+
+              {/* Social Media Icons */}
+              <div className="mt-4 flex items-center gap-3 text-[#0D0D0D]">
+                <a
+                  href={BRAND.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="text-[#6B6B66] hover:text-[#0D0D0D] transition-colors"
+                >
+                  <Instagram className="h-4 w-4" />
+                </a>
+                <a
+                  href={BRAND.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="TikTok"
+                  className="text-xs font-bold text-[#6B6B66] hover:text-[#0D0D0D] transition-colors"
+                >
+                  TikTok
+                </a>
+                <a
+                  href={BRAND.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="text-[#6B6B66] hover:text-[#0D0D0D] transition-colors"
+                >
+                  <Facebook className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://youtube.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                  className="text-[#6B6B66] hover:text-[#0D0D0D] transition-colors"
+                >
+                  <Youtube className="h-4 w-4" />
+                </a>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Main Footer Links */}
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-4">
-        {/* Brand Bio */}
-        <div className="md:col-span-2">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xs bg-foreground text-background font-black text-base font-mono">
-              P
-            </div>
-            <span className="text-base font-black tracking-widest text-foreground font-mono uppercase">
-              {BRAND.name}
-            </span>
-          </div>
-          <p className="mt-3 max-w-sm text-xs leading-relaxed text-muted-foreground">
-            أزياء كاجوال مصرية يومية بتصاميم راقية وخامات قطنية منتقاة بعناية. اطلب قطعتك بسهولة عبر واتساب وادفع كاش بعد المعاينة والقياس.
-          </p>
-
-          <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-              {BRAND.location}
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-              {BRAND.hours}
-            </span>
           </div>
         </div>
-
-        {/* Quick Links */}
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
-            المتجر
-          </h4>
-          <ul className="mt-3 space-y-2 text-xs">
-            <li>
-              <Link to="/products" className="text-muted-foreground hover:text-foreground">
-                جميع المنتجات والكتالوج
-              </Link>
-            </li>
-            <li>
-              <Link to="/offers" className="text-muted-foreground hover:text-foreground">
-                العروض والتخفيضات
-              </Link>
-            </li>
-            <li>
-              <Link to="/about" className="text-muted-foreground hover:text-foreground">
-                عن البراند والشحن
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Customer Support & Social */}
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
-            خدمة العملاء
-          </h4>
-          <div className="mt-3 space-y-2 text-xs">
-            <a
-              href={generalContactLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-emerald-400 hover:underline"
-            >
-              <MessageCircle className="h-3.5 w-3.5" />
-              <span>محادثة فورية على واتساب</span>
-            </a>
-          </div>
-
-          <div className="mt-5 flex gap-2">
-            <a
-              href={BRAND.instagram}
-              aria-label="Instagram"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="grid h-8 w-8 place-items-center border border-border text-muted-foreground hover:text-foreground hover:border-zinc-500"
-            >
-              <Instagram className="h-3.5 w-3.5" />
-            </a>
-            <a
-              href={BRAND.facebook}
-              aria-label="Facebook"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="grid h-8 w-8 place-items-center border border-border text-muted-foreground hover:text-foreground hover:border-zinc-500"
-            >
-              <Facebook className="h-3.5 w-3.5" />
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Copyright Bar */}
-      <div className="border-t border-border py-6 text-center text-[11px] text-muted-foreground">
-        <p>© {new Date().getFullYear()} {BRAND.name} Apparel. جميع الحقوق محفوظة.</p>
       </div>
     </footer>
   );

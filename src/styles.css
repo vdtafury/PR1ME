@@ -2,15 +2,13 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --font-sans: 'Cairo', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --radius-xs: 2px;
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
-  --radius-xl: 12px;
+  
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -23,81 +21,65 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* PR1ME Official Brand Palette */
+  --color-charcoal: var(--charcoal);
+  --color-stone: var(--stone);
+  --color-sand: var(--sand);
+  --color-accent: var(--accent);
+  --color-olive: var(--olive);
+  --color-sale: var(--sale);
   --color-whatsapp: var(--whatsapp);
   --color-whatsapp-foreground: var(--whatsapp-foreground);
   --color-whatsapp-hover: var(--whatsapp-hover);
   --color-price: var(--price);
-  --color-sale: var(--sale);
 }
 
 :root {
-  --radius: 0.375rem;
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.12 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.12 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.12 0 0);
-  --primary: oklch(0.12 0 0);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0 0);
-  --secondary-foreground: oklch(0.15 0 0);
-  --muted: oklch(0.95 0 0);
-  --muted-foreground: oklch(0.44 0 0);
-  --accent: oklch(0.94 0 0);
-  --accent-foreground: oklch(0.12 0 0);
-  --destructive: oklch(0.55 0.22 27);
-  --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.91 0 0);
-  --input: oklch(0.88 0 0);
-  --ring: oklch(0.65 0.18 150);
+  --radius: 0.25rem;
 
-  /* Clean commercial retail accents */
+  /* 70% Off White & Light Surfaces */
+  --background: #F7F7F5;
+  --foreground: #0D0D0D;
+  --card: #FFFFFF;
+  --card-foreground: #0D0D0D;
+  --popover: #FFFFFF;
+  --popover-foreground: #0D0D0D;
+
+  /* 20% Black & Primary Elements */
+  --primary: #0D0D0D;
+  --primary-foreground: #F7F7F5;
+  --secondary: #F7F7F5;
+  --secondary-foreground: #0D0D0D;
+
+  /* 5% Stone Gray / Borders & Dividers */
+  --border: #E5E5E0;
+  --input: #E5E5E0;
+  --stone: #E5E5E0;
+  --ring: #0D0D0D;
+
+  /* Neutral Scale */
+  --muted: #6B6B66;
+  --muted-foreground: #6B6B66;
+  --charcoal: #1F1F1F;
+
+  /* 3% Sand Beige (Brand Highlight) */
+  --sand: #C9B89A;
+  --accent: #C9B89A;
+
+  /* 2% Seasonal / Category / Sale */
+  --olive: #4A5A44;
+  --sale: #8B2E2E;
+
+  /* WhatsApp Official */
   --whatsapp: #15803d;
-  --whatsapp-foreground: #ffffff;
+  --whatsapp-foreground: #FFFFFF;
   --whatsapp-hover: #166534;
 
-  --price: oklch(0.12 0 0);
-  --sale: #b91c1c;
-}
-
-.dark {
-  /* Restrained, editorial dark canvas - confident & deep without neon/purple */
-  --radius: 0.375rem;
-  --background: #0d0d0f;
-  --foreground: #f4f4f5;
-  --card: #131316;
-  --card-foreground: #f4f4f5;
-  --popover: #151519;
-  --popover-foreground: #f4f4f5;
-  --primary: #f4f4f5;
-  --primary-foreground: #0d0d0f;
-  --secondary: #1a1a20;
-  --secondary-foreground: #f4f4f5;
-  --muted: #1c1c22;
-  --muted-foreground: #8e8e99;
-  --accent: #22222b;
-  --accent-foreground: #f4f4f5;
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
-  --border: #23232b;
-  --input: #23232b;
-  --ring: #22c55e;
-
-  /* Official WhatsApp Emerald */
-  --whatsapp: #22c55e;
-  --whatsapp-foreground: #000000;
-  --whatsapp-hover: #16a34a;
-
-  --price: #f4f4f5;
-  --sale: #ef4444;
+  --price: #0D0D0D;
 }
 
 @layer base {
@@ -118,57 +100,20 @@
   }
   h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.015em;
   }
 }
 
-/* Subtle, authentic commercial transitions */
-.retail-card {
-  position: relative;
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.retail-card:hover {
-  border-color: #3f3f4e;
-}
-
-/* Price typography - instant scanning */
+/* Tabular numbers for clean prices */
 .price-display {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
 
-/* Restrained retail badges */
-.badge-sale {
-  background-color: #b91c1c;
-  color: #ffffff;
-  font-weight: 700;
+/* Subtle image zooms */
+.img-zoom {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
-.dark .badge-sale {
-  background-color: #ef4444;
-  color: #000000;
-  font-weight: 800;
-}
-
-.badge-new {
-  background-color: #f4f4f5;
-  color: #0d0d0f;
-  font-weight: 700;
-}
-
-.dark .badge-new {
-  background-color: #272732;
-  color: #f4f4f5;
-  border: 1px solid #383848;
-}
-
-/* Clean editorial header blur - restrained */
-.editorial-nav {
-  background: rgba(13, 13, 15, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid #23232b;
+.img-zoom:hover {
+  transform: scale(1.03);
 }

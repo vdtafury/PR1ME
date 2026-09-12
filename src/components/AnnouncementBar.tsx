@@ -1,18 +1,27 @@
+import { Truck } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+
 export function AnnouncementBar() {
   return (
-    <div className="relative z-40 border-b border-border bg-card/60 py-2 text-[11px] font-medium text-muted-foreground">
+    <div className="relative z-40 bg-[#0D0D0D] py-2 text-[11px] text-[#F7F7F5]">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6">
+        {/* Right side in RTL: Shipping announcement */}
         <div className="flex items-center gap-2">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          <span className="text-foreground font-semibold">شحن سريع لكافة محافظات مصر</span>
-          <span className="hidden sm:inline text-border">•</span>
-          <span className="hidden sm:inline">معاينة وقياس القطعة قبل الدفع</span>
+          <Truck className="h-3.5 w-3.5 text-[#F7F7F5]" />
+          <span className="font-medium">
+            شحن مجاني للطلبات فوق 1000 جنيه داخل مصر
+          </span>
         </div>
 
-        <div className="flex items-center gap-4 text-[11px]">
-          <span className="text-foreground">شحن مجاني للطلبات فوق 1,000 ج.م</span>
-          <span className="hidden md:inline text-border">|</span>
-          <span className="hidden md:inline text-muted-foreground">الدفع كاش عند الاستلام</span>
+        {/* Left side in RTL: Tracking & Help */}
+        <div className="flex items-center gap-3 text-white/80">
+          <Link to="/about" className="hover:text-white transition-colors">
+            تتبع طلبك
+          </Link>
+          <span className="text-white/40">|</span>
+          <Link to="/about" className="hover:text-white transition-colors">
+            المساعدة
+          </Link>
         </div>
       </div>
     </div>
