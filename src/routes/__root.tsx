@@ -14,6 +14,8 @@ import { Footer } from "@/components/Footer";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { Toaster } from "@/components/ui/sonner";
 import { CartDrawer } from "@/components/CartDrawer";
+import { BrandLoader } from "@/components/BrandLoader";
+import { useRouterState } from "@tanstack/react-router";
 
 function NotFoundComponent() {
   return (
@@ -85,7 +87,10 @@ function RootComponent() {
 
 function SiteChrome() {
   const matchRoute = useMatchRoute();
+  const routerState = useRouterState();
+  const pathname = routerState.location.pathname;
   const isAdmin = !!matchRoute({ to: "/admin", fuzzy: true }) || !!matchRoute({ to: "/admin/login" });
+
   if (isAdmin) {
     return (
       <>
@@ -96,8 +101,11 @@ function SiteChrome() {
   }
   return (
     <div className="flex min-h-screen flex-col">
+      <BrandLoader />
       <Header />
-      <main className="flex-1"><Outlet /></main>
+      <main key={pathname} className="flex-1 animate-page-enter">
+        <Outlet />
+      </main>
       <Footer />
       <FloatingWhatsApp />
       <CartDrawer />

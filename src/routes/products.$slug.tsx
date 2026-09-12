@@ -15,6 +15,7 @@ import {
   ShoppingBag,
   HelpCircle,
   AlertCircle,
+  Check,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice, productOrderLink, generalContactLink } from "@/lib/whatsapp";
@@ -112,6 +113,7 @@ function ProductView({ product: p }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const [activeTab, setActiveTab] = useState<"details" | "shipping" | "guide">("details");
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
 
   // Embla carousel for mobile gestures
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
@@ -143,13 +145,15 @@ function ProductView({ product: p }: { product: Product }) {
     ? Math.round((savings / p.original_price!) * 100)
     : 0;
 
-  // Add to cart handler
+  // Add to cart handler with visual micro-interaction
   const handleAddToCart = () => {
     if (!isReadyToOrder) {
       toast.error("يرجى اختيار المقاس واللون أولاً");
       return;
     }
     addItem(p, qty, selectedSize || undefined, selectedColor || undefined);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 1500);
     toast.success(`تمت إضافة "${p.title}" إلى السلة`);
   };
 
@@ -260,13 +264,14 @@ function ProductView({ product: p }: { product: Product }) {
             )}
           </div>
 
-          {/* Desktop Main Image */}
+          {/* Desktop Main Image with Crossfade */}
           <div className="relative hidden aspect-square overflow-hidden border border-[#E5E5E0] bg-white md:block">
             {allImages[activeImg] ? (
               <img
+                key={activeImg}
                 src={allImages[activeImg]}
                 alt={p.title}
-                className="h-full w-full object-contain p-8"
+                className="h-full w-full object-contain p-8 animate-in fade-in duration-300"
               />
             ) : (
               <div className="grid h-full w-full place-items-center text-[#6B6B66]">
@@ -516,14 +521,25 @@ function ProductView({ product: p }: { product: Product }) {
                 type="button"
                 onClick={handleAddToCart}
                 disabled={!isReadyToOrder}
-                className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-xs border text-xs font-semibold transition-colors ${
-                  isReadyToOrder
-                    ? "border-[#0D0D0D] bg-white text-[#0D0D0D] hover:bg-[#F7F7F5] active:scale-98"
+                className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-xs border text-xs font-semibold transition-all duration-200 active:scale-98 ${
+                  isAdded
+                    ? "border-[#1F1F1F] bg-[#1F1F1F] text-emerald-400"
+                    : isReadyToOrder
+                    ? "border-[#0D0D0D] bg-white text-[#0D0D0D] hover:bg-[#F7F7F5]"
                     : "border-[#E5E5E0] bg-white text-[#6B6B66] cursor-not-allowed"
                 }`}
               >
-                <ShoppingBag className="h-3.5 w-3.5" />
-                <span>أضف إلى السلة</span>
+                {isAdded ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>تمت الإضافة ✓</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag className="h-3.5 w-3.5" />
+                    <span>أضف إلى السلة</span>
+                  </>
+                )}
               </button>
 
               <a
@@ -686,13 +702,15 @@ function ProductView({ product: p }: { product: Product }) {
               type="button"
               onClick={handleAddToCart}
               disabled={!isReadyToOrder}
-              className={`h-11 px-3.5 border text-xs font-bold transition-colors ${
-                isReadyToOrder
-                  ? "border-[#0D0D0D] bg-[#F7F7F5] text-[#0D0D0D] active:scale-95"
+              className={`h-11 px-3.5 border text-xs font-bold transition-all duration-200 active:scale-95 ${
+                isAdded
+                  ? "border-[#1F1F1F] bg-[#1F1F1F] text-emerald-400"
+                  : isReadyToOrder
+                  ? "border-[#0D0D0D] bg-[#F7F7F5] text-[#0D0D0D]"
                   : "border-[#E5E5E0] bg-white text-[#6B6B66] opacity-60"
               }`}
             >
-              السلة
+              {isAdded ? "تمت الإضافة ✓" : "السلة"}
             </button>
             <button
               type="button"

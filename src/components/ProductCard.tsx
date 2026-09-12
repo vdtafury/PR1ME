@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, ShoppingBag } from "lucide-react";
+import { Heart, ShoppingBag, Check } from "lucide-react";
 import { useState } from "react";
 import { formatPrice } from "@/lib/whatsapp";
 import { colorToHex } from "@/lib/colors";
@@ -9,6 +9,8 @@ import { useCartStore } from "@/lib/store";
 
 export function ProductCard({ product }: { product: Product }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isHeartPop, setIsHeartPop] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
   const hasSale = product.original_price && product.original_price > product.price;
@@ -22,7 +24,21 @@ export function ProductCard({ product }: { product: Product }) {
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     addItem(product, 1, product.sizes?.[0], product.colors?.[0]);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 1400);
     toast.success(`تمت إضافة "${product.title}" إلى السلة`);
+  };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsWishlisted(!isWishlisted);
+    setIsHeartPop(true);
+    setTimeout(() => setIsHeartPop(false), 260);
+    toast.success(
+      isWishlisted
+        ? "تمت الإزالة من المفضلة"
+        : `تمت إضافة "${product.title}" إلى المفضلة`
+    );
   };
 
   return (
@@ -60,23 +76,19 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </Link>
 
-        {/* Wishlist Heart Icon - 40px Touch Target */}
+        {/* Wishlist Heart Icon - 40px Touch Target with Pop Animation */}
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            setIsWishlisted(!isWishlisted);
-            toast.success(
-              isWishlisted
-                ? "تمت الإزالة من المفضلة"
-                : `تمت إضافة "${product.title}" إلى المفضلة`
-            );
-          }}
+          onClick={handleToggleWishlist}
           className="absolute top-1 right-1 z-10 grid h-10 w-10 place-items-center text-[#0D0D0D]/80 hover:text-[#0D0D0D] transition-colors"
           aria-label="إضافة للمفضلة"
         >
-          <div className="grid h-7 w-7 place-items-center rounded-full bg-white/80 backdrop-blur-xs shadow-xs">
+          <div
+            className={`grid h-7 w-7 place-items-center rounded-full bg-white/85 backdrop-blur-xs shadow-xs transition-transform ${
+              isHeartPop ? "animate-heart-pop" : "active:scale-90"
+            }`}
+          >
             <Heart
-              className={`h-3.5 w-3.5 ${
+              className={`h-3.5 w-3.5 transition-colors duration-200 ${
                 isWishlisted ? "fill-[#8B2E2E] text-[#8B2E2E]" : "stroke-[1.5]"
               }`}
             />
@@ -135,14 +147,27 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
 
-        {/* Quick Add Button with comfortable 38px touch target */}
+        {/* Quick Add Button with Immediate Micro-Interaction Feedback */}
         <div className="mt-2.5 pt-2 border-t border-[#E5E5E0]">
           <button
             onClick={handleQuickAdd}
-            className="flex min-h-[38px] w-full items-center justify-center gap-1 bg-[#0D0D0D] py-1.5 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98"
+            className={`flex min-h-[38px] w-full items-center justify-center gap-1.5 py-1.5 text-xs font-bold transition-all duration-200 active:scale-98 ${
+              isAdded
+                ? "bg-[#1F1F1F] text-emerald-400"
+                : "bg-[#0D0D0D] text-[#F7F7F5] hover:bg-[#1F1F1F]"
+            }`}
           >
-            <ShoppingBag className="h-3.5 w-3.5" />
-            <span>أضف للسلة</span>
+            {isAdded ? (
+              <>
+                <Check className="h-3.5 w-3.5 text-emerald-400" />
+                <span>تمت الإضافة ✓</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="h-3.5 w-3.5" />
+                <span>أضف للسلة</span>
+              </>
+            )}
           </button>
         </div>
       </div>

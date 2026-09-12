@@ -9,10 +9,30 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCartBumping, setIsCartBumping] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const items = useCartStore((s) => s.items);
   const setCartOpen = useCartStore((s) => s.setCartOpen);
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
+
+  // Cart Bump Animation when items are added
+  useEffect(() => {
+    if (itemCount > 0) {
+      setIsCartBumping(true);
+      const timer = setTimeout(() => setIsCartBumping(false), 260);
+      return () => clearTimeout(timer);
+    }
+  }, [itemCount]);
+
+  // Track scroll position for subtle header elevation
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -47,7 +67,13 @@ export function Header() {
   return (
     <div className="sticky top-0 z-40 flex flex-col bg-[#F7F7F5]">
       <AnnouncementBar />
-      <header className="border-b border-[#E5E5E0] bg-[#F7F7F5] py-2.5 sm:py-3.5 transition-colors">
+      <header
+        className={`border-b py-2.5 sm:py-3.5 transition-all duration-300 ${
+          isScrolled
+            ? "border-[#E5E5E0] bg-[#F7F7F5]/92 backdrop-blur-md shadow-xs"
+            : "border-[#E5E5E0] bg-[#F7F7F5]"
+        }`}
+      >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-3 sm:px-6">
           {/* Brand Logo - Far Right in RTL */}
           <Link to="/" className="flex flex-col items-start select-none min-h-[44px] justify-center">
@@ -90,7 +116,7 @@ export function Header() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="ابحث عن منتجك المفضل..."
-                className="w-full rounded-xs border border-[#E5E5E0] bg-white py-1.5 pr-8 pl-3 text-xs text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none"
+                className="w-full rounded-xs border border-[#E5E5E0] bg-white py-1.5 pr-8 pl-3 text-xs text-[#0D0D0D] placeholder:text-[#6B6B66] focus:border-[#0D0D0D] focus:outline-none transition-colors"
               />
               <Search className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6B6B66]" />
             </form>
@@ -98,21 +124,25 @@ export function Header() {
             {/* Mobile Search Toggle Button (44px touch target) */}
             <button
               onClick={() => setMobileSearchOpen((o) => !o)}
-              className="grid h-11 w-11 place-items-center text-[#0D0D0D] hover:text-[#6B6B66] md:hidden"
+              className="grid h-11 w-11 place-items-center text-[#0D0D0D] hover:text-[#6B6B66] md:hidden active:scale-95 transition-transform"
               aria-label="البحث"
             >
               <Search className="h-5 w-5" />
             </button>
 
-            {/* Cart Button (44px touch target) */}
+            {/* Cart Button (44px touch target) with Bump Animation */}
             <button
               onClick={() => setCartOpen(true)}
-              className="relative grid h-11 w-11 place-items-center text-[#0D0D0D] hover:text-[#6B6B66]"
+              className="relative grid h-11 w-11 place-items-center text-[#0D0D0D] hover:text-[#6B6B66] active:scale-95 transition-transform"
               aria-label="سلة المشتريات"
             >
               <ShoppingBag className="h-5 w-5" />
               {itemCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#0D0D0D] px-1 text-[9px] font-black text-[#F7F7F5]">
+                <span
+                  className={`absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#0D0D0D] px-1 text-[9px] font-black text-[#F7F7F5] transition-transform ${
+                    isCartBumping ? "animate-cart-bump" : ""
+                  }`}
+                >
                   {itemCount}
                 </span>
               )}
@@ -121,7 +151,7 @@ export function Header() {
             {/* Mobile Menu Hamburger (44px touch target) */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="grid h-11 w-11 place-items-center text-[#0D0D0D] lg:hidden"
+              className="grid h-11 w-11 place-items-center text-[#0D0D0D] lg:hidden active:scale-95 transition-transform"
               aria-label="فتح القائمة"
             >
               <Menu className="h-5 w-5" />
