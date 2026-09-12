@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -90,6 +91,7 @@ function SiteChrome() {
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
   const isAdmin = !!matchRoute({ to: "/admin", fuzzy: true }) || !!matchRoute({ to: "/admin/login" });
+  const [isPreloaderActive, setIsPreloaderActive] = useState(true);
 
   if (isAdmin) {
     return (
@@ -100,15 +102,23 @@ function SiteChrome() {
     );
   }
   return (
-    <div className="flex min-h-screen flex-col">
-      <BrandLoader />
-      <Header />
-      <main key={pathname} className="flex-1 animate-page-enter">
-        <Outlet />
-      </main>
-      <Footer />
-      <FloatingWhatsApp />
-      <CartDrawer />
+    <div className="flex min-h-screen flex-col bg-[#F7F7F5]">
+      <BrandLoader onReady={() => setIsPreloaderActive(false)} />
+      <div
+        className={`flex min-h-screen flex-col transition-all duration-700 ease-out ${
+          isPreloaderActive
+            ? "opacity-0 translate-y-2 pointer-events-none"
+            : "opacity-100 translate-y-0 pointer-events-auto"
+        }`}
+      >
+        <Header />
+        <main key={pathname} className="flex-1 animate-page-enter">
+          <Outlet />
+        </main>
+        <Footer />
+        <FloatingWhatsApp />
+        <CartDrawer />
+      </div>
       <Toaster />
     </div>
   );

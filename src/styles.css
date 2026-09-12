@@ -201,6 +201,30 @@
   }
 }
 
+@keyframes brand-progress {
+  0% {
+    width: 0%;
+    opacity: 0.6;
+  }
+  35% {
+    width: 45%;
+    opacity: 0.9;
+  }
+  75% {
+    width: 82%;
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+.animate-brand-progress {
+  animation: brand-progress 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: width;
+}
+
 @keyframes shimmer-stone {
   0% {
     background-position: -200% 0;
