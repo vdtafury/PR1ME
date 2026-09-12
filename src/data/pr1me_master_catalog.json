@@ -46,42 +46,6 @@
       "colorPalette": ["#0D0D0D", "#1F1F1F", "#C9B89A", "#4A5A44"],
       "products": [
         {
-          "code": "PR1-JK-001",
-          "slug": "pr1me-signature-ultra-light-puffer-jacket",
-          "nameEn": "PR1ME Signature Ultra-Light Puffer Jacket",
-          "nameAr": "جاكيت بافر PR1ME الترا لايت فائق الخفة",
-          "category": "jackets",
-          "priceEGP": 1450,
-          "originalPriceEGP": 1950,
-          "fit": "Standard Boxy Architectural",
-          "fabric": {
-            "outer": "100% Micro-Ripstop High-Density Nylon with DWR water-repellent finish",
-            "lining": "100% Breathable Anti-Static Polyester Taffeta",
-            "insulation": "High-Loft Featherlight Micro-Fiber Synthetic Down (Zero Feathers Clumping)"
-          },
-          "details": [
-            "Integral sculpted windbreaker hood ('Zaboot')",
-            "Matte rubberized tonal PR1ME chest patch",
-            "Water-resistant dual reversed coil front zipper with storm baffle",
-            "Hidden fleece-lined thermal handwarmer side pockets",
-            "Internal media zip pocket for smartphone & essentials",
-            "Stretch-bound cuffs and shock-cord hem lock to trap body heat"
-          ],
-          "sizes": ["M", "L", "XL", "XXL"],
-          "colors": [
-            { "nameEn": "Stealth Black", "nameAr": "أسود", "hex": "#0D0D0D" },
-            { "nameEn": "Charcoal Grey", "nameAr": "رمادي", "hex": "#1F1F1F" }
-          ],
-          "assets": {
-            "main": "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/puffer/cover-front.jpg",
-            "gallery": [
-              "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/puffer/cover-back.jpg",
-              "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/puffer/look-side.jpg",
-              "https://qgdjamllserirocgqpux.supabase.co/storage/v1/object/public/catalog/brand-assets/products/puffer/campaign-poster.jpg"
-            ]
-          }
-        },
-        {
           "code": "PR1-HD-001",
           "slug": "pr1me-heavyweight-380gsm-oversized-hoodie-sand",
           "nameEn": "PR1ME Heavyweight 380 GSM Oversized Hoodie — Sand",

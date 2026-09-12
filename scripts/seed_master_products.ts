@@ -32,28 +32,6 @@ async function run() {
 
   const products = [
     {
-      title: "PR1ME Signature Ultra-Light Puffer Jacket",
-      slug: "pr1me-signature-ultra-light-puffer-jacket",
-      short_description: "جاكيت بافر فائق الخفة ومقاوم للرياح مع غطاء رأس زعبوط متكامل وتطريز PR1ME التكتيكي على الصدر. تصميم خفيف ودافئ لحرية الحركة دائماً.",
-      description: "صُمم ليكون الدرع الأساسي لموسم الشتاء. صُنع من نايلون ميكرو-ريبستوب عازل للرياح والأمطار الخفيفة، مع حشوة عزل حراري خفيفة الوزن تمنحك أقصى درجات الدفء دون أي وزن إضافي. يتميز بقصة كلاسيكية مريحة مع غطاء رأس زعبوط مدمج، سحابات تكتيكية مقاومة للماء، وجيوب جانبية مخفية ببطانة صوفية دافئة. تفاصيل شعار PR1ME باللون الأسود على الصدر والياقة الخلفية تعزز الهوية البصرية الصامتة والأنيقة.\n\n• عزل حراري فائق الخفة\n• قماش خارجي كاره للماء ومقاوم للتمزق\n• أساور مطاطية تحافظ على الدفء\n• شعار PR1ME تكتيكي ناعم الملمس\n• صنع في مصر وفق أعلى معايير الجودة العالمية",
-      price: 1450,
-      original_price: 1950,
-      product_code: "PR1-JK-001",
-      category_id: catMap["jackets"],
-      sizes: ["M", "L", "XL", "XXL"],
-      colors: ["أسود", "رمادي"],
-      main_image: `${CDN_BASE}/puffer/cover-front.jpg`,
-      gallery_images: [
-        `${CDN_BASE}/puffer/cover-back.jpg`,
-        `${CDN_BASE}/puffer/look-side.jpg`,
-        `${CDN_BASE}/puffer/campaign-poster.jpg`
-      ],
-      tags: ["Colder Stories", "Puffer", "Winter 2026", "Outerwear", "Featured"],
-      is_available: true,
-      is_featured: true,
-      sort_order: 1
-    },
-    {
       title: "PR1ME Heavyweight 380 GSM Oversized Hoodie — Sand",
       slug: "pr1me-heavyweight-380gsm-oversized-hoodie-sand",
       short_description: "هودي أوفرسايز من القطن المصري الفاخر 380 GSM ببطانة لوب باك دافئة، وتطريز عالي الكثافة لشعار PR1ME وشعار 'WEAR YOUR STORY'.",
