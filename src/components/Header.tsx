@@ -149,15 +149,15 @@ export function Header() {
 
       {/* Dedicated Full-Screen Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex lg:hidden">
+        <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+            className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs transition-opacity lg:hidden"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Drawer Content */}
-          <div className="relative mr-auto flex h-[100dvh] w-full max-w-xs flex-col bg-[#F7F7F5] shadow-2xl border-l border-[#E5E5E0] animate-in slide-in-from-right duration-200">
+          <div className="fixed inset-y-0 right-0 z-50 flex h-[100dvh] w-[84vw] max-w-xs flex-col bg-[#F7F7F5] shadow-2xl border-l border-[#E5E5E0] animate-in slide-in-from-right duration-200 lg:hidden">
             {/* Drawer Header */}
             <div className="flex items-center justify-between border-b border-[#E5E5E0] p-4">
               <div className="flex flex-col">
@@ -178,14 +178,14 @@ export function Header() {
             </div>
 
             {/* Drawer Links List */}
-            <nav className="flex-1 overflow-y-auto px-4 py-3 divide-y divide-[#E5E5E0]/60">
+            <nav className="flex-1 overflow-y-auto px-4 py-3 divide-y divide-[#E5E5E0]/60 touch-scroll">
               {navLinks.map((link) => (
                 <Link
                   key={link.label}
                   to={link.href}
                   search={link.search}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex min-h-[48px] items-center justify-between py-3 text-sm font-bold text-[#0D0D0D] active:text-[#6B6B66]"
+                  className="flex min-h-[50px] items-center justify-between py-3 text-sm font-bold text-[#0D0D0D] active:text-[#6B6B66]"
                 >
                   <span>{link.label}</span>
                   <div className="flex items-center gap-2">
@@ -206,7 +206,7 @@ export function Header() {
                 href={generalContactLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex min-h-[44px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98"
+                className="flex min-h-[48px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98"
               >
                 <MessageCircle className="h-4 w-4 text-emerald-400" />
                 <span>طلب واستشارة فورية على واتساب</span>
@@ -218,7 +218,7 @@ export function Header() {
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

@@ -56,6 +56,18 @@ function ProductsPage() {
 
   const current = categories.data?.find((c) => c.slug === category) ?? null;
 
+  // Prevent body scroll when mobile filter sheet is open
+  useEffect(() => {
+    if (showFilters && typeof window !== "undefined" && window.innerWidth < 768) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showFilters]);
+
   const productsQ = useQuery({
     queryKey: ["products", category ?? "all", q ?? ""],
     queryFn: async () => {
@@ -203,27 +215,38 @@ function ProductsPage() {
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4 text-[#0D0D0D]" />
                   <h3 className="font-bold text-xs uppercase tracking-wider text-[#0D0D0D]">
-                    تصفية المنتجات
+                    تصفية وترتيب
                   </h3>
                 </div>
-                <button
-                  onClick={() => setShowFilters(false)}
-                  className="md:hidden grid h-9 w-9 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {hasActiveFilters && (
+                    <button
+                      onClick={resetFilters}
+                      className="text-[11px] text-[#8B2E2E] underline font-semibold px-1"
+                    >
+                      إعادة ضبط
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowFilters(false)}
+                    className="md:hidden grid h-10 w-10 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
+                    aria-label="إغلاق التصفية"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
 
               {/* Sort Selection */}
               <div className="space-y-2">
                 <label className="text-xs font-bold text-[#0D0D0D] flex items-center gap-1.5">
-                  <ArrowDownUp className="h-3 w-3 text-[#0D0D0D]" />
+                  <ArrowDownUp className="h-3.5 w-3.5 text-[#0D0D0D]" />
                   <span>الترتيب:</span>
                 </label>
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value as any)}
-                  className="w-full min-h-[44px] border border-[#E5E5E0] bg-[#F7F7F5] p-2 text-xs font-semibold focus:outline-none"
+                  className="w-full min-h-[46px] border border-[#E5E5E0] bg-[#F7F7F5] p-2.5 text-xs font-semibold focus:outline-none"
                 >
                   <option value="recommended">الأكثر طلباً ومقترح</option>
                   <option value="newest">وصل حديثاً (الأحدث)</option>
@@ -241,7 +264,7 @@ function ProductsPage() {
                       <button
                         key={s}
                         onClick={() => setSelectedSize(s === selectedSize ? null : s)}
-                        className={`min-w-[3rem] h-10 border font-mono text-xs font-bold transition-all ${
+                        className={`min-w-[3.5rem] h-11 border font-mono text-xs font-bold transition-all ${
                           s === selectedSize
                             ? "border-[#0D0D0D] bg-[#0D0D0D] text-[#F7F7F5]"
                             : "border-[#E5E5E0] bg-[#F7F7F5] text-[#0D0D0D]"
@@ -258,21 +281,21 @@ function ProductsPage() {
               {availableColors.length > 0 && (
                 <div className="space-y-2 border-t border-[#E5E5E0] pt-4 mt-4">
                   <label className="text-xs font-bold text-[#0D0D0D]">اللون:</label>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2.5">
                     {availableColors.map((c) => (
                       <button
                         key={c}
                         title={c}
                         onClick={() => setSelectedColor(c === selectedColor ? null : c)}
-                        className={`h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all ${
+                        className={`h-9 w-9 rounded-full border-2 flex items-center justify-center transition-all ${
                           c === selectedColor
-                            ? "border-[#0D0D0D] ring-2 ring-black/30 scale-110"
+                            ? "border-[#0D0D0D] ring-2 ring-black/30 scale-105"
                             : "border-[#E5E5E0]"
                         }`}
                         style={{ backgroundColor: colorToHex(c) }}
                       >
                         {c === selectedColor && (
-                          <Check className="h-3.5 w-3.5 text-white mix-blend-difference" />
+                          <Check className="h-4 w-4 text-white mix-blend-difference" />
                         )}
                       </button>
                     ))}
@@ -299,11 +322,11 @@ function ProductsPage() {
                 />
               </div>
 
-              {/* Apply / Close Button on Mobile */}
+              {/* Apply Button on Mobile */}
               <div className="mt-6 pt-3 border-t border-[#E5E5E0] md:hidden">
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="flex min-h-[44px] w-full items-center justify-center bg-[#0D0D0D] py-2.5 text-xs font-bold text-[#F7F7F5]"
+                  className="flex min-h-[48px] w-full items-center justify-center bg-[#0D0D0D] py-3 text-xs font-bold text-[#F7F7F5] active:scale-98"
                 >
                   عرض النتائج ({filteredProducts.length})
                 </button>

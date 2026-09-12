@@ -92,6 +92,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     touch-action: manipulation;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
   body {
     background-color: var(--color-background);
@@ -99,6 +101,7 @@
     font-family: var(--font-sans);
     font-feature-settings: 'cv02','cv03','cv04','cv11','tnum';
     overflow-x: hidden;
+    max-width: 100vw;
     min-height: 100dvh;
   }
   h1, h2, h3, h4, h5, h6 {

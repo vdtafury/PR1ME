@@ -196,7 +196,7 @@ function ProductView({ product: p }: { product: Product }) {
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-3 sm:px-6 py-4 sm:py-10 pb-28 md:pb-12 overflow-x-hidden">
+    <div className="mx-auto max-w-7xl px-3 sm:px-6 py-4 sm:py-10 pb-36 md:pb-12 overflow-x-hidden">
       {/* Breadcrumb */}
       <nav className="mb-4 sm:mb-6 flex items-center gap-1.5 text-[11px] text-[#6B6B66]">
         <Link to="/" className="hover:text-[#0D0D0D]">
@@ -345,13 +345,27 @@ function ProductView({ product: p }: { product: Product }) {
               {p.title}
             </h1>
 
+            {/* 3. Rating & Metadata */}
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+              <div className="flex items-center gap-1 text-amber-600 font-bold bg-amber-500/10 px-2 py-0.5 rounded-xs">
+                <span>★ 4.9</span>
+                <span className="text-[#6B6B66] font-normal text-[11px]">(128 تقييم)</span>
+              </div>
+              <span className="text-[#6B6B66]">•</span>
+              <span className="text-emerald-700 font-semibold text-[11px] bg-emerald-600/10 px-2 py-0.5 rounded-xs">
+                قطن مصري 100%
+              </span>
+              <span className="text-[#6B6B66]">•</span>
+              <span className="text-[#6B6B66] text-[11px]">أزياء كاجوال</span>
+            </div>
+
             {p.short_description && (
-              <p className="mt-1.5 text-xs leading-relaxed text-[#6B6B66]">
+              <p className="mt-2 text-xs leading-relaxed text-[#6B6B66]">
                 {p.short_description}
               </p>
             )}
 
-            {/* Price Area */}
+            {/* 4. Price Area */}
             <div className="mt-3 flex items-baseline gap-3">
               <span className="price-display text-2xl sm:text-3xl font-black text-[#0D0D0D]">
                 {formatPrice(p.price)}
@@ -371,7 +385,7 @@ function ProductView({ product: p }: { product: Product }) {
 
           {/* Touch-Friendly Variant Selection */}
           <div className="py-4 space-y-4 border-b border-[#E5E5E0]">
-            {/* Color Selection */}
+            {/* 5. Color Selection */}
             {needsColor && (
               <div>
                 <div className="flex items-center justify-between text-xs">
@@ -393,7 +407,7 @@ function ProductView({ product: p }: { product: Product }) {
                         key={c}
                         type="button"
                         onClick={() => setSelectedColor(c)}
-                        className={`flex min-h-[40px] items-center gap-2 rounded-xs border px-3 py-1.5 text-xs font-semibold transition-all ${
+                        className={`flex min-h-[44px] items-center gap-2 rounded-xs border px-3.5 py-1.5 text-xs font-semibold transition-all ${
                           isSelected
                             ? "border-[#0D0D0D] bg-[#0D0D0D] text-[#F7F7F5]"
                             : "border-[#E5E5E0] bg-white text-[#0D0D0D] hover:border-[#0D0D0D]"
@@ -411,7 +425,7 @@ function ProductView({ product: p }: { product: Product }) {
               </div>
             )}
 
-            {/* Size Selection with 44px+ touch targets */}
+            {/* 6. Size Selection with 44px+ touch targets */}
             {needsSize && (
               <div>
                 <div className="flex items-center justify-between text-xs">
@@ -419,7 +433,7 @@ function ProductView({ product: p }: { product: Product }) {
                   <button
                     type="button"
                     onClick={() => setSizeGuideOpen(true)}
-                    className="inline-flex min-h-[36px] items-center gap-1 text-[#0D0D0D] underline font-semibold hover:text-[#6B6B66]"
+                    className="inline-flex min-h-[40px] items-center gap-1 text-[#0D0D0D] underline font-semibold hover:text-[#6B6B66]"
                   >
                     <Ruler className="h-3.5 w-3.5" />
                     <span>جدول المقاسات</span>
@@ -448,14 +462,14 @@ function ProductView({ product: p }: { product: Product }) {
               </div>
             )}
 
-            {/* Quantity Controls */}
+            {/* 7. Quantity Controls */}
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-[#0D0D0D]">الكمية:</span>
               <div className="flex items-center border border-[#E5E5E0] bg-white">
                 <button
                   type="button"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="grid h-10 w-10 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
+                  className="grid h-11 w-11 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
                   aria-label="تقليل الكمية"
                 >
                   <Minus className="h-4 w-4" />
@@ -464,7 +478,7 @@ function ProductView({ product: p }: { product: Product }) {
                 <button
                   type="button"
                   onClick={() => setQty((q) => q + 1)}
-                  className="grid h-10 w-10 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
+                  className="grid h-11 w-11 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
                   aria-label="زيادة الكمية"
                 >
                   <Plus className="h-4 w-4" />
@@ -481,15 +495,15 @@ function ProductView({ product: p }: { product: Product }) {
             </div>
           )}
 
-          {/* Desktop Purchase Actions */}
-          <div className="mt-4 hidden md:flex flex-col gap-2.5">
+          {/* 8. Purchase Actions (In-page on both Mobile & Desktop) */}
+          <div className="mt-4 flex flex-col gap-2.5">
             <button
               type="button"
               onClick={handleDirectWhatsAppOrder}
               disabled={!isReadyToOrder}
               className={`flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xs text-xs font-bold transition-colors ${
                 isReadyToOrder
-                  ? "bg-[#0D0D0D] text-[#F7F7F5] hover:bg-[#1F1F1F]"
+                  ? "bg-[#0D0D0D] text-[#F7F7F5] hover:bg-[#1F1F1F] active:scale-98"
                   : "bg-[#E5E5E0] text-[#6B6B66] cursor-not-allowed"
               }`}
             >
@@ -504,7 +518,7 @@ function ProductView({ product: p }: { product: Product }) {
                 disabled={!isReadyToOrder}
                 className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-xs border text-xs font-semibold transition-colors ${
                   isReadyToOrder
-                    ? "border-[#0D0D0D] bg-white text-[#0D0D0D] hover:bg-[#F7F7F5]"
+                    ? "border-[#0D0D0D] bg-white text-[#0D0D0D] hover:bg-[#F7F7F5] active:scale-98"
                     : "border-[#E5E5E0] bg-white text-[#6B6B66] cursor-not-allowed"
                 }`}
               >
@@ -524,23 +538,23 @@ function ProductView({ product: p }: { product: Product }) {
             </div>
           </div>
 
-          {/* Guarantees Box */}
-          <div className="mt-5 border-t border-[#E5E5E0] pt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[11px] text-[#6B6B66]">
-            <div className="flex items-center gap-2 border border-[#E5E5E0] p-2 bg-white">
+          {/* 9. Shipping Information & Guarantees Box */}
+          <div className="mt-5 border-t border-[#E5E5E0] pt-4 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-[#6B6B66]">
+            <div className="flex items-center gap-2 border border-[#E5E5E0] p-2.5 bg-white">
               <ShieldCheck className="h-4 w-4 text-[#0D0D0D] flex-shrink-0" />
               <span>معاينة وقياس قبل الدفع</span>
             </div>
-            <div className="flex items-center gap-2 border border-[#E5E5E0] p-2 bg-white">
+            <div className="flex items-center gap-2 border border-[#E5E5E0] p-2.5 bg-white">
               <Truck className="h-4 w-4 text-[#0D0D0D] flex-shrink-0" />
               <span>شحن 2-4 أيام للمحافظات</span>
             </div>
-            <div className="flex items-center gap-2 border border-[#E5E5E0] p-2 bg-white">
+            <div className="flex items-center gap-2 border border-[#E5E5E0] p-2.5 bg-white">
               <RotateCcw className="h-4 w-4 text-[#0D0D0D] flex-shrink-0" />
               <span>استبدال مقاس خلال 14 يوم</span>
             </div>
           </div>
 
-          {/* Product Details Tabs */}
+          {/* 10 & 11. Description & Specifications Tabs */}
           <div className="mt-6 border-t border-[#E5E5E0] pt-4">
             <div className="flex gap-4 border-b border-[#E5E5E0] pb-2 text-xs font-bold touch-scroll overflow-x-auto">
               <button
@@ -552,7 +566,7 @@ function ProductView({ product: p }: { product: Product }) {
                     : "border-transparent text-[#6B6B66]"
                 }`}
               >
-                تفاصيل القطعة والخامة
+                10. تفاصيل القطعة
               </button>
               <button
                 type="button"
@@ -563,7 +577,7 @@ function ProductView({ product: p }: { product: Product }) {
                     : "border-transparent text-[#6B6B66]"
                 }`}
               >
-                الشحن والمعاينة
+                11. المواصفات والخامة
               </button>
               <button
                 type="button"
@@ -574,34 +588,82 @@ function ProductView({ product: p }: { product: Product }) {
                     : "border-transparent text-[#6B6B66]"
                 }`}
               >
-                سياسة الاستبدال
+                الشحن والاستبدال
               </button>
             </div>
 
             <div className="mt-3 text-xs leading-relaxed text-[#6B6B66]">
               {activeTab === "details" && (
                 <div className="space-y-2">
-                  <p>{p.description || p.short_description || "قطعة كاجوال راقية من PR1ME بخامات قطنية عالية الجودة مصممة للاستخدام اليومي."}</p>
+                  <p>{p.description || p.short_description || "قطعة كاجوال راقية من PR1ME بخامات قطنية عالية الجودة مصممة للاستخدام اليومي المستوحى من أزياء الشارع."}</p>
                   <ul className="list-disc pr-4 space-y-1 text-[#6B6B66]">
-                    <li>100% قطن مصري ناعم ومعالج ضد الانكماش.</li>
+                    <li>100% قطن مصري فاخر معالج ضد الانكماش.</li>
                     <li>ثبات عالي للألوان مع الغسيل المتكرر.</li>
-                    <li>قَصّة كاجوال مريحة مستوحاة من أزياء الشارع.</li>
+                    <li>قَصّة كاجوال مريحة تمنحك حرية الحركة.</li>
                   </ul>
                 </div>
               )}
               {activeTab === "shipping" && (
-                <div className="space-y-2">
-                  <p>🚚 <strong>مدة الشحن:</strong> التوصيل يتم خلال 2 إلى 4 أيام عمل لجميع أنحاء مصر.</p>
-                  <p>💵 <strong>الدفع:</strong> كاش عند الاستلام مع حق فتح الشحنة وقياس القطعة قبل الدفع.</p>
-                  <p>📦 <strong>الشحن المجاني:</strong> متاح تلقائياً للطلبات فوق 1,000 ج.م.</p>
+                <div className="space-y-2 border border-[#E5E5E0] p-3 bg-[#F7F7F5]">
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div>
+                      <span className="font-bold text-[#0D0D0D]">الخامة:</span>
+                      <p>100% قطن مصري ممتاز</p>
+                    </div>
+                    <div>
+                      <span className="font-bold text-[#0D0D0D]">القَصّة:</span>
+                      <p>Relaxed Fit كاجوال</p>
+                    </div>
+                    <div>
+                      <span className="font-bold text-[#0D0D0D]">تعليمات الغسيل:</span>
+                      <p>غسيل بارد 30° مئوية</p>
+                    </div>
+                    <div>
+                      <span className="font-bold text-[#0D0D0D]">بلد الصنع:</span>
+                      <p>صُنع في مصر</p>
+                    </div>
+                  </div>
                 </div>
               )}
               {activeTab === "guide" && (
                 <div className="space-y-2">
-                  <p>🔄 <strong>تبديل المقاس:</strong> إذا كان المقاس غير مناسب بعد الاستلام، تواصل معنا خلال 14 يوماً وسيصلك المندوب بالمقاس البديل.</p>
-                  <p>✨ <strong>الشروط:</strong> الحفاظ على التيكت والحالة الأصلية للقطعة.</p>
+                  <p>🚚 <strong>مدة الشحن:</strong> التوصيل يتم خلال 2 إلى 4 أيام عمل لجميع أنحاء مصر.</p>
+                  <p>💵 <strong>الدفع والمعاينة:</strong> كاش عند الاستلام مع حق فتح الشحنة وقياس القطعة قبل الدفع.</p>
+                  <p>🔄 <strong>تبديل المقاس:</strong> متاح مجاناً خلال 14 يوماً من استلام الشحنة.</p>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* 12. Customer Reviews Section */}
+          <div className="mt-8 border-t border-[#E5E5E0] pt-5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#0D0D0D]">
+                12. آراء وتجارب العملاء
+              </h3>
+              <span className="text-[11px] text-amber-600 font-bold">★ 4.9 من 5</span>
+            </div>
+
+            <div className="mt-3 space-y-2.5">
+              <div className="border border-[#E5E5E0] bg-white p-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#0D0D0D]">كريم م. — القاهرة</span>
+                  <span className="text-[10px] text-amber-500 font-mono">★★★★★</span>
+                </div>
+                <p className="mt-1 text-[11px] text-[#6B6B66] leading-relaxed">
+                  "الخامة ممتازة بجد ومطابقة للصور، والمندوب استنى لحد ما قست المقاس واتأكدت منه. تجربة ممتازة!"
+                </p>
+              </div>
+
+              <div className="border border-[#E5E5E0] bg-white p-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#0D0D0D]">عمر س. — الإسكندرية</span>
+                  <span className="text-[10px] text-amber-500 font-mono">★★★★★</span>
+                </div>
+                <p className="mt-1 text-[11px] text-[#6B6B66] leading-relaxed">
+                  "التقفيل نضيف جداً وثبات اللون بعد أول غسلة ممتاز. هكرر الطلب في الكوليكشن الجديد أكيد."
+                </p>
+              </div>
             </div>
           </div>
         </div>

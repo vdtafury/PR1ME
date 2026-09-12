@@ -60,55 +60,55 @@ function HomePage() {
     <div className="flex flex-col gap-10 sm:gap-16 bg-[#F7F7F5] pb-12 overflow-x-hidden">
       {/* 1. Mobile-First Hero Section */}
       <section className="relative overflow-hidden bg-[#0D0D0D] text-white">
-        <div className="relative min-h-[72dvh] sm:min-h-[580px] w-full flex flex-col justify-end sm:justify-center">
+        <div className="relative min-h-[75dvh] max-h-[640px] sm:min-h-[580px] w-full flex flex-col justify-end sm:justify-center">
           {/* Background Streetwear Imagery */}
           <div className="absolute inset-0 z-0">
             <img
               src={heroImg}
               alt="PR1ME Streetwear - Good Outfits Better Days"
-              className="h-full w-full object-cover object-[center_20%] sm:object-center brightness-70"
+              className="h-full w-full object-cover object-[center_25%] sm:object-center brightness-70"
               fetchPriority="high"
             />
             {/* Mobile bottom gradient overlay for maximum readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent sm:bg-gradient-to-r sm:from-transparent sm:via-black/50 sm:to-black/90" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent sm:bg-gradient-to-r sm:from-transparent sm:via-black/50 sm:to-black/90" />
           </div>
 
           {/* Hero Content */}
-          <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 py-8 sm:py-16">
+          <div className="relative z-10 mx-auto w-full max-w-7xl px-3.5 sm:px-6 py-6 sm:py-16">
             <div className="flex flex-col items-start max-w-xl pr-0 sm:pr-6">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#C9B89A] mb-2 sm:mb-3">
+              <span className="inline-flex items-center gap-1.5 rounded-xs bg-[#C9B89A]/15 border border-[#C9B89A]/30 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-[#C9B89A] mb-2 sm:mb-3">
                 CAIRO STREETWEAR • 2026
               </span>
 
-              <h1 className="text-2xl sm:text-4xl lg:text-6xl font-black leading-[1.2] text-white tracking-tight">
+              <h1 className="text-2xl sm:text-4xl lg:text-6xl font-black leading-[1.15] text-white tracking-tight">
                 مش مجرد ملابس.
                 <br />
                 <span className="text-[#F7F7F5]">دي قصتك.</span>
               </h1>
 
-              <p className="mt-2.5 sm:mt-4 text-xs sm:text-sm text-white/80 leading-relaxed max-w-md">
-                تصاميم يومية بخامات مريحة وجودة حقيقية مستوحاة من الشارع المصري.
+              <p className="mt-2 text-xs sm:text-sm text-white/85 leading-relaxed max-w-md">
+                تصاميم كاجوال بخامات مريحة وجودة حقيقية مستوحاة من الشارع المصري.
               </p>
 
               {/* Touch-Friendly CTAs */}
-              <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+              <div className="mt-5 sm:mt-8 flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 <Link
                   to="/products"
-                  className="flex-1 sm:flex-initial inline-flex min-h-[44px] items-center justify-center gap-2 bg-[#F7F7F5] px-6 py-3 text-xs font-bold text-[#0D0D0D] transition-colors hover:bg-white active:scale-98"
+                  className="flex-1 sm:flex-initial inline-flex min-h-[46px] items-center justify-center gap-2 bg-[#F7F7F5] px-5 py-2.5 text-xs font-bold text-[#0D0D0D] transition-colors hover:bg-white active:scale-98"
                 >
                   <span>تسوق الآن</span>
                   <ArrowLeft className="h-3.5 w-3.5" />
                 </Link>
                 <Link
                   to="/products"
-                  className="flex-1 sm:flex-initial inline-flex min-h-[44px] items-center justify-center border border-white/60 bg-black/30 backdrop-blur-xs px-5 py-3 text-xs font-bold text-white transition-colors hover:bg-white/10 active:scale-98"
+                  className="flex-1 sm:flex-initial inline-flex min-h-[46px] items-center justify-center border border-white/60 bg-black/35 backdrop-blur-xs px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-white/10 active:scale-98"
                 >
                   <span>شاهد الكوليكشن</span>
                 </Link>
               </div>
 
-              {/* Pagination Indicator */}
-              <div className="mt-6 sm:mt-10 flex items-center gap-2 text-xs font-mono text-white/60">
+              {/* Editorial Indicator */}
+              <div className="mt-5 sm:mt-10 flex items-center gap-2 text-xs font-mono text-white/60">
                 <span className="font-bold text-white">01</span>
                 <span className="h-px w-8 bg-white/40" />
                 <span>03</span>
