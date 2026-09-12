@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { useState, useMemo } from "react";
-import { Filter, X, ArrowDownUp, RotateCcw, Search, Sparkles } from "lucide-react";
+import { Filter, X, ArrowDownUp, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { colorToHex } from "@/lib/colors";
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/products/")({
       {
         name: "description",
         content:
-          "تصفح أحدث كولكشن من التيشيرتات، الهوديز، البناطيل والملابس الكاجوال من PR1ME. خامات قطنية ممتازة وشحن لجميع محافظات مصر.",
+          "تصفح تشكيلة PR1ME من التيشيرتات، الهوديز والملابس الكاجوال الرجالية في مصر. خامات قطنية ممتازة ومعاينة قبل الدفع.",
       },
       { property: "og:title", content: "كتالوج المنتجات — PR1ME" },
       { property: "og:url", content: "/products" },
@@ -128,21 +128,17 @@ function ProductsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-12">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border/60 pb-6">
+      {/* Header Area */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-5">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-black tracking-tight text-foreground sm:text-4xl">
-              {current ? current.name : "جميع المنتجات والكتالوج"}
-            </h1>
-            {current && (
-              <span className="rounded-full bg-foreground/10 px-2.5 py-0.5 text-xs font-bold">
-                قسم خاص
-              </span>
-            )}
-          </div>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            PR1ME STORE
+          </span>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            {current ? current.name : "الكتالوج وجميع المنتجات"}
+          </h1>
           <p className="mt-1 text-xs text-muted-foreground">
-            {filteredProducts.length} قطعة متوفرة وجاهزة للشحن الفوري
+            عرض {filteredProducts.length} قطعة متوفرة للشحن الفوري
           </p>
         </div>
 
@@ -151,29 +147,29 @@ function ProductsPage() {
           {hasActiveFilters && (
             <button
               onClick={resetFilters}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-border/60 bg-muted/30 px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground"
+              className="inline-flex items-center gap-1.5 border border-border bg-card px-3 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
             >
               <RotateCcw className="h-3.5 w-3.5" />
-              <span>إعادة تعيين</span>
+              <span>إعادة ضبط</span>
             </button>
           )}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 border px-4 py-2 text-xs font-semibold transition-colors ${
               showFilters
-                ? "border-foreground bg-foreground text-background shadow-md"
-                : "border-border/80 bg-card hover:bg-muted text-foreground"
+                ? "border-foreground bg-foreground text-background"
+                : "border-border bg-card text-foreground hover:bg-muted"
             }`}
           >
-            <Filter className="h-4 w-4" />
-            <span>الفلاتر والترتيب</span>
-            {hasActiveFilters && <span className="h-2 w-2 rounded-full bg-whatsapp" />}
+            <Filter className="h-3.5 w-3.5" />
+            <span>تصفية وترتيب</span>
+            {hasActiveFilters && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />}
           </button>
         </div>
       </div>
 
-      {/* Categories Bar */}
-      <div className="mt-6 flex flex-wrap gap-2 overflow-x-auto pb-2">
+      {/* Category Pills Strip */}
+      <div className="mt-5 flex gap-2 overflow-x-auto pb-2">
         <button
           onClick={() => navigate({ search: { q } })}
           className={chip(!category)}
@@ -192,50 +188,49 @@ function ProductsPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="mt-8 flex flex-col md:flex-row gap-8">
-        {/* Advanced Filters Drawer / Sidebar */}
+      <div className="mt-6 flex flex-col md:flex-row gap-8">
+        {/* Filters Sidebar / Drawer */}
         {showFilters && (
           <>
             {/* Mobile Backdrop */}
             <div
-              className="fixed inset-0 z-40 bg-black/75 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-40 bg-black/80 backdrop-blur-xs md:hidden"
               onClick={() => setShowFilters(false)}
             />
 
-            <div className="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-border/70 bg-background p-6 shadow-2xl md:static md:w-64 md:flex-shrink-0 md:rounded-2xl md:border md:border-border/60 md:bg-card md:p-5 md:shadow-none animate-in slide-in-from-bottom-5 md:animate-none">
-              <div className="mb-6 flex items-center justify-between border-b border-border/50 pb-3 md:mb-4">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-whatsapp" />
-                  <h3 className="font-black text-sm text-foreground">تصفية وترتيب المنتجات</h3>
-                </div>
+            <div className="fixed bottom-0 inset-x-0 z-50 max-h-[85vh] overflow-y-auto border-t border-border bg-background p-5 md:static md:w-60 md:flex-shrink-0 md:border md:border-border md:bg-card md:p-4">
+              <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
+                <h3 className="font-bold text-xs uppercase tracking-wider text-foreground">
+                  تصفية المنتجات
+                </h3>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={resetFilters}
-                    className="text-xs font-bold text-muted-foreground hover:text-foreground underline"
+                    className="text-[11px] font-semibold text-muted-foreground hover:text-foreground underline"
                   >
                     مسح
                   </button>
                   <button
                     onClick={() => setShowFilters(false)}
-                    className="md:hidden grid h-8 w-8 place-items-center rounded-xl border border-border/60"
+                    className="md:hidden grid h-7 w-7 place-items-center border border-border"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
               </div>
 
-              {/* Sort Dropdown */}
-              <div className="space-y-2.5">
+              {/* Sort Selection */}
+              <div className="space-y-2">
                 <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                  <ArrowDownUp className="h-3.5 w-3.5 text-whatsapp" />
-                  <span>ترتيب حسب:</span>
+                  <ArrowDownUp className="h-3 w-3 text-emerald-400" />
+                  <span>الترتيب:</span>
                 </label>
                 <select
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value as any)}
-                  className="w-full rounded-xl border border-border/80 bg-muted/40 p-2.5 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-whatsapp"
+                  className="w-full border border-border bg-card p-2 text-xs font-semibold focus:outline-none"
                 >
-                  <option value="recommended">المقترح والأكثر طلباً</option>
+                  <option value="recommended">الأكثر طلباً ومقترح</option>
                   <option value="newest">وصل حديثاً (الأحدث)</option>
                   <option value="price_asc">السعر: من الأقل للأعلى</option>
                   <option value="price_desc">السعر: من الأعلى للأقل</option>
@@ -244,17 +239,17 @@ function ProductsPage() {
 
               {/* Size Filter */}
               {availableSizes.length > 0 && (
-                <div className="space-y-2.5 border-t border-border/50 pt-4 mt-4">
+                <div className="space-y-2 border-t border-border pt-4 mt-4">
                   <label className="text-xs font-bold text-foreground">المقاس:</label>
                   <div className="flex flex-wrap gap-1.5">
                     {availableSizes.map((s) => (
                       <button
                         key={s}
                         onClick={() => setSelectedSize(s === selectedSize ? null : s)}
-                        className={`min-w-[2.5rem] rounded-lg border px-2.5 py-1 text-xs font-bold transition-all ${
+                        className={`min-w-[2.25rem] h-8 border font-mono text-xs font-bold transition-all ${
                           s === selectedSize
-                            ? "border-foreground bg-foreground text-background shadow-xs"
-                            : "border-border/80 bg-muted/40 text-foreground hover:border-foreground/50"
+                            ? "border-foreground bg-foreground text-background"
+                            : "border-border bg-card text-foreground hover:border-zinc-500"
                         }`}
                       >
                         {s}
@@ -266,7 +261,7 @@ function ProductsPage() {
 
               {/* Color Filter */}
               {availableColors.length > 0 && (
-                <div className="space-y-2.5 border-t border-border/50 pt-4 mt-4">
+                <div className="space-y-2 border-t border-border pt-4 mt-4">
                   <label className="text-xs font-bold text-foreground">اللون:</label>
                   <div className="flex flex-wrap gap-2">
                     {availableColors.map((c) => (
@@ -274,10 +269,10 @@ function ProductsPage() {
                         key={c}
                         title={c}
                         onClick={() => setSelectedColor(c === selectedColor ? null : c)}
-                        className={`h-7 w-7 rounded-full border-2 transition-all ${
+                        className={`h-6 w-6 rounded-full border transition-all ${
                           c === selectedColor
-                            ? "border-foreground ring-2 ring-foreground/30 scale-110"
-                            : "border-border/80 hover:scale-105"
+                            ? "border-foreground ring-2 ring-foreground/40"
+                            : "border-border hover:border-zinc-400"
                         }`}
                         style={{ backgroundColor: colorToHex(c) }}
                       />
@@ -287,10 +282,12 @@ function ProductsPage() {
               )}
 
               {/* Max Price Slider */}
-              <div className="space-y-2.5 border-t border-border/50 pt-4 mt-4">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-foreground">السعر الأقصى:</label>
-                  <span className="text-xs font-black text-whatsapp">{formatPrice(maxPrice)}</span>
+              <div className="space-y-2 border-t border-border pt-4 mt-4">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-foreground">السعر الأقصى:</span>
+                  <span className="price-display font-mono font-bold text-foreground">
+                    {formatPrice(maxPrice)}
+                  </span>
                 </div>
                 <input
                   type="range"
@@ -299,7 +296,7 @@ function ProductsPage() {
                   step="50"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
-                  className="w-full accent-whatsapp"
+                  className="w-full accent-foreground"
                 />
               </div>
             </div>
@@ -309,32 +306,29 @@ function ProductsPage() {
         {/* Products Grid */}
         <div className="flex-1">
           {productsQ.isLoading ? (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
-                  className="aspect-[4/5] animate-pulse rounded-2xl border border-border/50 bg-muted/40"
+                  className="aspect-[4/5] animate-pulse border border-border bg-muted/40"
                 />
               ))}
             </div>
           ) : filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
               {filteredProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
           ) : (
-            <div className="flex min-h-[350px] flex-col items-center justify-center rounded-3xl border border-dashed border-border/80 bg-muted/20 p-8 text-center">
-              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-muted/60 text-muted-foreground mb-4">
-                <Filter className="h-8 w-8 opacity-40" />
-              </div>
-              <h3 className="text-lg font-bold text-foreground">لا توجد منتجات تطابق اختياراتك</h3>
+            <div className="flex min-h-[300px] flex-col items-center justify-center border border-dashed border-border p-8 text-center">
+              <h3 className="text-base font-bold text-foreground">لا توجد منتجات تطابق الفلاتر</h3>
               <p className="mt-1 text-xs text-muted-foreground max-w-sm">
-                جرب تغيير المقاس أو اللون أو زيادة نطاق السعر للوصول إلى المنتجات المتاحة.
+                جرب تغيير المقاس أو اللون أو زيادة نطاق السعر للاطلاع على المنتجات المتاحة.
               </p>
               <button
                 onClick={resetFilters}
-                className="mt-4 rounded-xl bg-foreground px-5 py-2.5 text-xs font-bold text-background transition-transform hover:scale-105 active:scale-95"
+                className="mt-4 border border-border bg-foreground px-4 py-2 text-xs font-bold text-background"
               >
                 مسح جميع الفلاتر
               </button>
@@ -347,10 +341,9 @@ function ProductsPage() {
 }
 
 function chip(active: boolean) {
-  return `rounded-xl border px-4 py-2 text-xs font-bold transition-all whitespace-nowrap ${
+  return `border px-3.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap ${
     active
-      ? "border-foreground bg-foreground text-background shadow-sm"
-      : "border-border/80 bg-card hover:bg-muted text-foreground"
+      ? "border-foreground bg-foreground text-background"
+      : "border-border bg-card text-muted-foreground hover:text-foreground hover:border-zinc-500"
   }`;
 }
-

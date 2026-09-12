@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { MessageCircle, Sparkles, Tag } from "lucide-react";
+import { MessageCircle, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { generalContactLink } from "@/lib/whatsapp";
 import type { Offer } from "@/lib/types";
@@ -9,10 +9,10 @@ export const Route = createFileRoute("/offers")({
   component: OffersPage,
   head: () => ({
     meta: [
-      { title: "العروض والخصومات الحصرية — PR1ME" },
+      { title: "العروض والخصومات الخاصة — PR1ME" },
       {
         name: "description",
-        content: "اكتشف أحدث العروض والخصومات الترويجية الحصرية على الملابس الكاجوال من PR1ME.",
+        content: "اكتشف أحدث العروض والخصومات الترويجية على الملابس الكاجوال من PR1ME.",
       },
       { property: "og:title", content: "العروض والخصومات — PR1ME" },
       { property: "og:url", content: "/offers" },
@@ -36,17 +36,16 @@ function OffersPage() {
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-14">
-      <div className="border-b border-border/60 pb-6">
-        <div className="flex items-center gap-2 text-whatsapp font-bold text-xs uppercase tracking-wider">
-          <Sparkles className="h-4 w-4" />
-          <span>فرص محدودة لفترة وجيزة</span>
-        </div>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-foreground sm:text-4xl">
-          العروض والخصومات الحصرية
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-12">
+      <div className="border-b border-border pb-5">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">
+          PROMOTIONS & BUNDLES
+        </span>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          العروض والتخفيضات الخاصة
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          استفد من باقات التوفير وأقوى الخصومات. اضغط على أي عرض لطلبه مباشرة عبر واتساب.
+        <p className="mt-1 text-xs text-muted-foreground">
+          باقات توفير وخصومات على تشكيلات مختارة. اضغط على أي عرض لطلبه مباشرة عبر واتساب.
         </p>
       </div>
 
@@ -56,35 +55,37 @@ function OffersPage() {
             key={o.id}
             href={
               o.link_url ||
-              generalContactLink(`مرحباً PR1ME، أود الاستفادة من العرض الحصري: ${o.title}`)
+              generalContactLink(`مرحباً PR1ME، أود الاستفادة من العرض: ${o.title}`)
             }
             target={o.link_url ? "_self" : "_blank"}
             rel="noopener noreferrer"
-            className="group relative block aspect-[16/9] overflow-hidden rounded-3xl border border-border/70 bg-card shadow-xl transition-all duration-300 hover:border-whatsapp hover:shadow-2xl hover:-translate-y-1"
+            className="group relative block aspect-[16/9] overflow-hidden border border-border bg-card transition-colors hover:border-zinc-500"
           >
             {o.image_url && (
               <img
                 src={o.image_url}
                 alt={o.title}
                 loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-102"
               />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-            <div className="absolute inset-0 flex flex-col justify-end p-6 text-white sm:p-8">
+            <div className="absolute inset-0 flex flex-col justify-end p-5 text-white sm:p-7">
               {o.badge_text && (
-                <span className="mb-2.5 w-fit rounded-full bg-whatsapp px-3 py-1 text-xs font-black uppercase shadow-md">
+                <span className="mb-2 w-fit rounded-xs bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
                   {o.badge_text}
                 </span>
               )}
-              <h3 className="text-2xl font-black sm:text-3xl">{o.title}</h3>
+              <h3 className="text-xl font-black text-white sm:text-2xl">{o.title}</h3>
               {o.description && (
-                <p className="mt-2 max-w-md text-sm leading-relaxed text-white/90">{o.description}</p>
+                <p className="mt-1.5 max-w-md text-xs text-zinc-300 leading-relaxed">
+                  {o.description}
+                </p>
               )}
               <div className="mt-4">
-                <span className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-xs font-bold text-black shadow-lg transition-transform group-hover:scale-105">
-                  <MessageCircle className="h-4 w-4 text-whatsapp" />
-                  <span>اطلب العرض الآن عبر واتساب</span>
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white underline underline-offset-4">
+                  <MessageCircle className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>اطلب هذا العرض عبر واتساب ←</span>
                 </span>
               </div>
             </div>
@@ -92,14 +93,15 @@ function OffersPage() {
         ))}
 
         {q.data?.length === 0 && (
-          <div className="col-span-2 rounded-3xl border border-dashed border-border/80 p-12 text-center text-muted-foreground">
-            <Tag className="mx-auto h-12 w-12 opacity-30 mb-3" />
-            <p className="text-base font-bold text-foreground">لا توجد عروض نشطة حالياً</p>
-            <p className="text-xs text-muted-foreground mt-1">تابعنا باستمرار للاستفادة من تخفيضات الموسم القادمة.</p>
+          <div className="col-span-2 border border-dashed border-border p-12 text-center text-muted-foreground">
+            <Tag className="mx-auto h-8 w-8 opacity-30 mb-2" />
+            <p className="text-sm font-bold text-foreground">لا توجد عروض نشطة حالياً</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              تابعنا باستمرار للاستفادة من تخفيضات الموسم القادمة.
+            </p>
           </div>
         )}
       </div>
     </div>
   );
 }
-
