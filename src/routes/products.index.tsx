@@ -352,6 +352,13 @@ function ProductsPage() {
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
+          ) : (productsQ.data ?? []).length === 0 ? (
+            <div className="flex min-h-[260px] flex-col items-center justify-center border border-dashed border-[#E5E5E0] p-6 text-center bg-white">
+              <h3 className="text-sm font-bold text-[#0D0D0D]">لا توجد منتجات متوفرة حالياً</h3>
+              <p className="mt-1 text-xs text-[#6B6B66] max-w-xs">
+                نعمل على تجهيز كوليكشن جديد يليق بكم. ترقبوا الإطلاق قريباً.
+              </p>
+            </div>
           ) : (
             <div className="flex min-h-[260px] flex-col items-center justify-center border border-dashed border-[#E5E5E0] p-6 text-center bg-white">
               <h3 className="text-sm font-bold text-[#0D0D0D]">لا توجد قطع تطابق الفلاتر</h3>

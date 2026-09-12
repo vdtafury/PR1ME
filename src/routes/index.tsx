@@ -227,7 +227,14 @@ function HomePage() {
                   className="aspect-[4/5] skeleton-stone border border-[#E5E5E0]"
                 />
               ))
-            : (featured.data ?? []).map((p) => <ProductCard key={p.id} product={p} />)}
+            : (featured.data ?? []).length > 0 ? (
+                (featured.data ?? []).map((p) => <ProductCard key={p.id} product={p} />)
+              ) : (
+                <div className="col-span-full py-12 px-4 text-center border border-dashed border-[#E5E5E0] bg-white">
+                  <p className="text-xs font-bold text-[#0D0D0D]">لا توجد منتجات معروضة حالياً</p>
+                  <p className="mt-1 text-[11px] text-[#6B6B66]">ترقبوا إطلاق الكوليكشن الجديد قريباً.</p>
+                </div>
+              )}
         </div>
       </section>
 
