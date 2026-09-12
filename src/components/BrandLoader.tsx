@@ -64,10 +64,10 @@ export function BrandLoader({ onReady }: BrandLoaderProps) {
       setPhase(3);
       onReadyRef.current?.();
 
-      // Complete unmount after 600ms fade duration
+      // Complete unmount after 850ms slide-up duration
       tDone = setTimeout(() => {
         setPhase("done");
-      }, 650);
+      }, 850);
     };
 
     // Minimum cinematic presence: 1800ms (to give the intended premium feel)
@@ -106,14 +106,18 @@ export function BrandLoader({ onReady }: BrandLoaderProps) {
       id="pr1me-preloader"
       aria-label="PR1ME Brand Intro"
       aria-hidden={phase === 3}
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0D0D0D] select-none transition-all duration-600 ease-out ${
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0D0D0D] select-none will-change-transform transition-transform duration-800 ease-[cubic-bezier(0.76,0,0.24,1)] ${
         phase === 3
-          ? "opacity-0 pointer-events-none scale-[1.01]"
-          : "opacity-100 pointer-events-auto scale-100"
+          ? "-translate-y-full pointer-events-none"
+          : "translate-y-0 pointer-events-auto"
       }`}
     >
       {/* Centered Editorial Brand Experience */}
-      <div className="flex flex-col items-center justify-center text-center px-4 max-w-sm sm:max-w-md">
+      <div
+        className={`flex flex-col items-center justify-center text-center px-4 max-w-sm sm:max-w-md transition-all duration-500 ease-out ${
+          phase === 3 ? "-translate-y-12 opacity-30" : "translate-y-0 opacity-100"
+        }`}
+      >
         {/* Phase 1 (200ms): PR1ME Monospace Wordmark */}
         <div
           className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${

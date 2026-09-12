@@ -110,10 +110,8 @@ function SiteChrome() {
     <div className="flex min-h-screen flex-col bg-[#F7F7F5]">
       <BrandLoader onReady={handlePreloaderReady} />
       <div
-        className={`flex min-h-screen flex-col transition-all duration-700 ease-out ${
-          isPreloaderActive
-            ? "opacity-0 translate-y-2 pointer-events-none"
-            : "opacity-100 translate-y-0 pointer-events-auto"
+        className={`flex min-h-screen flex-col ${
+          isPreloaderActive ? "pointer-events-none select-none" : "pointer-events-auto"
         }`}
       >
         <Header />
