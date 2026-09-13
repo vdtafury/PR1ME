@@ -87,7 +87,7 @@ export function ProductCheckoutDrawer({
 
   if (!mounted || !isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!name.trim()) {
