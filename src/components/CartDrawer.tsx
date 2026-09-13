@@ -10,7 +10,14 @@ import { toast } from "sonner";
 
 export function CartDrawer() {
   const { isCartOpen, setCartOpen, items, updateQuantity, removeItem, clearCart } = useCartStore();
-  const [step, setStep] = useState<"cart" | "checkout">("cart");
+  const [step, setStep] = useState<"cart" | "checkout" | "success">("cart");
+  const [orderSuccess, setOrderSuccess] = useState<{
+    code: string;
+    finalTotal: number;
+    name: string;
+    governorate: string;
+    itemCount: number;
+  } | null>(null);
 
   // Form State
   const [name, setName] = useState("");
@@ -21,17 +28,23 @@ export function CartDrawer() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Close and reset
+  const handleClose = () => {
+    setCartOpen(false);
+    setStep("cart");
+    setOrderSuccess(null);
+  };
+
   // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setCartOpen(false);
-        setStep("cart");
+        handleClose();
       }
     };
     if (isCartOpen) window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
-  }, [isCartOpen, setCartOpen]);
+  }, [isCartOpen, handleClose]);
 
   // Prevent body scroll when cart is open
   useEffect(() => {
@@ -75,14 +88,18 @@ export function CartDrawer() {
     setErrorMsg("");
     setIsSubmitting(true);
     const orderCode = generateOrderCode();
+    const finalAmt = finalTotal;
+    const gov = governorate;
+    const clientName = name.trim();
+    const count = items.length;
 
     // 1. Record order in Supabase
     try {
       const orderPayload = {
         order_code: orderCode,
-        customer_name: name.trim(),
+        customer_name: clientName,
         phone: phone.trim(),
-        governorate,
+        governorate: gov,
         address: address.trim(),
         notes: notes.trim() || null,
         items: items.map((item) => ({
@@ -96,57 +113,34 @@ export function CartDrawer() {
         })),
         subtotal,
         shipping_fee: shippingFee,
-        total: finalTotal,
+        total: finalAmt,
         status: "جديد",
       };
 
       const { error: dbError } = await supabase.from("orders").insert([orderPayload]);
       if (dbError) {
         console.warn("Could not insert cart order into Supabase:", dbError.message);
+        toast.error("تعذر حفظ الطلب في قاعدة البيانات: " + dbError.message);
+        setIsSubmitting(false);
+        return;
       }
-    } catch (err) {
+
+      clearCart();
+      setOrderSuccess({
+        code: orderCode,
+        finalTotal: finalAmt,
+        name: clientName,
+        governorate: gov,
+        itemCount: count,
+      });
+      setStep("success");
+      toast.success(`تم استلام طلبك بنجاح! كود الطلب: #${orderCode}`);
+    } catch (err: any) {
       console.warn("DB insert error caught:", err);
+      toast.error("حدث خطأ أثناء حفظ الطلب، يرجى المحاولة ثانية");
     } finally {
       setIsSubmitting(false);
     }
-
-    // 2. Format Arabic WhatsApp message
-    let message = `مرحباً PR1ME، أود تأكيد طلب أوردر جديد:\n`;
-    message += `🔖 *كود الطلب: #${orderCode}*\n\n`;
-
-    message += `👤 *بيانات العميل والتوصيل:*\n`;
-    message += `▪️ الاسم: ${name.trim()}\n`;
-    message += `▪️ الهاتف: ${phone.trim()}\n`;
-    message += `▪️ المحافظة: ${governorate}\n`;
-    message += `▪️ العنوان: ${address.trim()}\n`;
-    if (notes.trim()) {
-      message += `▪️ ملاحظات: ${notes.trim()}\n`;
-    }
-
-    message += `\n🛍️ *المنتجات المطلوبة (${items.length}):*\n`;
-    items.forEach((item, index) => {
-      message += `▪️ ${index + 1}. ${item.product.title}\n`;
-      message += `   - الكمية: ${item.quantity}\n`;
-      if (item.selectedSize) message += `   - المقاس: ${item.selectedSize}\n`;
-      if (item.selectedColor) message += `   - اللون: ${item.selectedColor}\n`;
-      message += `   - السعر: ${formatPrice(item.product.price * item.quantity)}\n`;
-    });
-
-    message += `\n💰 *تفاصيل الحساب والفاتورة:*\n`;
-    message += `▪️ سعر المنتجات: ${formatPrice(subtotal)}\n`;
-    message += `▪️ مصاريف الشحن (${governorate}): ${
-      isFreeShipping ? "شحن مجاني ✨ (أكثر من 1000 ج.م)" : formatPrice(shippingFee)
-    }\n`;
-    message += `▪️ *الإجمالي المطلوب عند الاستلام: ${formatPrice(finalTotal)}*\n`;
-    message += `📍 طريقة الدفع: كاش عند الاستلام (مع المعاينة والقياس قبل الدفع)\n`;
-    message += `\nبرجاء مراجعة الطلب وتأكيد موعد الشحن. شكراً!`;
-
-    const url = generalContactLink(message);
-    window.open(url, "_blank");
-    toast.success(`تم تسجيل طلبك (#${orderCode}) وتجهيز رسالة واتساب!`);
-    clearCart();
-    setStep("cart");
-    setCartOpen(false);
   };
 
   return (
@@ -154,7 +148,7 @@ export function CartDrawer() {
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs transition-opacity"
-        onClick={() => setCartOpen(false)}
+        onClick={handleClose}
       />
 
       {/* Mobile Drawer (100dvh for mobile address bar safety) */}
@@ -171,18 +165,24 @@ export function CartDrawer() {
               >
                 <ArrowRight className="h-4 w-4" />
               </button>
+            ) : step === "success" ? (
+              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
             ) : (
               <ShoppingBag className="h-4 w-4 text-[#0D0D0D]" />
             )}
             <h2 className="text-sm font-bold text-[#0D0D0D]">
-              {step === "cart" ? "سلة المشتريات" : "بيانات الشحن والتوصيل"}
+              {step === "cart"
+                ? "سلة المشتريات"
+                : step === "checkout"
+                ? "بيانات الشحن والتوصيل"
+                : "تأكيد الطلب"}
             </h2>
             {step === "cart" && (
               <span className="text-xs text-[#6B6B66] font-mono">({items.length})</span>
             )}
           </div>
           <button
-            onClick={() => setCartOpen(false)}
+            onClick={handleClose}
             className="grid h-10 w-10 place-items-center text-[#6B6B66] hover:text-[#0D0D0D]"
             aria-label="إغلاق السلة"
           >
@@ -458,8 +458,74 @@ export function CartDrawer() {
           </div>
         )}
 
+        {/* Step 3: Success Confirmation View */}
+        {step === "success" && orderSuccess && (
+          <div className="flex-1 overflow-y-auto p-5 touch-scroll flex flex-col items-center text-center justify-center space-y-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-xs">
+              <CheckCircle2 className="h-8 w-8" />
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-lg font-black text-[#0D0D0D]">
+                تم استلام طلبك بنجاح! 🎉
+              </h3>
+              <p className="text-xs text-[#6B6B66] leading-relaxed max-w-xs">
+                شكراً لتسوقك من <span className="font-bold text-[#0D0D0D]">PR1ME</span>. تم تسجيل بيانات الأوردر في نظامنا وجاري مراجعته وتجهيزه.
+              </p>
+            </div>
+
+            {/* Order Code Badge */}
+            <div className="w-full border border-[#E5E5E0] bg-[#F7F7F5] p-3.5 rounded-xs">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-[#6B6B66] block mb-1">
+                كود تتبع الطلب الخاص بك
+              </span>
+              <span className="font-mono text-xl sm:text-2xl font-black text-[#0D0D0D] tracking-widest select-all">
+                #{orderSuccess.code}
+              </span>
+            </div>
+
+            {/* Order Details Recap */}
+            <div className="w-full border border-[#E5E5E0] p-3.5 text-xs text-right space-y-2 bg-white rounded-xs">
+              <div className="flex justify-between border-b border-[#E5E5E0] pb-2 text-[11px]">
+                <span className="text-[#6B6B66]">العميل:</span>
+                <span className="font-bold text-[#0D0D0D]">{orderSuccess.name}</span>
+              </div>
+              <div className="flex justify-between border-b border-[#E5E5E0] pb-2 text-[11px]">
+                <span className="text-[#6B6B66]">المحافظة:</span>
+                <span className="font-bold text-[#0D0D0D]">{orderSuccess.governorate}</span>
+              </div>
+              <div className="flex justify-between border-b border-[#E5E5E0] pb-2 text-[11px]">
+                <span className="text-[#6B6B66]">عدد المنتجات:</span>
+                <span className="font-bold text-[#0D0D0D]">{orderSuccess.itemCount} قطع</span>
+              </div>
+              <div className="flex justify-between pt-1">
+                <span className="font-bold text-[#0D0D0D]">المبلغ المطلوب عند الاستلام:</span>
+                <span className="font-black font-mono text-base text-[#0D0D0D]">
+                  {formatPrice(orderSuccess.finalTotal)}
+                </span>
+              </div>
+            </div>
+
+            {/* Shipping & Delivery Reassurance */}
+            <div className="flex items-start gap-2 text-right border border-blue-100 bg-blue-50/50 p-3 text-[11px] text-blue-950 rounded-xs">
+              <Truck className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+              <p className="leading-relaxed">
+                سيتواصل معك أحد ممثلي خدمة عملاء PR1ME هاتفياً لتأكيد العنوان وموعد خروج الشحنة مع المندوب. الدفع كاش عند الاستلام مع إمكانية المعاينة.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleClose}
+              className="mt-2 flex min-h-[50px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs sm:text-sm font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98 cursor-pointer"
+            >
+              <span>متابعة التسوق</span>
+            </button>
+          </div>
+        )}
+
         {/* Footer with Safe-Area Insets */}
-        {items.length > 0 && (
+        {step !== "success" && items.length > 0 && (
           <div className="border-t border-[#E5E5E0] bg-white p-3.5 sm:p-4 pb-safe space-y-2.5">
             <div className="flex items-center justify-between text-xs">
               <div className="flex flex-col">
@@ -498,8 +564,8 @@ export function CartDrawer() {
                 disabled={isSubmitting}
                 className="flex min-h-[52px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98 cursor-pointer disabled:opacity-75"
               >
-                <MessageCircle className="h-4 w-4 text-emerald-400" />
-                <span>{isSubmitting ? "جاري تسجيل الطلب..." : "تأكيد وإرسال الطلب على واتساب"}</span>
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                <span>{isSubmitting ? "جاري تسجيل وتأكيد الطلب..." : "تأكيد وإتمام الطلب (الدفع عند الاستلام)"}</span>
               </button>
             )}
           </div>

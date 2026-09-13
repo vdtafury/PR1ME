@@ -34,6 +34,18 @@ export function ProductCheckoutDrawer({
   const [notes, setNotes] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState<{
+    code: string;
+    finalTotal: number;
+    name: string;
+    governorate: string;
+  } | null>(null);
+
+  const handleClose = () => {
+    setOrderSuccess(null);
+    setErrorMsg("");
+    onClose();
+  };
 
   // Calculations
   const subtotal = product.price * quantity;
@@ -50,32 +62,32 @@ export function ProductCheckoutDrawer({
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onClose();
+        handleClose();
       }
     };
     if (isOpen) window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   // Lock body & html scroll when drawer is open
   useEffect(() => {
-    if (!isOpen) return;
-
-    const originalBodyOverflow = document.body.style.overflow;
-    const originalHtmlOverflow = document.documentElement.style.overflow;
-
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "unset";
+    }
 
     return () => {
-      document.body.style.overflow = originalBodyOverflow;
-      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "unset";
     };
   }, [isOpen]);
 
   if (!mounted || !isOpen) return null;
 
-  const handleFinalSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!name.trim()) {
@@ -125,59 +137,132 @@ export function ProductCheckoutDrawer({
       const { error: dbError } = await supabase.from("orders").insert([orderPayload]);
       if (dbError) {
         console.warn("Could not insert order into Supabase:", dbError.message);
+        toast.error("تعذر حفظ الطلب في قاعدة البيانات: " + dbError.message);
+        setIsSubmitting(false);
+        return;
       }
-    } catch (err) {
+
+      setOrderSuccess({
+        code: orderCode,
+        finalTotal,
+        name: name.trim(),
+        governorate,
+      });
+      toast.success(`تم استلام طلبك بنجاح! كود الطلب: #${orderCode}`);
+    } catch (err: any) {
       console.warn("DB insert error caught:", err);
+      toast.error("حدث خطأ أثناء حفظ الطلب، يرجى المحاولة ثانية");
     } finally {
       setIsSubmitting(false);
     }
-
-    // 2. Format Arabic WhatsApp message
-    let message = `مرحباً PR1ME، أود تأكيد طلب أوردر جديد:\n`;
-    message += `🔖 *كود الطلب: #${orderCode}*\n\n`;
-
-    message += `👤 *بيانات العميل والتوصيل:*\n`;
-    message += `▪️ الاسم: ${name.trim()}\n`;
-    message += `▪️ الهاتف: ${phone.trim()}\n`;
-    message += `▪️ المحافظة: ${governorate}\n`;
-    message += `▪️ العنوان: ${address.trim()}\n`;
-    if (notes.trim()) {
-      message += `▪️ ملاحظات: ${notes.trim()}\n`;
-    }
-
-    message += `\n🛍️ *المنتج المطلوب:*\n`;
-    message += `▪️ ${product.title}\n`;
-    message += `   - الكمية: ${quantity}\n`;
-    if (selectedSize) message += `   - المقاس: ${selectedSize}\n`;
-    if (selectedColor) message += `   - اللون: ${selectedColor}\n`;
-    if (product.product_code) message += `   - كود الموديل: ${product.product_code}\n`;
-    message += `   - سعر القطعة: ${formatPrice(product.price)}\n`;
-
-    message += `\n💰 *تفاصيل الحساب والفاتورة:*\n`;
-    message += `▪️ سعر المنتجات: ${formatPrice(subtotal)}\n`;
-    message += `▪️ مصاريف الشحن (${governorate}): ${
-      isFreeShipping ? "شحن مجاني ✨ (أكثر من 1000 ج.م)" : formatPrice(shippingFee)
-    }\n`;
-    message += `▪️ *الإجمالي المطلوب عند الاستلام: ${formatPrice(finalTotal)}*\n`;
-
-    message += `\n📍 طريقة الدفع: كاش عند الاستلام (مع المعاينة والقياس قبل الدفع)\n`;
-    if (typeof window !== "undefined" && window.location.href) {
-      message += `🔗 رابط المنتج: ${window.location.href}\n`;
-    }
-    message += `\nبرجاء تأكيد الطلب وتحديد موعد خروج الشحنة مع المندوب. شكراً!`;
-
-    const url = generalContactLink(message);
-    window.open(url, "_blank");
-    toast.success(`تم تسجيل طلبك (#${orderCode}) وتجهيز رسالة واتساب!`);
-    onClose();
   };
+
+  if (orderSuccess) {
+    return createPortal(
+      <div className="fixed inset-0 z-[99999] pointer-events-auto select-auto" dir="rtl">
+        {/* Backdrop */}
+        <div
+          className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity duration-200"
+          onClick={handleClose}
+          aria-hidden="true"
+        />
+
+        {/* Slide-over Drawer Panel */}
+        <aside
+          className="fixed inset-y-0 left-0 flex h-[100dvh] max-h-[100dvh] w-full sm:max-w-md flex-col bg-white shadow-2xl border-r border-[#E5E5E0] animate-in slide-in-from-left duration-200 overscroll-contain z-10"
+          role="dialog"
+          aria-modal="true"
+        >
+          {/* Header */}
+          <div className="flex-shrink-0 flex items-center justify-between border-b border-[#E5E5E0] p-3.5 sm:p-4 bg-white">
+            <h2 className="text-sm font-bold text-[#0D0D0D]">تأكيد الطلب</h2>
+            <button
+              onClick={handleClose}
+              className="grid h-9 w-9 place-items-center text-[#6B6B66] hover:text-[#0D0D0D] hover:bg-black/5 rounded-xs transition-colors"
+              aria-label="إغلاق"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Success Content */}
+          <div className="flex-1 overflow-y-auto p-5 touch-scroll overscroll-contain flex flex-col items-center text-center justify-center space-y-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-xs">
+              <CheckCircle2 className="h-8 w-8" />
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-lg font-black text-[#0D0D0D]">
+                تم استلام طلبك بنجاح! 🎉
+              </h3>
+              <p className="text-xs text-[#6B6B66] leading-relaxed max-w-xs">
+                شكراً لطلبك من <span className="font-bold text-[#0D0D0D]">PR1ME</span>. تم تسجيل بيانات الأوردر في نظامنا وجاري مراجعته وتجهيزه.
+              </p>
+            </div>
+
+            {/* Order Code Badge */}
+            <div className="w-full border border-[#E5E5E0] bg-[#F7F7F5] p-3.5 rounded-xs">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-[#6B6B66] block mb-1">
+                كود تتبع الطلب الخاص بك
+              </span>
+              <span className="font-mono text-xl sm:text-2xl font-black text-[#0D0D0D] tracking-widest select-all">
+                #{orderSuccess.code}
+              </span>
+            </div>
+
+            {/* Order Details Recap */}
+            <div className="w-full border border-[#E5E5E0] p-3.5 text-xs text-right space-y-2 bg-white rounded-xs">
+              <div className="flex justify-between border-b border-[#E5E5E0] pb-2 text-[11px]">
+                <span className="text-[#6B6B66]">العميل:</span>
+                <span className="font-bold text-[#0D0D0D]">{orderSuccess.name}</span>
+              </div>
+              <div className="flex justify-between border-b border-[#E5E5E0] pb-2 text-[11px]">
+                <span className="text-[#6B6B66]">المحافظة:</span>
+                <span className="font-bold text-[#0D0D0D]">{orderSuccess.governorate}</span>
+              </div>
+              <div className="flex justify-between border-b border-[#E5E5E0] pb-2 text-[11px]">
+                <span className="text-[#6B6B66]">المنتج:</span>
+                <span className="font-bold text-[#0D0D0D] line-clamp-1">{product.title} (x{quantity})</span>
+              </div>
+              <div className="flex justify-between pt-1">
+                <span className="font-bold text-[#0D0D0D]">المبلغ المطلوب عند الاستلام:</span>
+                <span className="font-black font-mono text-base text-[#0D0D0D]">
+                  {formatPrice(orderSuccess.finalTotal)}
+                </span>
+              </div>
+            </div>
+
+            {/* Shipping & Delivery Reassurance */}
+            <div className="flex items-start gap-2 text-right border border-blue-100 bg-blue-50/50 p-3 text-[11px] text-blue-950 rounded-xs">
+              <Truck className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+              <p className="leading-relaxed">
+                سيتواصل معك أحد ممثلي خدمة عملاء PR1ME هاتفياً لتأكيد العنوان وموعد خروج الشحنة مع المندوب. الدفع كاش عند الاستلام مع إمكانية المعاينة.
+              </p>
+            </div>
+          </div>
+
+          {/* Footer Action */}
+          <div className="flex-shrink-0 border-t border-[#E5E5E0] p-3.5 sm:p-4 bg-white pb-safe">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="flex min-h-[50px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs sm:text-sm font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98 cursor-pointer"
+            >
+              <span>متابعة التسوق</span>
+            </button>
+          </div>
+        </aside>
+      </div>,
+      document.body
+    );
+  }
 
   const drawerElement = (
     <div className="fixed inset-0 z-[99999] pointer-events-auto select-auto" dir="rtl">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity duration-200"
-        onClick={onClose}
+        onClick={handleClose}
         aria-hidden="true"
       />
 
@@ -391,9 +476,9 @@ export function ProductCheckoutDrawer({
             disabled={isSubmitting}
             className="flex min-h-[52px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-3 text-xs sm:text-sm font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] active:scale-98 cursor-pointer disabled:opacity-75"
           >
-            <MessageCircle className="h-4 w-4 text-emerald-400" />
+            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
             <span>
-              {isSubmitting ? "جاري تسجيل الطلب..." : "تأكيد وإرسال الطلب على واتساب"}
+              {isSubmitting ? "جاري تسجيل وتأكيد الطلب..." : "تأكيد وإتمام الطلب (الدفع عند الاستلام)"}
             </span>
           </button>
         </div>

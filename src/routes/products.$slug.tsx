@@ -16,6 +16,7 @@ import {
   HelpCircle,
   AlertCircle,
   Check,
+  CheckCircle2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice, productOrderLink, generalContactLink } from "@/lib/whatsapp";
@@ -536,7 +537,7 @@ function ProductView({ product: p }: { product: Product }) {
                   : "bg-[#E5E5E0] text-[#6B6B66] cursor-not-allowed"
               }`}
             >
-              <MessageCircle className="h-4 w-4 text-emerald-400" />
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
               <span>اطلب الآن (الدفع كاش عند الاستلام)</span>
             </button>
 
@@ -746,7 +747,7 @@ function ProductView({ product: p }: { product: Product }) {
                   : "bg-[#E5E5E0] text-[#6B6B66] opacity-60"
               }`}
             >
-              <MessageCircle className="h-3.5 w-3.5 text-emerald-400" />
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
               <span>اطلب الآن</span>
             </button>
           </div>
