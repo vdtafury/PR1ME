@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, ShoppingBag, Menu, X, ArrowLeft, MessageCircle } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, ArrowLeft, MessageCircle, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { useCartStore } from "@/lib/store";
@@ -61,6 +61,7 @@ export function Header() {
     { label: "تيشيرتات", href: "/products", search: { category: "t-shirts" } },
     { label: "أكسسوارات", href: "/products", search: { category: "accessories" } },
     { label: "العروض والتخفيضات", href: "/offers", badge: "خصومات" },
+    { label: "تتبع طلبك", href: "/track" },
     { label: "عن البراند والشحن", href: "/about" },
   ];
 
@@ -129,6 +130,16 @@ export function Header() {
             >
               <Search className="h-5 w-5" />
             </button>
+
+            {/* Account / User Button (44px touch target) */}
+            <Link
+              to="/account"
+              className="grid h-11 w-11 place-items-center text-[#0D0D0D] hover:text-[#6B6B66] active:scale-95 transition-transform"
+              aria-label="حسابي وطلباتي"
+              title="حسابي وطلباتي"
+            >
+              <User className="h-5 w-5" />
+            </Link>
 
             {/* Cart Button (44px touch target) with Bump Animation */}
             <button
@@ -207,8 +218,23 @@ export function Header() {
               </button>
             </div>
 
+            {/* Mobile Account Quick Link */}
+            <div className="p-3 border-b border-[#E5E5E0] bg-[#F7F7F5]">
+              <Link
+                to="/account"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between p-2.5 bg-white border border-[#E5E5E0] rounded-xs text-xs font-bold text-[#0D0D0D] active:bg-[#F7F7F5]"
+              >
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-[#0D0D0D]" />
+                  <span>حسابي وطلباتي المسجلة</span>
+                </div>
+                <ArrowLeft className="h-3.5 w-3.5 text-[#6B6B66]" />
+              </Link>
+            </div>
+
             {/* Drawer Links List */}
-            <nav className="flex-1 overflow-y-auto px-4 py-3 divide-y divide-[#E5E5E0]/60 touch-scroll">
+            <nav className="flex-1 overflow-y-auto px-4 py-2 divide-y divide-[#E5E5E0]/60 touch-scroll">
               {navLinks.map((link) => (
                 <Link
                   key={link.label}

@@ -1,4 +1,5 @@
 import { X, MessageCircle, ShieldCheck, ArrowRight, Truck, CheckCircle2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { formatPrice, generalContactLink } from "@/lib/whatsapp";
 import { getShippingFee, generateOrderCode, ALL_GOVERNORATES, FREE_SHIPPING_THRESHOLD, SHIPPING_RATES } from "@/lib/shipping";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +40,7 @@ export function ProductCheckoutDrawer({
     finalTotal: number;
     name: string;
     governorate: string;
+    phone: string;
   } | null>(null);
 
   const handleClose = () => {
@@ -147,6 +149,7 @@ export function ProductCheckoutDrawer({
         finalTotal,
         name: name.trim(),
         governorate,
+        phone: phone.trim(),
       });
       toast.success(`تم استلام طلبك بنجاح! كود الطلب: #${orderCode}`);
     } catch (err: any) {
@@ -238,6 +241,42 @@ export function ProductCheckoutDrawer({
               <p className="leading-relaxed">
                 سيتواصل معك أحد ممثلي خدمة عملاء PR1ME هاتفياً لتأكيد العنوان وموعد خروج الشحنة مع المندوب. الدفع كاش عند الاستلام مع إمكانية المعاينة.
               </p>
+            </div>
+
+            {/* Action Buttons: Live Track + Register Account */}
+            <div className="w-full space-y-2.5 pt-1">
+              <Link
+                to="/track"
+                search={{ code: orderSuccess.code, phone: orderSuccess.phone }}
+                onClick={handleClose}
+                className="flex min-h-[46px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-2.5 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] rounded-xs"
+              >
+                <Truck className="h-4 w-4 text-emerald-400" />
+                <span>تتبع مسار شحنتك لحظة بلحظة 📦</span>
+              </Link>
+
+              <div className="border border-[#E5E5E0] bg-[#F7F7F5] p-3 text-right rounded-xs space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#0D0D0D]">
+                  <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                  <span>تود حفظ ومتابعة هذا الطلب دائماً؟</span>
+                </div>
+                <p className="text-[11px] text-[#6B6B66] leading-relaxed">
+                  أنشئ حسابك الآن برقم هاتفك لربط هذا الأوردر ومتابعة موعد تسليمه وإعادة الطلب بسهولة.
+                </p>
+                <Link
+                  to="/account/login"
+                  search={{
+                    tab: "register",
+                    phone: orderSuccess.phone,
+                    name: orderSuccess.name,
+                    code: orderSuccess.code,
+                  }}
+                  onClick={handleClose}
+                  className="flex min-h-[40px] w-full items-center justify-center gap-1.5 border border-[#0D0D0D] bg-white py-2 text-xs font-bold text-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-[#F7F7F5] transition-colors rounded-xs"
+                >
+                  <span>إنشاء حساب بالهاتف وحفظ الطلب 🔐</span>
+                </Link>
+              </div>
             </div>
           </div>
 
