@@ -47,36 +47,28 @@ export const Route = createFileRoute("/order-success")({
   }),
 });
 
-function getTimelineDates(baseDate: Date) {
-  const arabicMonths = [
+function getSimpleTimelineDates(baseDate: Date) {
+  const months = [
     "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
     "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
   ];
-  const arabicDays = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
 
-  const formatShort = (d: Date) => {
-    return `${arabicDays[d.getDay()]}، ${d.getDate()} ${arabicMonths[d.getMonth()]}`;
-  };
+  let hours = baseDate.getHours();
+  const minutes = baseDate.getMinutes().toString().padStart(2, "0");
+  const period = hours >= 12 ? "م" : "ص";
+  hours = hours % 12 || 12;
 
-  const formatWithTime = (d: Date) => {
-    let hours = d.getHours();
-    const minutes = d.getMinutes().toString().padStart(2, "0");
-    const period = hours >= 12 ? "م" : "ص";
-    hours = hours % 12 || 12;
-    return `${formatShort(d)} - ${hours}:${minutes} ${period}`;
-  };
-
-  const step1Date = formatWithTime(baseDate);
-  const step2Date = "اليوم (خلال 30 إلى 60 دقيقة)";
+  const step1 = `${baseDate.getDate()} ${months[baseDate.getMonth()]} (${hours}:${minutes} ${period})`;
+  const step2 = "اليوم (قريباً)";
 
   const tomorrow = new Date(baseDate.getTime() + 24 * 60 * 60 * 1000);
-  const step3Date = `غداً (${formatShort(tomorrow)})`;
+  const step3 = `غداً (${tomorrow.getDate()} ${months[tomorrow.getMonth()]})`;
 
-  const deliveryStart = new Date(baseDate.getTime() + 2 * 24 * 60 * 60 * 1000);
-  const deliveryEnd = new Date(baseDate.getTime() + 4 * 24 * 60 * 60 * 1000);
-  const step4Date = `بين ${formatShort(deliveryStart)} و ${formatShort(deliveryEnd)}`;
+  const dStart = new Date(baseDate.getTime() + 2 * 24 * 60 * 60 * 1000);
+  const dEnd = new Date(baseDate.getTime() + 4 * 24 * 60 * 60 * 1000);
+  const step4 = `${dStart.getDate()} - ${dEnd.getDate()} ${months[dEnd.getMonth()]}`;
 
-  return { step1Date, step2Date, step3Date, step4Date };
+  return { step1, step2, step3, step4 };
 }
 
 function OrderSuccessPage() {
@@ -88,7 +80,7 @@ function OrderSuccessPage() {
   const orderCode = search.code || "";
   const customerPhone = search.phone || "";
   const orderDate = order?.created_at ? new Date(order.created_at) : new Date();
-  const timelineDates = getTimelineDates(orderDate);
+  const timelineDates = getSimpleTimelineDates(orderDate);
 
   useEffect(() => {
     async function loadOrder() {
@@ -190,175 +182,75 @@ function OrderSuccessPage() {
         )}
       </div>
 
-      {/* Modern Detailed Timeline Section */}
-      <div className="mt-6 rounded-2xl border border-[#E5E5E0] bg-white p-4 sm:p-7 shadow-xs">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E5E5E0] pb-4 mb-6">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping" />
-              <h2 className="text-base sm:text-lg font-black text-[#0D0D0D]">
-                المسار الزمني لتوصيل طلبك (Timeline)
-              </h2>
-            </div>
-            <p className="mt-1 text-xs text-[#6B6B66]">
-              متابعة مباشرة ومجدولة لكافة مراحل معالجة وشحن وتوصيل شحنتك بالتواريخ والتفاصيل
-            </p>
-          </div>
-
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800 border border-emerald-200">
-            <Clock className="h-3.5 w-3.5 text-emerald-600" />
-            <span>مدة التوصيل المعتادة: 2 - 4 أيام</span>
+      {/* Clean Horizontal Timeline */}
+      <div className="mt-5 rounded-2xl border border-[#E5E5E0] bg-white p-4 sm:p-6 shadow-xs">
+        <div className="flex items-center justify-between mb-5 border-b border-[#E5E5E0] pb-3">
+          <h2 className="text-xs sm:text-sm font-bold text-[#0D0D0D]">
+            حالة ومراحل الطلب
+          </h2>
+          <span className="text-[11px] text-emerald-800 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            توصيل متوقع: {timelineDates.step4}
           </span>
         </div>
 
-        {/* Vertical Stepper Timeline with Connecting Line */}
-        <div className="relative space-y-7 pr-1 sm:pr-2">
-          {/* Continuous Timeline Line */}
-          <div className="absolute right-[19px] sm:right-[23px] top-5 bottom-5 w-0.5 bg-gradient-to-b from-emerald-500 via-blue-400 to-[#E5E5E0]" />
-
-          {/* Step 1: Completed */}
-          <div className="relative flex items-start gap-3.5 sm:gap-4">
-            <div className="relative z-10 flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow-md shadow-emerald-600/25 ring-4 ring-white">
-              <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
-            </div>
-
-            <div className="flex-1 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3.5 sm:p-4 text-right">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-xs sm:text-sm font-black text-[#0D0D0D]">
-                  1. تسجيل الطلب وحجز المنتجات
-                </h3>
-                <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold text-white">
-                  مكتمل الآن ✓
-                </span>
-              </div>
-
-              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-800">
-                <Calendar className="h-3.5 w-3.5 text-emerald-700" />
-                <span>{timelineDates.step1Date}</span>
-              </div>
-
-              <p className="mt-1.5 text-xs text-[#6B6B66] leading-relaxed">
-                تم استقبال طلبك بنجاح في نظام <strong className="text-[#0D0D0D]">PR1ME</strong>، وحجز القطع في المستودع وإصدار كود الشحنة الرسمي <strong className="font-mono text-[#0D0D0D]">#{displayCode}</strong>.
-              </p>
-
-              <div className="mt-2.5 flex flex-wrap gap-2 text-[10px]">
-                <span className="rounded-md bg-white border border-emerald-200 px-2 py-0.5 text-emerald-900 font-medium">
-                  📦 حجز مؤكد في المستودع
-                </span>
-                <span className="rounded-md bg-white border border-emerald-200 px-2 py-0.5 text-emerald-900 font-medium">
-                  📍 مستودع الشحن: القاهرة
-                </span>
-              </div>
-            </div>
+        {/* Horizontal Stepper Bar */}
+        <div className="relative">
+          {/* Background Connecting Line */}
+          <div className="absolute top-4 inset-x-6 sm:inset-x-12 h-0.5 bg-[#E5E5E0] z-0">
+            <div className="h-full bg-emerald-500 w-[28%]" />
           </div>
 
-          {/* Step 2: In Progress */}
-          <div className="relative flex items-start gap-3.5 sm:gap-4">
-            <div className="relative z-10 flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-white shadow-md shadow-blue-600/30 ring-4 ring-white animate-pulse">
-              <PhoneCall className="h-5 w-5 sm:h-6 sm:w-6" />
+          <div className="relative z-10 grid grid-cols-4 gap-1 text-center">
+            {/* Step 1: Placed */}
+            <div className="flex flex-col items-center">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-white font-bold text-xs shadow-xs ring-4 ring-white">
+                ✓
+              </div>
+              <span className="mt-2 text-[11px] sm:text-xs font-bold text-[#0D0D0D]">
+                تم الطلب
+              </span>
+              <span className="mt-0.5 text-[9px] sm:text-[10px] text-emerald-700 font-medium dir-ltr">
+                {timelineDates.step1}
+              </span>
             </div>
 
-            <div className="flex-1 rounded-xl border border-blue-400 bg-blue-50/60 p-3.5 sm:p-4 text-right">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-xs sm:text-sm font-black text-[#0D0D0D]">
-                  2. مراجعة وتأكيد البيانات هاتفياً أو عبر واتساب
-                </h3>
-                <span className="rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-bold text-white">
-                  الخطوة الحالية ⏳
-                </span>
+            {/* Step 2: Confirmation */}
+            <div className="flex flex-col items-center">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white font-bold text-xs shadow-xs ring-4 ring-white animate-pulse">
+                2
               </div>
-
-              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-blue-900">
-                <Clock className="h-3.5 w-3.5 text-blue-700" />
-                <span>{timelineDates.step2Date}</span>
-              </div>
-
-              <p className="mt-1.5 text-xs text-[#6B6B66] leading-relaxed">
-                يقوم فريق التأكيد بمراجعة العنوان والمحافظة ({displayGov || "المحددة"}) لترتيب موعد خروج الشحنة والتأكد من تواجدك لاستلامها.
-              </p>
-
-              <div className="mt-2.5 flex flex-wrap items-center gap-2 text-[10px]">
-                {displayPhone && (
-                  <span className="rounded-md bg-white border border-blue-200 px-2 py-0.5 text-blue-900 font-medium">
-                    📱 التواصل على الرقم: <strong className="font-mono" dir="ltr">{displayPhone}</strong>
-                  </span>
-                )}
-                <span className="rounded-md bg-white border border-blue-200 px-2 py-0.5 text-blue-900 font-medium">
-                  💬 رسالة واتساب أو مكالمة سريعة
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Step 3: Upcoming */}
-          <div className="relative flex items-start gap-3.5 sm:gap-4">
-            <div className="relative z-10 flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-full bg-white border-2 border-amber-500 text-amber-600 shadow-xs ring-4 ring-white">
-              <Truck className="h-5 w-5 sm:h-6 sm:w-6" />
+              <span className="mt-2 text-[11px] sm:text-xs font-bold text-[#0D0D0D]">
+                تأكيد البيانات
+              </span>
+              <span className="mt-0.5 text-[9px] sm:text-[10px] text-blue-700 font-medium">
+                {timelineDates.step2}
+              </span>
             </div>
 
-            <div className="flex-1 rounded-xl border border-[#E5E5E0] bg-[#F7F7F5] p-3.5 sm:p-4 text-right">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-xs sm:text-sm font-bold text-[#0D0D0D]">
-                  3. الفحص الدقيق، التغليف الفاخر، وتسليم الشحنة لشركة الشحن
-                </h3>
-                <span className="rounded-full bg-amber-500/15 border border-amber-300 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">
-                  الموعد المتوقع
-                </span>
+            {/* Step 3: Shipping */}
+            <div className="flex flex-col items-center">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white border-2 border-[#E5E5E0] text-[#6B6B66] font-bold text-xs ring-4 ring-white">
+                3
               </div>
-
-              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-[#6B6B66]">
-                <Calendar className="h-3.5 w-3.5 text-[#0D0D0D]" />
-                <span>{timelineDates.step3Date}</span>
-              </div>
-
-              <p className="mt-1.5 text-xs text-[#6B6B66] leading-relaxed">
-                يتم فحص كل قطعة للتأكد من خلوها من أي عيوب ومطابقتها للمقاس، ثم توضع في التغليف المخصص لعلامة PR1ME وتسليمها لشركة الشحن السريع.
-              </p>
-
-              <div className="mt-2.5 flex flex-wrap gap-2 text-[10px]">
-                <span className="rounded-md bg-white border border-[#E5E5E0] px-2 py-0.5 text-[#6B6B66]">
-                  🛡️ فحص ومطابقة المقاس
-                </span>
-                <span className="rounded-md bg-white border border-[#E5E5E0] px-2 py-0.5 text-[#6B6B66]">
-                  📦 تغليف مقوى لحماية الملابس
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Step 4: Final Step */}
-          <div className="relative flex items-start gap-3.5 sm:gap-4">
-            <div className="relative z-10 flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-full bg-white border-2 border-purple-600 text-purple-700 shadow-xs ring-4 ring-white">
-              <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6" />
+              <span className="mt-2 text-[11px] sm:text-xs font-medium text-[#6B6B66]">
+                الشحن
+              </span>
+              <span className="mt-0.5 text-[9px] sm:text-[10px] text-[#6B6B66]">
+                {timelineDates.step3}
+              </span>
             </div>
 
-            <div className="flex-1 rounded-xl border border-purple-200 bg-purple-50/40 p-3.5 sm:p-4 text-right">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-xs sm:text-sm font-black text-[#0D0D0D]">
-                  4. وصول المندوب لباب بيتك (المعاينة والقياس قبل الدفع)
-                </h3>
-                <span className="rounded-full bg-purple-600 px-2.5 py-0.5 text-[10px] font-bold text-white">
-                  المرحلة الختامية 🎁
-                </span>
+            {/* Step 4: Delivery */}
+            <div className="flex flex-col items-center">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white border-2 border-[#E5E5E0] text-[#6B6B66] font-bold text-xs ring-4 ring-white">
+                4
               </div>
-
-              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-purple-900">
-                <Calendar className="h-3.5 w-3.5 text-purple-700" />
-                <span>{timelineDates.step4Date}</span>
-              </div>
-
-              <p className="mt-1.5 text-xs text-[#6B6B66] leading-relaxed">
-                يتصل بك المندوب مسبقاً قبل القدوم. يحق لك بالكامل فتح الشحنة وقياس القطعة والتأكد من الخامة والتقفيل قبل سداد أي مليم.
-              </p>
-
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white border border-purple-200 p-2.5 text-[11px]">
-                <span className="font-bold text-[#0D0D0D]">
-                  💵 المبلغ المطلوب كاش عند الاستلام:
-                </span>
-                <span className="font-black font-mono text-sm text-emerald-700">
-                  {formatPrice(displayTotal)}
-                </span>
-              </div>
+              <span className="mt-2 text-[11px] sm:text-xs font-medium text-[#6B6B66]">
+                الاستلام
+              </span>
+              <span className="mt-0.5 text-[9px] sm:text-[10px] text-[#6B6B66]">
+                {timelineDates.step4}
+              </span>
             </div>
           </div>
         </div>
