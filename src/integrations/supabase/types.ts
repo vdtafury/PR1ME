@@ -169,6 +169,54 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          id: string
+          order_code: string
+          customer_name: string
+          phone: string
+          governorate: string
+          address: string
+          notes: string | null
+          items: Json
+          subtotal: number
+          shipping_fee: number
+          total: number
+          status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          order_code: string
+          customer_name: string
+          phone: string
+          governorate: string
+          address: string
+          notes?: string | null
+          items?: Json
+          subtotal?: number
+          shipping_fee?: number
+          total?: number
+          status?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          order_code?: string
+          customer_name?: string
+          phone?: string
+          governorate?: string
+          address?: string
+          notes?: string | null
+          items?: Json
+          subtotal?: number
+          shipping_fee?: number
+          total?: number
+          status?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -180,6 +228,27 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      track_guest_order: {
+        Args: {
+          p_code: string
+          p_phone: string
+        }
+        Returns: {
+          id: string
+          order_code: string
+          customer_name: string
+          phone: string
+          governorate: string
+          address: string
+          notes: string | null
+          items: Json
+          subtotal: number
+          shipping_fee: number
+          total: number
+          status: string
+          created_at: string
+        }[]
       }
     }
     Enums: {

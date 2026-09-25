@@ -1,4 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { supabase } from "@/integrations/supabase/client"
 import { AdminLoginForm } from "@/components/AdminLoginForm";
 
 export const Route = createFileRoute("/admin/login")({

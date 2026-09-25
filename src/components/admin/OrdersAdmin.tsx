@@ -49,7 +49,7 @@ export function OrdersAdmin() {
         console.warn("Could not fetch orders from Supabase:", error.message);
         throw error;
       }
-      return (data as Order[]) || [];
+      return (data as unknown as Order[]) || [];
     },
     refetchInterval: 20000, // auto-refresh every 20s
   });

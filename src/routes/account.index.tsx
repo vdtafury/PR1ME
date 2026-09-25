@@ -125,7 +125,7 @@ function CustomerAccountPage() {
       }
 
       // Filter by normalized phone match
-      const matchingOrders = (data as Order[]).filter((o) => phonesMatch(o.phone, cleanPhone));
+      const matchingOrders = (data as unknown as Order[]).filter((o) => phonesMatch(o.phone, cleanPhone));
       return matchingOrders;
     },
   });

@@ -110,7 +110,7 @@ function TrackOrderPage() {
       });
 
       if (!rpcError && rpcData && rpcData.length > 0) {
-        setOrder(rpcData[0] as Order);
+        setOrder(rpcData[0] as unknown as Order);
         setLoading(false);
         return;
       }
@@ -129,7 +129,7 @@ function TrackOrderPage() {
       if (directData && directData.length > 0) {
         const matched = directData.find((o: any) => phonesMatch(o.phone, cleanPhone));
         if (matched) {
-          setOrder(matched as Order);
+          setOrder(matched as unknown as Order);
         } else {
           setOrder(null);
         }
