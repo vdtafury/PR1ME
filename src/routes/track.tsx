@@ -413,7 +413,7 @@ function TrackOrderPage() {
                     <div className="flex justify-between text-[11px]">
                       <span className="text-[#6B6B66]">مصاريف الشحن:</span>
                       <span className="font-mono">
-                        {order.shipping_fee === 0 ? "شحن مجاني ✨" : formatPrice(order.shipping_fee)}
+                        {order.shipping_fee === 0 ? "شحن مجاني" : formatPrice(order.shipping_fee)}
                       </span>
                     </div>
                     <div className="flex justify-between border-t border-[#E5E5E0] pt-2">
@@ -448,7 +448,7 @@ function TrackOrderPage() {
                   }}
                   className="inline-flex items-center justify-center gap-1.5 bg-[#0D0D0D] px-4 py-2 text-xs font-bold text-[#F7F7F5] hover:bg-[#1F1F1F] rounded-xs transition-colors"
                 >
-                  <span>أنشئ حسابك لحفظ هذا الطلب 🔐</span>
+                  <span>أنشئ حسابك لحفظ هذا الطلب</span>
                 </Link>
               </div>
             </div>

@@ -196,7 +196,7 @@ export function ProductCheckoutDrawer({
 
             <div className="space-y-1">
               <h3 className="text-lg font-black text-[#0D0D0D]">
-                تم استلام طلبك بنجاح! 🎉
+                تم استلام طلبك بنجاح
               </h3>
               <p className="text-xs text-[#6B6B66] leading-relaxed max-w-xs">
                 شكراً لطلبك من <span className="font-bold text-[#0D0D0D]">PR1ME</span>. تم تسجيل بيانات الأوردر في نظامنا وجاري مراجعته وتجهيزه.
@@ -252,7 +252,7 @@ export function ProductCheckoutDrawer({
                 className="flex min-h-[46px] w-full items-center justify-center gap-2 bg-[#0D0D0D] py-2.5 text-xs font-bold text-[#F7F7F5] transition-colors hover:bg-[#1F1F1F] rounded-xs"
               >
                 <Truck className="h-4 w-4 text-emerald-400" />
-                <span>تتبع مسار شحنتك لحظة بلحظة 📦</span>
+                <span>تتبع مسار شحنتك لحظة بلحظة</span>
               </Link>
 
               <div className="border border-[#E5E5E0] bg-[#F7F7F5] p-3 text-right rounded-xs space-y-2">
@@ -274,7 +274,7 @@ export function ProductCheckoutDrawer({
                   onClick={handleClose}
                   className="flex min-h-[40px] w-full items-center justify-center gap-1.5 border border-[#0D0D0D] bg-white py-2 text-xs font-bold text-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-[#F7F7F5] transition-colors rounded-xs"
                 >
-                  <span>إنشاء حساب بالهاتف وحفظ الطلب 🔐</span>
+                  <span>إنشاء حساب بالهاتف وحفظ الطلب</span>
                 </Link>
               </div>
             </div>
@@ -445,7 +445,7 @@ export function ProductCheckoutDrawer({
                 {ALL_GOVERNORATES.map((g) => {
                   const rate = SHIPPING_RATES[g];
                   const label = isFreeShipping
-                    ? `${g} (شحن مجاني ✨)`
+                    ? `${g} (شحن مجاني)`
                     : `${g} (شحن: ${rate} ج.م)`;
                   return (
                     <option key={g} value={g}>

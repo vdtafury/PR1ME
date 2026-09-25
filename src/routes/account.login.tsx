@@ -146,7 +146,7 @@ function AccountLoginPage() {
             <PackageCheck className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
             <div>
               <span className="font-bold block text-sm">
-                تم تسجيل طلبك بنجاح #{search.code} 🎉
+                تم تسجيل طلبك بنجاح #{search.code}
               </span>
               <p className="mt-0.5 leading-relaxed text-emerald-800">
                 أنشئ كلمة مرور لحسابك الآن برقم هاتفك <strong>{search.phone}</strong> ليتم ربط هذا الطلب وجميع طلباتك السابقة بحسابك فوراً.
@@ -335,7 +335,7 @@ function AccountLoginPage() {
               to="/track"
               className="text-xs font-semibold text-[#6B6B66] hover:text-[#0D0D0D] transition-colors"
             >
-              تريد تتبع طلب دون تسجيل الدخول؟ اضغط هنا 📦
+              تريد تتبع طلب دون تسجيل الدخول؟ اضغط هنا
             </Link>
           </div>
         </div>

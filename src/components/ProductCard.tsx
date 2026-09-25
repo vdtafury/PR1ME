@@ -169,7 +169,7 @@ export function ProductCard({ product }: { product: Product }) {
             {isAdded ? (
               <>
                 <Check className="h-3.5 w-3.5 text-emerald-400" />
-                <span>تمت الإضافة ✓</span>
+                <span>تمت الإضافة</span>
               </>
             ) : (
               <>

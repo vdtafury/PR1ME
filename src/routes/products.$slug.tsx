@@ -17,6 +17,7 @@ import {
   AlertCircle,
   Check,
   CheckCircle2,
+  Star,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice, productOrderLink, generalContactLink } from "@/lib/whatsapp";
@@ -389,8 +390,9 @@ function ProductView({ product: p }: { product: Product }) {
 
             {/* 3. Rating & Metadata */}
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-              <div className="flex items-center gap-1 text-amber-600 font-bold bg-amber-500/10 px-2 py-0.5 rounded-xs">
-                <span>★ 4.9</span>
+              <div className="flex items-center gap-1.5 text-[#0D0D0D] font-bold bg-[#F7F7F5] border border-[#E5E5E0] px-2 py-0.5 rounded-sm">
+                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                <span>4.9</span>
                 <span className="text-[#6B6B66] font-normal text-[11px]">(128 تقييم)</span>
               </div>
               <span className="text-[#6B6B66]">•</span>
@@ -542,10 +544,10 @@ function ProductView({ product: p }: { product: Product }) {
             <button
               type="button"
               onClick={handleScrollToOrderForm}
-              className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#0D0D0D] text-[#F7F7F5] hover:bg-[#1F1F1F] active:scale-98 shadow-md"
+              className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#0D0D0D] text-[#F7F7F5] hover:bg-[#1F1F1F] active:scale-98"
             >
               <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-              <span>املأ بيانات الطلب بالأسفل (الدفع عند الاستلام) ⬇️</span>
+              <span>طلب مباشر (الدفع عند الاستلام)</span>
             </button>
 
             <div className="flex gap-2.5">
@@ -564,7 +566,7 @@ function ProductView({ product: p }: { product: Product }) {
                 {isAdded ? (
                   <>
                     <Check className="h-3.5 w-3.5 text-emerald-400" />
-                    <span>تمت الإضافة ✓</span>
+                    <span>تمت الإضافة</span>
                   </>
                 ) : (
                   <>
@@ -689,9 +691,9 @@ function ProductView({ product: p }: { product: Product }) {
               )}
               {activeTab === "guide" && (
                 <div className="space-y-2">
-                  <p>🚚 <strong>مدة الشحن:</strong> التوصيل يتم خلال 2 إلى 4 أيام عمل لجميع أنحاء مصر.</p>
-                  <p>💵 <strong>الدفع والمعاينة:</strong> كاش عند الاستلام مع حق فتح الشحنة وقياس القطعة قبل الدفع.</p>
-                  <p>🔄 <strong>تبديل المقاس:</strong> متاح مجاناً خلال 14 يوماً من استلام الشحنة.</p>
+                  <p><strong>مدة الشحن:</strong> التوصيل يتم خلال 2 إلى 4 أيام عمل لجميع أنحاء مصر.</p>
+                  <p><strong>الدفع والمعاينة:</strong> كاش عند الاستلام مع حق فتح الشحنة وقياس القطعة قبل الدفع.</p>
+                  <p><strong>تبديل المقاس:</strong> متاح مجاناً خلال 14 يوماً من استلام الشحنة.</p>
                 </div>
               )}
             </div>
@@ -703,14 +705,18 @@ function ProductView({ product: p }: { product: Product }) {
               <h3 className="text-xs font-bold uppercase tracking-wider text-[#0D0D0D]">
                 12. آراء وتجارب العملاء
               </h3>
-              <span className="text-[11px] text-amber-600 font-bold">★ 4.9 من 5</span>
+              <span className="text-[11px] text-[#0D0D0D] font-bold">4.9 من 5</span>
             </div>
 
             <div className="mt-3 space-y-2.5">
               <div className="border border-[#E5E5E0] bg-white p-3 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-[#0D0D0D]">كريم م. — القاهرة</span>
-                  <span className="text-[10px] text-amber-500 font-mono">★★★★★</span>
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
                 </div>
                 <p className="mt-1 text-[11px] text-[#6B6B66] leading-relaxed">
                   "الخامة ممتازة بجد ومطابقة للصور، والمندوب استنى لحد ما قست المقاس واتأكدت منه. تجربة ممتازة!"
@@ -720,7 +726,11 @@ function ProductView({ product: p }: { product: Product }) {
               <div className="border border-[#E5E5E0] bg-white p-3 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-[#0D0D0D]">عمر س. — الإسكندرية</span>
-                  <span className="text-[10px] text-amber-500 font-mono">★★★★★</span>
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
                 </div>
                 <p className="mt-1 text-[11px] text-[#6B6B66] leading-relaxed">
                   "التقفيل نضيف جداً وثبات اللون بعد أول غسلة ممتاز. هكرر الطلب في الكوليكشن الجديد أكيد."
@@ -732,7 +742,7 @@ function ProductView({ product: p }: { product: Product }) {
       </div>
 
       {/* Sticky Bottom Action Bar on Mobile with Safe-Area Inset */}
-      <div className="fixed bottom-0 inset-x-0 z-40 border-t border-[#E5E5E0] bg-white p-2.5 sm:p-3 pb-safe md:hidden shadow-xl">
+      <div className="fixed bottom-0 inset-x-0 z-40 border-t border-[#E5E5E0] bg-white p-2.5 sm:p-3 pb-safe md:hidden shadow-lg">
         <div className="flex items-center justify-between gap-2.5">
           <div className="flex flex-col min-w-0 pr-1">
             <span className="text-[10px] text-[#6B6B66] truncate font-medium">
@@ -756,15 +766,15 @@ function ProductView({ product: p }: { product: Product }) {
                   : "border-[#E5E5E0] bg-white text-[#6B6B66] opacity-60"
               }`}
             >
-              {isAdded ? "تمت الإضافة ✓" : "السلة"}
+              {isAdded ? "تمت الإضافة" : "السلة"}
             </button>
             <button
               type="button"
               onClick={handleScrollToOrderForm}
-              className="h-11 flex-1 max-w-[190px] flex items-center justify-center gap-1.5 text-xs font-black transition-all bg-[#0D0D0D] text-[#F7F7F5] active:scale-95 shadow-md rounded-xl"
+              className="h-11 flex-1 max-w-[190px] flex items-center justify-center gap-1.5 text-xs font-black transition-all bg-[#0D0D0D] text-[#F7F7F5] active:scale-95 rounded-xl"
             >
               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-              <span>اطلب الآن ⬇️</span>
+              <span>اطلب الآن</span>
             </button>
           </div>
         </div>

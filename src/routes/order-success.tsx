@@ -128,56 +128,42 @@ function OrderSuccessPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-3 sm:px-6 py-6 sm:py-12 overflow-x-hidden" dir="rtl">
-      {/* Top Celebration Card */}
-      <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-500/10 via-emerald-500/5 to-transparent p-5 sm:p-8 text-center shadow-xs">
-        <div className="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 ring-8 ring-emerald-500/10 animate-in zoom-in duration-300">
-          <CheckCircle2 className="h-9 w-9 sm:h-12 sm:w-12" />
+      {/* Top Confirmation Card */}
+      <div className="rounded-xl border border-[#E5E5E0] bg-white p-6 sm:p-8 text-center shadow-xs">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#0D0D0D] text-white">
+          <Check className="h-6 w-6" />
         </div>
 
-        <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-800">
-          <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
-          تم استلام طلبك وتأكيده في النظام
+        <span className="mt-4 inline-block text-xs font-semibold text-[#6B6B66]">
+          تأكيد استلام الطلب
         </span>
 
-        <h1 className="mt-3 text-2xl sm:text-3xl font-black text-[#0D0D0D]">
-          شكراً لك، {displayName}! 🎉
+        <h1 className="mt-1 text-xl sm:text-2xl font-bold text-[#0D0D0D]">
+          شكراً لك، {displayName}
         </h1>
-        <p className="mt-2 text-xs sm:text-sm text-[#6B6B66] max-w-md mx-auto leading-relaxed">
-          تم حفظ طلبك بنجاح وجاري مراجعته من فريق <strong className="text-[#0D0D0D]">PR1ME</strong>. لا داعي للقلق، الدفع كاش عند الاستلام بعد المعاينة والقياس.
+        <p className="mt-2 text-xs text-[#6B6B66] max-w-md mx-auto leading-relaxed">
+          تم تسجيل طلبك بنجاح وجاري تجهيزه للشحن. الدفع نقداً عند استلام ومعاينة المنتج.
         </p>
 
         {/* Order Code Highlight */}
         {displayCode && (
-          <div className="mt-5 mx-auto max-w-sm rounded-xl border border-[#E5E5E0] bg-white p-4 shadow-sm">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B66] block">
-              كود تتبع الطلب الخاص بك
+          <div className="mt-5 mx-auto max-w-xs rounded-lg border border-[#E5E5E0] bg-[#F7F7F5] p-3 text-center">
+            <span className="text-[10px] font-semibold text-[#6B6B66] block">
+              كود الطلب
             </span>
             <div className="mt-1 flex items-center justify-center gap-2">
-              <span className="font-mono text-xl sm:text-2xl font-black text-[#0D0D0D] tracking-wider select-all">
+              <span className="font-mono text-lg font-bold text-[#0D0D0D] tracking-wider select-all">
                 #{displayCode.replace(/^#/, "")}
               </span>
               <button
                 type="button"
                 onClick={handleCopyCode}
-                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[#E5E5E0] bg-[#F7F7F5] px-3 text-xs font-bold text-[#0D0D0D] hover:bg-[#E5E5E0] active:scale-95 transition-all"
+                className="inline-flex h-7 items-center gap-1 rounded border border-[#E5E5E0] bg-white px-2.5 text-[11px] font-medium text-[#0D0D0D] hover:bg-[#E5E5E0] transition-colors"
                 title="نسخ كود الطلب"
               >
-                {copied ? (
-                  <>
-                    <Check className="h-4 w-4 text-emerald-600" />
-                    <span>تم النسخ</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-4 w-4 text-[#6B6B66]" />
-                    <span>نسخ</span>
-                  </>
-                )}
+                {copied ? <span>تم النسخ</span> : <span>نسخ</span>}
               </button>
             </div>
-            <p className="mt-2 text-[11px] text-[#6B6B66]">
-              احتفظ بهذا الكود أو رقم هاتفك لتتبع شحنتك في أي وقت.
-            </p>
           </div>
         )}
       </div>
@@ -204,7 +190,7 @@ function OrderSuccessPage() {
             {/* Step 1: Placed */}
             <div className="flex flex-col items-center">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-white font-bold text-xs shadow-xs ring-4 ring-white">
-                ✓
+                <Check className="h-4 w-4 stroke-[3]" />
               </div>
               <span className="mt-2 text-[11px] sm:text-xs font-bold text-[#0D0D0D]">
                 تم الطلب
@@ -337,13 +323,13 @@ function OrderSuccessPage() {
             <div className="flex justify-between text-[#6B6B66]">
               <span>مصاريف الشحن:</span>
               <span className="font-mono font-semibold">
-                {order.shipping_fee === 0 ? "شحن مجاني 🎉" : formatPrice(order.shipping_fee)}
+                {order.shipping_fee === 0 ? "شحن مجاني" : formatPrice(order.shipping_fee)}
               </span>
             </div>
           )}
           <div className="flex justify-between items-baseline pt-2 border-t border-[#E5E5E0] text-sm">
-            <span className="font-black text-[#0D0D0D]">المبلغ الإجمالي كاش عند الاستلام:</span>
-            <span className="font-black font-mono text-lg text-emerald-700">
+            <span className="font-bold text-[#0D0D0D]">المبلغ الإجمالي كاش عند الاستلام:</span>
+            <span className="font-bold font-mono text-base sm:text-lg text-[#0D0D0D]">
               {formatPrice(displayTotal)}
             </span>
           </div>
@@ -357,10 +343,10 @@ function OrderSuccessPage() {
           <Link
             to="/track"
             search={{ code: displayCode, phone: displayPhone }}
-            className="flex min-h-[50px] w-full items-center justify-center gap-2 rounded-xl bg-[#0D0D0D] py-3 text-xs sm:text-sm font-bold text-[#F7F7F5] transition-all hover:bg-[#1F1F1F] active:scale-98 shadow-md"
+            className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#0D0D0D] py-3 text-xs sm:text-sm font-bold text-[#F7F7F5] transition-all hover:bg-[#1F1F1F] active:scale-98"
           >
-            <Truck className="h-4 w-4 text-emerald-400" />
-            <span>تتبع مسار شحنتك لحظة بلحظة 📦</span>
+            <Truck className="h-4 w-4 text-white" />
+            <span>تتبع مسار الشحنة</span>
           </Link>
         )}
 
@@ -368,11 +354,11 @@ function OrderSuccessPage() {
         {displayPhone && (
           <div className="rounded-xl border border-[#E5E5E0] bg-[#F7F7F5] p-4 text-right space-y-2">
             <div className="flex items-center gap-2 text-xs font-bold text-[#0D0D0D]">
-              <ShieldCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-              <span>تود حفظ هذا الطلب في حسابك الخاص؟</span>
+              <ShieldCheck className="h-4 w-4 text-[#0D0D0D] flex-shrink-0" />
+              <span>تود حفظ هذا الطلب في حسابك؟</span>
             </div>
             <p className="text-[11px] text-[#6B6B66] leading-relaxed">
-              سجل حسابك مجاناً برقم الهاتف <strong className="font-mono text-[#0D0D0D]">{displayPhone}</strong> لمتابعة جميع طلباتك السابقة والقادمة وإعادة الطلب بضغطة زر.
+              سجل حسابك برقم الهاتف <strong className="font-mono text-[#0D0D0D]">{displayPhone}</strong> لمتابعة جميع طلباتك السابقة والقادمة وإعادة الطلب بسهولة.
             </p>
             <Link
               to="/account/login"
@@ -382,9 +368,9 @@ function OrderSuccessPage() {
                 name: displayName !== "عزيزنا العميل" ? displayName : undefined,
                 code: displayCode,
               }}
-              className="inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-lg border border-[#0D0D0D] bg-white py-2 text-xs font-bold text-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-white transition-colors"
+              className="inline-flex min-h-[40px] w-full items-center justify-center gap-2 rounded-lg border border-[#0D0D0D] bg-white py-2 text-xs font-bold text-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-white transition-colors"
             >
-              <span>إنشاء حساب بالهاتف وحفظ الطلب 🔐</span>
+              <span>إنشاء حساب وحفظ الطلب</span>
             </Link>
           </div>
         )}
@@ -395,7 +381,7 @@ function OrderSuccessPage() {
             href={generalContactLink(`مرحباً PR1ME، بخصوص طلبي كود #${displayCode || ""}`)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex min-h-[46px] items-center justify-center gap-2 rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-800 py-2.5 text-xs font-bold hover:bg-emerald-100 transition-colors"
+            className="flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[#E5E5E0] bg-white text-[#0D0D0D] py-2.5 text-xs font-semibold hover:bg-[#F7F7F5] transition-colors"
           >
             <MessageCircle className="h-4 w-4 text-emerald-600" />
             <span>استفسار عبر واتساب</span>
@@ -403,10 +389,10 @@ function OrderSuccessPage() {
 
           <Link
             to="/products"
-            className="flex min-h-[46px] items-center justify-center gap-2 rounded-xl border border-[#E5E5E0] bg-white py-2.5 text-xs font-bold text-[#0D0D0D] hover:bg-[#F7F7F5] transition-colors"
+            className="flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[#E5E5E0] bg-white py-2.5 text-xs font-semibold text-[#0D0D0D] hover:bg-[#F7F7F5] transition-colors"
           >
             <ShoppingBag className="h-4 w-4" />
-            <span>متابعة التسوق والكتالوج</span>
+            <span>متابعة التسوق</span>
           </Link>
         </div>
       </div>

@@ -203,34 +203,26 @@ export function ProductInlineOrderForm({
   return (
     <section
       id="order-form"
-      className="mt-6 scroll-mt-20 rounded-2xl border-2 border-[#0D0D0D] bg-white p-4 sm:p-6 shadow-xl relative overflow-hidden"
+      className="mt-6 scroll-mt-20 rounded-xl border border-[#E5E5E0] bg-white p-4 sm:p-6 shadow-xs"
       dir="rtl"
     >
-      {/* Decorative Top Accent Bar */}
-      <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-[#0D0D0D] via-emerald-600 to-[#0D0D0D]" />
-
       {/* Header */}
-      <div className="border-b border-[#E5E5E0] pb-4">
+      <div className="border-b border-[#E5E5E0] pb-3.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-800 border border-emerald-500/20">
-            <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
-            <span>طلب فوري مباشر — الدفع عند الاستلام</span>
+          <span className="text-xs font-bold text-[#0D0D0D]">
+            بيانات الشحن والتوصيل (الدفع عند الاستلام)
           </span>
-          <span className="text-[11px] text-[#6B6B66] font-medium">
-            توصيل سريع لباب بيتك (2 - 4 أيام)
+          <span className="text-[11px] text-[#6B6B66]">
+            التوصيل خلال 2 - 4 أيام عمل
           </span>
         </div>
-
-        <h2 className="mt-2 text-base sm:text-lg font-black text-[#0D0D0D]">
-          بيانات الشحن والاستلام
-        </h2>
         <p className="mt-1 text-xs text-[#6B6B66] leading-relaxed">
-          املأ بياناتك أدناه واضغط <strong className="text-[#0D0D0D]">"تأكيد الطلب"</strong> وسيتم تجهيز شحنتك فوراً. الدفع كاش عند الاستلام بعد المعاينة والقياس.
+          يرجى إدخال بياناتك بدقة لتأكيد وتسليم الشحنة. الدفع نقداً عند استلام ومعاينة القطعة.
         </p>
       </div>
 
       {/* Selected Items Quick Recap on Top of Form */}
-      <div className="my-4 rounded-xl border border-[#E5E5E0] bg-[#F7F7F5] p-3 text-xs">
+      <div className="my-4 rounded-lg border border-[#E5E5E0] bg-[#F7F7F5] p-3 text-xs">
         <div className="flex items-center justify-between">
           <span className="font-bold text-[#0D0D0D] truncate max-w-[220px]">
             {product.title}
@@ -242,50 +234,50 @@ export function ProductInlineOrderForm({
         <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
           {needsSize && (
             <span
-              className={`rounded-md px-2 py-0.5 font-semibold border ${
+              className={`rounded px-2 py-0.5 font-semibold border ${
                 selectedSize
                   ? "bg-white border-[#0D0D0D] text-[#0D0D0D]"
-                  : "bg-amber-50 border-amber-300 text-amber-800 animate-pulse cursor-pointer"
+                  : "bg-white border-amber-300 text-amber-800 cursor-pointer"
               }`}
               onClick={!selectedSize ? onSelectSizeRequest : undefined}
             >
-              المقاس: <strong>{selectedSize || "⚠️ يرجى الاختيار"}</strong>
+              المقاس: <strong>{selectedSize || "اختر المقاس"}</strong>
             </span>
           )}
 
           {needsColor && (
             <span
-              className={`rounded-md px-2 py-0.5 font-semibold border ${
+              className={`rounded px-2 py-0.5 font-semibold border ${
                 selectedColor
                   ? "bg-white border-[#0D0D0D] text-[#0D0D0D]"
-                  : "bg-amber-50 border-amber-300 text-amber-800 animate-pulse cursor-pointer"
+                  : "bg-white border-amber-300 text-amber-800 cursor-pointer"
               }`}
               onClick={!selectedColor ? onSelectColorRequest : undefined}
             >
-              اللون: <strong>{selectedColor || "⚠️ يرجى الاختيار"}</strong>
+              اللون: <strong>{selectedColor || "اختر اللون"}</strong>
             </span>
           )}
 
-          <span className="rounded-md bg-white border border-[#E5E5E0] px-2 py-0.5 text-[#6B6B66]">
+          <span className="rounded bg-white border border-[#E5E5E0] px-2 py-0.5 text-[#6B6B66]">
             الكمية: <strong className="text-[#0D0D0D]">{quantity}</strong>
           </span>
         </div>
       </div>
 
-      {/* Form Error Banner with Friendly Instructions and Immediate Solutions */}
+      {/* Form Error Banner with Direct Helpful Solution */}
       {formError && (
         <div
           role="alert"
-          className="mb-4 rounded-xl border border-rose-300 bg-rose-50/90 p-3.5 text-xs text-rose-950 animate-in fade-in slide-in-from-top-2 duration-200"
+          className="mb-4 rounded-lg border border-rose-200 bg-rose-50/80 p-3 text-xs text-rose-950"
         >
           <div className="flex items-start gap-2.5">
-            <AlertCircle className="h-5 w-5 text-rose-600 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="h-4 w-4 text-rose-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <strong className="block font-bold text-rose-900">
                 {formError.message}
               </strong>
               <p className="mt-1 text-[11px] leading-relaxed text-rose-800">
-                💡 <span className="font-semibold">الحل:</span> {formError.solution}
+                <span className="font-semibold">توجيه:</span> {formError.solution}
               </p>
             </div>
           </div>
@@ -371,7 +363,7 @@ export function ProductInlineOrderForm({
               يتكون من 11 رقم (010, 011, 012, 015)
             </span>
             {isPhoneValid && (
-              <span className="text-emerald-700 font-bold">✓ رقم صالح ومكتمل</span>
+              <span className="text-emerald-700 font-semibold">رقم هاتف صالح</span>
             )}
           </div>
         </div>
@@ -398,7 +390,7 @@ export function ProductInlineOrderForm({
                 const govFee = SHIPPING_RATES[gov] ?? 60;
                 return (
                   <option key={gov} value={gov}>
-                    {gov} {isFreeShipping ? "(شحن مجاني 🎉)" : `(شحن: ${formatPrice(govFee)})`}
+                    {gov} {isFreeShipping ? "(شحن مجاني)" : `(شحن: ${formatPrice(govFee)})`}
                   </option>
                 );
               })}
@@ -406,7 +398,7 @@ export function ProductInlineOrderForm({
           </div>
           <p className="mt-1 text-[10px] text-[#6B6B66]">
             {isFreeShipping
-              ? `تهانينا! طلبيتك مؤهلة للشحن المجاني (أكثر من ${formatPrice(FREE_SHIPPING_THRESHOLD)}).`
+              ? `طلبك مؤهل للشحن المجاني (أكثر من ${formatPrice(FREE_SHIPPING_THRESHOLD)}).`
               : "يتم احتساب سعر الشحن تلقائياً حسب المحافظة."}
           </p>
         </div>
@@ -457,7 +449,7 @@ export function ProductInlineOrderForm({
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="مثال: يفضل التوصيل بعد العصر، رن الجرس مرتين..."
+              placeholder="مثال: يفضل التوصيل بعد العصر، الاتصال قبل الحضور..."
               className="block w-full min-h-[44px] rounded-xl border border-[#E5E5E0] bg-white pr-10 pl-3 text-xs sm:text-sm text-[#0D0D0D] placeholder:text-[#9E9E99] transition-all focus:border-[#0D0D0D] focus:outline-none focus:ring-2 focus:ring-black/10"
             />
           </div>
@@ -474,7 +466,7 @@ export function ProductInlineOrderForm({
             <span>مصاريف الشحن ({governorate}):</span>
             <span className="font-mono font-bold text-[#0D0D0D]">
               {isFreeShipping ? (
-                <span className="text-emerald-700 font-bold">شحن مجاني 🎉</span>
+                <span className="text-emerald-700 font-bold">شحن مجاني</span>
               ) : (
                 formatPrice(shippingFee)
               )}
@@ -482,8 +474,8 @@ export function ProductInlineOrderForm({
           </div>
 
           <div className="flex justify-between items-baseline pt-2 border-t border-[#E5E5E0] text-sm">
-            <span className="font-black text-[#0D0D0D]">الإجمالي المطلوب عند الاستلام:</span>
-            <span className="font-black font-mono text-lg text-emerald-800">
+            <span className="font-bold text-[#0D0D0D]">الإجمالي المطلوب عند الاستلام:</span>
+            <span className="font-bold font-mono text-base sm:text-lg text-[#0D0D0D]">
               {formatPrice(finalTotal)}
             </span>
           </div>
@@ -507,7 +499,7 @@ export function ProductInlineOrderForm({
           ) : (
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-              <span>تأكيد الطلب الآن (الدفع عند الاستلام)</span>
+              <span>تأكيد الطلب (الدفع عند الاستلام)</span>
             </div>
           )}
         </button>
