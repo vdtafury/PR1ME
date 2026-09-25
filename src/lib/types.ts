@@ -69,3 +69,18 @@ export interface Order {
   created_at: string;
 }
 
+export interface Review {
+  id: string;
+  product_id: string;
+  user_id?: string | null;
+  customer_name: string;
+  governorate?: string | null;
+  rating: number;
+  comment: string;
+  is_verified_buyer: boolean;
+  order_code?: string | null;
+  is_approved: boolean;
+  created_at: string;
+}
+
+

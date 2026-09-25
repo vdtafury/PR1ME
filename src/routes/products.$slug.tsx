@@ -23,12 +23,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatPrice, productOrderLink, generalContactLink } from "@/lib/whatsapp";
 import { ProductCard } from "@/components/ProductCard";
 import { colorToHex } from "@/lib/colors";
-import type { Product } from "@/lib/types";
+import type { Product, Review } from "@/lib/types";
 import { useCartStore } from "@/lib/store";
 import useEmblaCarousel from "embla-carousel-react";
 import { toast } from "sonner";
 import { resolveImageUrl } from "@/lib/images";
 import { ProductInlineOrderForm } from "@/components/ProductInlineOrderForm";
+import { ProductReviews } from "@/components/ProductReviews";
 import { SizeGuideModal } from "@/components/SizeGuideModal";
 
 export const Route = createFileRoute("/products/$slug")({
@@ -121,6 +122,38 @@ function ProductView({ product: p }: { product: Product }) {
   const [activeTab, setActiveTab] = useState<"details" | "shipping" | "guide">("details");
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
+
+  // Dynamic Reviews & Rating calculation from real data
+  const reviewsQ = useQuery({
+    queryKey: ["reviews", p.id],
+    queryFn: async (): Promise<Review[]> => {
+      try {
+        const { data, error } = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("product_id", p.id)
+          .eq("is_approved", true)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          const local = localStorage.getItem(`pr1me_reviews_${p.id}`);
+          return local ? JSON.parse(local) : [];
+        }
+
+        return (data as Review[]) || [];
+      } catch {
+        const local = localStorage.getItem(`pr1me_reviews_${p.id}`);
+        return local ? JSON.parse(local) : [];
+      }
+    },
+  });
+
+  const reviewsList = reviewsQ.data || [];
+  const reviewsCount = reviewsList.length;
+  const avgRating =
+    reviewsCount > 0
+      ? (reviewsList.reduce((acc, r) => acc + r.rating, 0) / reviewsCount).toFixed(1)
+      : null;
 
   // Embla carousel for mobile gestures
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
@@ -390,11 +423,28 @@ function ProductView({ product: p }: { product: Product }) {
 
             {/* 3. Rating & Metadata */}
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-              <div className="flex items-center gap-1.5 text-[#0D0D0D] font-bold bg-[#F7F7F5] border border-[#E5E5E0] px-2 py-0.5 rounded-sm">
-                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                <span>4.9</span>
-                <span className="text-[#6B6B66] font-normal text-[11px]">(128 تقييم)</span>
-              </div>
+              <a
+                href="#reviews-section"
+                className="flex items-center gap-1.5 text-[#0D0D0D] font-bold bg-[#F7F7F5] border border-[#E5E5E0] px-2 py-0.5 rounded-sm hover:border-[#0D0D0D] transition-colors"
+              >
+                <Star
+                  className={`h-3.5 w-3.5 ${
+                    avgRating ? "fill-amber-400 text-amber-400" : "text-[#6B6B66]"
+                  }`}
+                />
+                {avgRating ? (
+                  <>
+                    <span>{avgRating}</span>
+                    <span className="text-[#6B6B66] font-normal text-[11px]">
+                      ({reviewsCount} {reviewsCount === 1 ? "تقييم" : "تقييمات"})
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-[#6B6B66] font-normal text-[11px]">
+                    كن أول من يقيّم المنتج
+                  </span>
+                )}
+              </a>
               <span className="text-[#6B6B66]">•</span>
               <span className="text-emerald-700 font-semibold text-[11px] bg-emerald-600/10 px-2 py-0.5 rounded-xs">
                 قطن مصري 100%
@@ -699,45 +749,8 @@ function ProductView({ product: p }: { product: Product }) {
             </div>
           </div>
 
-          {/* 12. Customer Reviews Section */}
-          <div className="mt-8 border-t border-[#E5E5E0] pt-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#0D0D0D]">
-                12. آراء وتجارب العملاء
-              </h3>
-              <span className="text-[11px] text-[#0D0D0D] font-bold">4.9 من 5</span>
-            </div>
-
-            <div className="mt-3 space-y-2.5">
-              <div className="border border-[#E5E5E0] bg-white p-3 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#0D0D0D]">كريم م. — القاهرة</span>
-                  <div className="flex items-center gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                </div>
-                <p className="mt-1 text-[11px] text-[#6B6B66] leading-relaxed">
-                  "الخامة ممتازة بجد ومطابقة للصور، والمندوب استنى لحد ما قست المقاس واتأكدت منه. تجربة ممتازة!"
-                </p>
-              </div>
-
-              <div className="border border-[#E5E5E0] bg-white p-3 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#0D0D0D]">عمر س. — الإسكندرية</span>
-                  <div className="flex items-center gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                </div>
-                <p className="mt-1 text-[11px] text-[#6B6B66] leading-relaxed">
-                  "التقفيل نضيف جداً وثبات اللون بعد أول غسلة ممتاز. هكرر الطلب في الكوليكشن الجديد أكيد."
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* 12. Real Customer Reviews & Ratings Section */}
+          <ProductReviews productId={p.id} productTitle={p.title} />
         </div>
       </div>
 

@@ -217,6 +217,56 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          id: string
+          product_id: string
+          user_id: string | null
+          customer_name: string
+          governorate: string | null
+          rating: number
+          comment: string
+          is_verified_buyer: boolean
+          order_code: string | null
+          is_approved: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          user_id?: string | null
+          customer_name: string
+          governorate?: string | null
+          rating: number
+          comment: string
+          is_verified_buyer?: boolean
+          order_code?: string | null
+          is_approved?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          user_id?: string | null
+          customer_name?: string
+          governorate?: string | null
+          rating?: number
+          comment?: string
+          is_verified_buyer?: boolean
+          order_code?: string | null
+          is_approved?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
