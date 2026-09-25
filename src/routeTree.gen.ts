@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as OrderSuccessRouteImport } from './routes/order-success'
 import { Route as OffersRouteImport } from './routes/offers'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
@@ -30,6 +31,11 @@ const TrackRoute = TrackRouteImport.update({
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrderSuccessRoute = OrderSuccessRouteImport.update({
+  id: '/order-success',
+  path: '/order-success',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OffersRoute = OffersRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/account': typeof AccountRouteWithChildren
   '/offers': typeof OffersRoute
+  '/order-success': typeof OrderSuccessRoute
   '/products': typeof ProductsRouteWithChildren
   '/track': typeof TrackRoute
   '/account/login': typeof AccountLoginRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/offers': typeof OffersRoute
+  '/order-success': typeof OrderSuccessRoute
   '/track': typeof TrackRoute
   '/account/login': typeof AccountLoginRoute
   '/admin/login': typeof AdminLoginRoute
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/account': typeof AccountRouteWithChildren
   '/offers': typeof OffersRoute
+  '/order-success': typeof OrderSuccessRoute
   '/products': typeof ProductsRouteWithChildren
   '/track': typeof TrackRoute
   '/account/login': typeof AccountLoginRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/offers'
+    | '/order-success'
     | '/products'
     | '/track'
     | '/account/login'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/offers'
+    | '/order-success'
     | '/track'
     | '/account/login'
     | '/admin/login'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/offers'
+    | '/order-success'
     | '/products'
     | '/track'
     | '/account/login'
@@ -172,6 +184,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRouteWithChildren
   OffersRoute: typeof OffersRoute
+  OrderSuccessRoute: typeof OrderSuccessRoute
   ProductsRoute: typeof ProductsRouteWithChildren
   TrackRoute: typeof TrackRoute
   AdminLoginRoute: typeof AdminLoginRoute
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       path: '/products'
       fullPath: '/products'
       preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/order-success': {
+      id: '/order-success'
+      path: '/order-success'
+      fullPath: '/order-success'
+      preLoaderRoute: typeof OrderSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/offers': {
@@ -299,6 +319,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AccountRoute: AccountRouteWithChildren,
   OffersRoute: OffersRoute,
+  OrderSuccessRoute: OrderSuccessRoute,
   ProductsRoute: ProductsRouteWithChildren,
   TrackRoute: TrackRoute,
   AdminLoginRoute: AdminLoginRoute,

@@ -1,5 +1,5 @@
 import { X, Minus, Plus, ShoppingBag, MessageCircle, ShieldCheck, ArrowRight, Truck, MapPin, CheckCircle2 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useCartStore } from "@/lib/store";
 import { formatPrice, generalContactLink } from "@/lib/whatsapp";
 import { getShippingFee, generateOrderCode, ALL_GOVERNORATES, SHIPPING_RATES, FREE_SHIPPING_THRESHOLD } from "@/lib/shipping";
@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export function CartDrawer() {
+  const navigate = useNavigate();
   const { isCartOpen, setCartOpen, items, updateQuantity, removeItem, clearCart } = useCartStore();
   const [step, setStep] = useState<"cart" | "checkout" | "success">("cart");
   const [orderSuccess, setOrderSuccess] = useState<{
@@ -128,16 +129,18 @@ export function CartDrawer() {
       }
 
       clearCart();
-      setOrderSuccess({
-        code: orderCode,
-        finalTotal: finalAmt,
-        name: clientName,
-        governorate: gov,
-        itemCount: count,
-        phone: phone.trim(),
-      });
-      setStep("success");
+      handleClose();
       toast.success(`تم استلام طلبك بنجاح! كود الطلب: #${orderCode}`);
+      navigate({
+        to: "/order-success",
+        search: {
+          code: orderCode,
+          phone: phone.trim(),
+          name: clientName,
+          gov,
+          total: finalAmt,
+        },
+      });
     } catch (err: any) {
       console.warn("DB insert error caught:", err);
       toast.error("حدث خطأ أثناء حفظ الطلب، يرجى المحاولة ثانية");

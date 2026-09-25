@@ -27,7 +27,7 @@ import { useCartStore } from "@/lib/store";
 import useEmblaCarousel from "embla-carousel-react";
 import { toast } from "sonner";
 import { resolveImageUrl } from "@/lib/images";
-import { ProductCheckoutDrawer } from "@/components/ProductCheckoutDrawer";
+import { ProductInlineOrderForm } from "@/components/ProductInlineOrderForm";
 import { SizeGuideModal } from "@/components/SizeGuideModal";
 
 export const Route = createFileRoute("/products/$slug")({
@@ -120,7 +120,6 @@ function ProductView({ product: p }: { product: Product }) {
   const [activeTab, setActiveTab] = useState<"details" | "shipping" | "guide">("details");
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   // Embla carousel for mobile gestures
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
@@ -164,13 +163,26 @@ function ProductView({ product: p }: { product: Product }) {
     toast.success(`تمت إضافة "${p.title}" إلى السلة`);
   };
 
-  // Open shipping & checkout details drawer
-  const handleOpenCheckout = () => {
-    if (!isReadyToOrder) {
-      toast.error("يرجى تحديد المقاس واللون أولاً لمتابعة الطلب");
+  // Smooth scroll to inline fast order form with instant guidance
+  const handleScrollToOrderForm = () => {
+    if (needsSize && !selectedSize) {
+      document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      toast.error("يرجى اختيار المقاس أولاً من الخيارات المتاحة");
       return;
     }
-    setIsCheckoutOpen(true);
+    if (needsColor && !selectedColor) {
+      document.getElementById("color-selector")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      toast.error("يرجى اختيار اللون أولاً");
+      return;
+    }
+    const orderFormEl = document.getElementById("order-form");
+    if (orderFormEl) {
+      orderFormEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      const nameInput = document.getElementById("order-input-name");
+      if (nameInput) {
+        setTimeout(() => nameInput.focus(), 300);
+      }
+    }
   };
 
   // Direct WhatsApp order link (fallback)
@@ -417,7 +429,7 @@ function ProductView({ product: p }: { product: Product }) {
           <div className="py-4 space-y-4 border-b border-[#E5E5E0]">
             {/* 5. Color Selection */}
             {needsColor && (
-              <div>
+              <div id="color-selector" className="scroll-mt-24">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-[#0D0D0D]">اللون:</span>
                   <span className="text-[#6B6B66]">
@@ -457,7 +469,7 @@ function ProductView({ product: p }: { product: Product }) {
 
             {/* 6. Size Selection with 44px+ touch targets */}
             {needsSize && (
-              <div>
+              <div id="size-selector" className="scroll-mt-24">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-[#0D0D0D]">المقاس:</span>
                   <button
@@ -529,16 +541,11 @@ function ProductView({ product: p }: { product: Product }) {
           <div className="mt-4 flex flex-col gap-2.5">
             <button
               type="button"
-              onClick={handleOpenCheckout}
-              disabled={!isReadyToOrder}
-              className={`flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xs text-xs font-bold transition-colors ${
-                isReadyToOrder
-                  ? "bg-[#0D0D0D] text-[#F7F7F5] hover:bg-[#1F1F1F] active:scale-98"
-                  : "bg-[#E5E5E0] text-[#6B6B66] cursor-not-allowed"
-              }`}
+              onClick={handleScrollToOrderForm}
+              className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#0D0D0D] text-[#F7F7F5] hover:bg-[#1F1F1F] active:scale-98 shadow-md"
             >
               <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-              <span>اطلب الآن (الدفع كاش عند الاستلام)</span>
+              <span>املأ بيانات الطلب بالأسفل (الدفع عند الاستلام) ⬇️</span>
             </button>
 
             <div className="flex gap-2.5">
@@ -546,7 +553,7 @@ function ProductView({ product: p }: { product: Product }) {
                 type="button"
                 onClick={handleAddToCart}
                 disabled={!isReadyToOrder}
-                className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-xs border text-xs font-semibold transition-all duration-200 active:scale-98 ${
+                className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-xl border text-xs font-semibold transition-all duration-200 active:scale-98 ${
                   isAdded
                     ? "border-[#1F1F1F] bg-[#1F1F1F] text-emerald-400"
                     : isReadyToOrder
@@ -571,13 +578,27 @@ function ProductView({ product: p }: { product: Product }) {
                 href={generalContactLink(`مرحباً PR1ME، لدي استفسار عن: ${p.title}`)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xs border border-[#E5E5E0] bg-white px-4 text-xs font-semibold text-[#6B6B66] hover:text-[#0D0D0D]"
+                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-[#E5E5E0] bg-white px-4 text-xs font-semibold text-[#6B6B66] hover:text-[#0D0D0D]"
               >
                 <HelpCircle className="h-3.5 w-3.5" />
                 <span>استفسار</span>
               </a>
             </div>
           </div>
+
+          {/* In-Page Fast Order Form (Frictionless Mobile-First Cash on Delivery) */}
+          <ProductInlineOrderForm
+            product={p}
+            quantity={qty}
+            selectedSize={selectedSize}
+            selectedColor={selectedColor}
+            onSelectSizeRequest={() => {
+              document.getElementById("size-selector")?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }}
+            onSelectColorRequest={() => {
+              document.getElementById("color-selector")?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }}
+          />
 
           {/* 9. Shipping Information & Guarantees Box */}
           <div className="mt-5 border-t border-[#E5E5E0] pt-4 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-[#6B6B66]">
@@ -739,16 +760,11 @@ function ProductView({ product: p }: { product: Product }) {
             </button>
             <button
               type="button"
-              onClick={handleOpenCheckout}
-              disabled={!isReadyToOrder}
-              className={`h-11 flex-1 max-w-[190px] flex items-center justify-center gap-1 text-xs font-bold transition-colors ${
-                isReadyToOrder
-                  ? "bg-[#0D0D0D] text-[#F7F7F5] active:scale-95"
-                  : "bg-[#E5E5E0] text-[#6B6B66] opacity-60"
-              }`}
+              onClick={handleScrollToOrderForm}
+              className="h-11 flex-1 max-w-[190px] flex items-center justify-center gap-1.5 text-xs font-black transition-all bg-[#0D0D0D] text-[#F7F7F5] active:scale-95 shadow-md rounded-xl"
             >
               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-              <span>اطلب الآن</span>
+              <span>اطلب الآن ⬇️</span>
             </button>
           </div>
         </div>
@@ -783,16 +799,6 @@ function ProductView({ product: p }: { product: Product }) {
         onClose={() => setSizeGuideOpen(false)}
         productTitle={p.title}
         categorySlug={p.category_id}
-      />
-
-      {/* Product Quick Checkout Drawer */}
-      <ProductCheckoutDrawer
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-        product={p}
-        quantity={qty}
-        selectedSize={selectedSize}
-        selectedColor={selectedColor}
       />
     </div>
   );
