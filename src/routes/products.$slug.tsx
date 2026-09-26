@@ -119,7 +119,10 @@ function ProductView({ product: p }: { product: Product }) {
     p.sizes?.length === 1 ? p.sizes[0] : null
   );
   const [qty, setQty] = useState(1);
-  const [activeTab, setActiveTab] = useState<"details" | "shipping" | "guide">("details");
+  const hasDetails = Boolean(p.description?.trim() || p.short_description?.trim());
+  const [activeTab, setActiveTab] = useState<"details" | "shipping" | "guide">(
+    hasDetails ? "details" : "shipping"
+  );
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
@@ -671,17 +674,19 @@ function ProductView({ product: p }: { product: Product }) {
           {/* 10 & 11. Description & Specifications Tabs */}
           <div className="mt-6 border-t border-[#E5E5E0] pt-4">
             <div className="flex gap-4 border-b border-[#E5E5E0] pb-2 text-xs font-bold touch-scroll overflow-x-auto">
-              <button
-                type="button"
-                onClick={() => setActiveTab("details")}
-                className={`pb-2 transition-colors border-b-2 -mb-2.5 whitespace-nowrap min-h-[36px] ${
-                  activeTab === "details"
-                    ? "border-[#0D0D0D] text-[#0D0D0D]"
-                    : "border-transparent text-[#6B6B66]"
-                }`}
-              >
-                10. تفاصيل القطعة
-              </button>
+              {hasDetails && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("details")}
+                  className={`pb-2 transition-colors border-b-2 -mb-2.5 whitespace-nowrap min-h-[36px] ${
+                    activeTab === "details"
+                      ? "border-[#0D0D0D] text-[#0D0D0D]"
+                      : "border-transparent text-[#6B6B66]"
+                  }`}
+                >
+                  تفاصيل القطعة
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setActiveTab("shipping")}
@@ -691,7 +696,7 @@ function ProductView({ product: p }: { product: Product }) {
                     : "border-transparent text-[#6B6B66]"
                 }`}
               >
-                11. المواصفات والخامة
+                المواصفات والخامة
               </button>
               <button
                 type="button"
@@ -707,14 +712,11 @@ function ProductView({ product: p }: { product: Product }) {
             </div>
 
             <div className="mt-3 text-xs leading-relaxed text-[#6B6B66]">
-              {activeTab === "details" && (
+              {activeTab === "details" && hasDetails && (
                 <div className="space-y-2">
-                  <p>{p.description || p.short_description || "قطعة كاجوال راقية من PR1ME بخامات قطنية عالية الجودة مصممة للاستخدام اليومي المستوحى من أزياء الشارع."}</p>
-                  <ul className="list-disc pr-4 space-y-1 text-[#6B6B66]">
-                    <li>100% قطن مصري فاخر معالج ضد الانكماش.</li>
-                    <li>ثبات عالي للألوان مع الغسيل المتكرر.</li>
-                    <li>قَصّة كاجوال مريحة تمنحك حرية الحركة.</li>
-                  </ul>
+                  <p className="whitespace-pre-line text-[#262626]">
+                    {p.description || p.short_description}
+                  </p>
                 </div>
               )}
               {activeTab === "shipping" && (

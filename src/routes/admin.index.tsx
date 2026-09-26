@@ -326,7 +326,8 @@ function ProductEditor({ product, categories, onClose, onSaved }: { product: Par
       const slug = (form.slug || form.title || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
       const payload: any = {
         title: form.title, slug,
-        short_description: form.short_description, description: form.description,
+        short_description: form.short_description?.trim() ? form.short_description.trim() : null,
+        description: form.description?.trim() ? form.description.trim() : null,
         price: Number(form.price ?? 0),
         original_price: form.original_price ? Number(form.original_price) : null,
         product_code: form.product_code || null,
@@ -367,8 +368,23 @@ function ProductEditor({ product, categories, onClose, onSaved }: { product: Par
         <Field label="Colors (select multiple)" className="sm:col-span-2">
           <ColorsPicker value={form.colors ?? []} onChange={(v) => set("colors", v)} />
         </Field>
-        <Field label="Short description" className="sm:col-span-2"><input className={inputCls} value={form.short_description ?? ""} onChange={(e) => set("short_description", e.target.value)} /></Field>
-        <Field label="Description" className="sm:col-span-2"><textarea rows={4} className={inputCls} value={form.description ?? ""} onChange={(e) => set("description", e.target.value)} /></Field>
+        <Field label="Short description (اختياري / Optional)" className="sm:col-span-2">
+          <input
+            className={inputCls}
+            value={form.short_description ?? ""}
+            onChange={(e) => set("short_description", e.target.value)}
+            placeholder="الشرح المختصر أعلى الصفحة (اختياري)"
+          />
+        </Field>
+        <Field label="Description (اختياري / Optional)" className="sm:col-span-2">
+          <textarea
+            rows={4}
+            className={inputCls}
+            value={form.description ?? ""}
+            onChange={(e) => set("description", e.target.value)}
+            placeholder="الشرح والتفاصيل الكاملة للمنتج (اختياري)"
+          />
+        </Field>
         <div className="sm:col-span-2 border-t border-border pt-4 mt-2">
           <span className="mb-2 block text-xs font-semibold text-muted-foreground">Product Images (Upload multiple, select Cover, and arrange)</span>
           
