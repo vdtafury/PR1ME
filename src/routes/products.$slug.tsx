@@ -159,7 +159,7 @@ function ProductView({ product: p }: { product: Product }) {
       : null;
 
   // Embla carousel for mobile gestures
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, direction: "rtl" });
   const [selectedEmblaIndex, setSelectedEmblaIndex] = useState(0);
 
   const onSelect = useCallback(() => {
