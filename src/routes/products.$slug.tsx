@@ -293,7 +293,7 @@ function ProductView({ product: p }: { product: Product }) {
                       <img
                         src={src}
                         alt={`${p.title} - ${idx + 1}`}
-                        loading={idx === 0 ? "eager" : "lazy"}
+                        loading={idx === selectedEmblaIndex ? "eager" : "lazy"}
                         decoding="async"
                         onError={(e) => {
                           e.currentTarget.src = "/brand/hero-cairo-streetwear.jpg";
