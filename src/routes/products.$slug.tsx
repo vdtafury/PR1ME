@@ -289,7 +289,7 @@ function ProductView({ product: p }: { product: Product }) {
               <div className="flex touch-pan-y">
                 {allImages.length > 0 ? (
                   allImages.map((src, idx) => (
-                    <div className="relative min-w-0 flex-[0_0_100%] aspect-square" key={idx}>
+                    <div className="relative min-w-0 flex-[0_0_100%] aspect-[3/4]" key={idx}>
                       <img
                         src={src}
                         alt={`${p.title} - ${idx + 1}`}
@@ -298,7 +298,7 @@ function ProductView({ product: p }: { product: Product }) {
                         onError={(e) => {
                           e.currentTarget.src = "/brand/hero-cairo-streetwear.jpg";
                         }}
-                        className="h-full w-full object-contain p-4"
+                        className="h-full w-full object-contain"
                       />
                     </div>
                   ))
