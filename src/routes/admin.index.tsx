@@ -240,6 +240,47 @@ function ProductsAdmin() {
   );
 }
 
+async function optimizeProductImage(file: File): Promise<File> {
+  if (
+    !file.type.startsWith("image/") ||
+    file.type === "image/svg+xml" ||
+    file.type === "image/gif"
+  ) {
+    return file;
+  }
+
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1 && file.size <= 700_000) {
+      bitmap.close();
+      return file;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    const context = canvas.getContext("2d");
+    if (!context) {
+      bitmap.close();
+      return file;
+    }
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+
+    const optimized = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/webp", 0.82),
+    );
+    if (!optimized || optimized.size >= file.size) return file;
+
+    const extension = optimized.type === "image/webp" ? "webp" : "png";
+    const filename = file.name.replace(/\.[^.]+$/, "") || "product-image";
+    return new File([optimized], `${filename}.${extension}`, { type: optimized.type });
+  } catch {
+    return file;
+  }
+}
+
 function ProductEditor({ product, categories, onClose, onSaved }: { product: Partial<Product>; categories: Category[]; onClose: () => void; onSaved: () => void }) {
   const [form, setForm] = useState<Partial<Product>>({
     title: "", slug: "", short_description: "", description: "",
@@ -258,9 +299,14 @@ function ProductEditor({ product, categories, onClose, onSaved }: { product: Par
 
   async function uploadImage(file: File): Promise<string | null> {
     try {
-      const ext = file.name.split(".").pop();
+      const optimizedFile = await optimizeProductImage(file);
+      const ext = optimizedFile.name.split(".").pop();
       const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error } = await supabase.storage.from("catalog").upload(path, file, { cacheControl: "3600", upsert: false });
+      const { error } = await supabase.storage.from("catalog").upload(path, optimizedFile, {
+        cacheControl: "3600",
+        contentType: optimizedFile.type,
+        upsert: false,
+      });
       if (error) throw error;
       const { data } = supabase.storage.from("catalog").getPublicUrl(path);
       return data.publicUrl;
