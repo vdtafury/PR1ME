@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   MessageCircle,
   ChevronLeft,
@@ -112,6 +113,8 @@ function ProductView({ product: p }: { product: Product }) {
     .filter(Boolean)
     .map((src) => resolveImageUrl(src as string));
   const [activeImg, setActiveImg] = useState(0);
+  const [desktopImageAspectRatio, setDesktopImageAspectRatio] = useState("1 / 1");
+  const [mobileImageAspectRatio, setMobileImageAspectRatio] = useState("3 / 4");
   const [selectedColor, setSelectedColor] = useState<string | null>(
     p.colors?.length === 1 ? p.colors[0] : null
   );
@@ -125,6 +128,11 @@ function ProductView({ product: p }: { product: Product }) {
   );
   const [isSizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
+  const [purchaseBarTarget, setPurchaseBarTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setPurchaseBarTarget(document.body);
+  }, []);
 
   // Dynamic Reviews & Rating calculation from real data
   const reviewsQ = useQuery({
@@ -164,7 +172,12 @@ function ProductView({ product: p }: { product: Product }) {
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
-    setSelectedEmblaIndex(emblaApi.selectedScrollSnap());
+    const index = emblaApi.selectedScrollSnap();
+    setSelectedEmblaIndex(index);
+    const image = emblaApi.slideNodes()[index]?.querySelector("img");
+    if (image?.naturalWidth && image.naturalHeight) {
+      setMobileImageAspectRatio(`${image.naturalWidth} / ${image.naturalHeight}`);
+    }
   }, [emblaApi]);
 
   useEffect(() => {
@@ -222,6 +235,22 @@ function ProductView({ product: p }: { product: Product }) {
     }
   };
 
+  const handlePrimaryPurchase = () => {
+    if (isReadyToOrder) {
+      handleAddToCart();
+      return;
+    }
+    handleScrollToOrderForm();
+  };
+
+  const purchasePrompt = isReadyToOrder
+    ? "أضف للسلة"
+    : needsSize && !selectedSize && needsColor && !selectedColor
+      ? "اختر المقاس واللون"
+      : needsSize && !selectedSize
+        ? "اختر المقاس"
+        : "اختر اللون";
+
   // Direct WhatsApp order link (fallback)
   const handleDirectWhatsAppOrder = () => {
     if (!isReadyToOrder) {
@@ -265,7 +294,7 @@ function ProductView({ product: p }: { product: Product }) {
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-3 sm:px-6 py-4 sm:py-10 pb-36 md:pb-12 overflow-x-hidden">
+    <div className="mx-auto max-w-7xl px-3 sm:px-6 py-4 sm:py-10 pb-36 md:pb-28 overflow-x-hidden">
       {/* Breadcrumb */}
       <nav className="mb-4 sm:mb-6 flex items-center gap-1.5 text-[11px] text-[#6B6B66]">
         <Link to="/" className="hover:text-[#0D0D0D]">
@@ -285,16 +314,27 @@ function ProductView({ product: p }: { product: Product }) {
         <div className="lg:col-span-7">
           {/* Mobile Swiper with Native App Carousel Gestures */}
           <div className="md:hidden">
-            <div className="overflow-hidden border border-[#E5E5E0] bg-white relative" ref={emblaRef}>
-              <div className="flex touch-pan-y">
+            <div
+              className="overflow-hidden border border-[#E5E5E0] bg-white relative"
+              ref={emblaRef}
+              style={{ aspectRatio: mobileImageAspectRatio }}
+            >
+              <div className="flex h-full touch-pan-y">
                 {allImages.length > 0 ? (
                   allImages.map((src, idx) => (
-                    <div className="relative min-w-0 flex-[0_0_100%] aspect-[3/4]" key={idx}>
+                    <div className="relative h-full min-w-0 flex-[0_0_100%]" key={idx}>
                       <img
                         src={src}
                         alt={`${p.title} - ${idx + 1}`}
                         loading={idx === selectedEmblaIndex ? "eager" : "lazy"}
                         decoding="async"
+                        onLoad={(e) => {
+                          if (idx === selectedEmblaIndex) {
+                            setMobileImageAspectRatio(
+                              `${e.currentTarget.naturalWidth} / ${e.currentTarget.naturalHeight}`
+                            );
+                          }
+                        }}
                         onError={(e) => {
                           e.currentTarget.src = "/brand/hero-cairo-streetwear.jpg";
                         }}
@@ -335,17 +375,25 @@ function ProductView({ product: p }: { product: Product }) {
           </div>
 
           {/* Desktop Main Image with Crossfade */}
-          <div className="relative hidden aspect-square overflow-hidden border border-[#E5E5E0] bg-white md:block">
+          <div
+            className="relative hidden overflow-hidden border border-[#E5E5E0] bg-white md:block"
+            style={{ aspectRatio: desktopImageAspectRatio }}
+          >
             {allImages[activeImg] ? (
               <img
                 key={activeImg}
                 src={allImages[activeImg]}
                 alt={p.title}
                 decoding="async"
+                onLoad={(e) => {
+                  setDesktopImageAspectRatio(
+                    `${e.currentTarget.naturalWidth} / ${e.currentTarget.naturalHeight}`
+                  );
+                }}
                 onError={(e) => {
                   e.currentTarget.src = "/brand/hero-cairo-streetwear.jpg";
                 }}
-                className="h-full w-full object-contain p-8 animate-in fade-in duration-300"
+                className="h-full w-full object-contain animate-in fade-in duration-300"
               />
             ) : (
               <div className="grid h-full w-full place-items-center text-[#6B6B66]">
@@ -399,7 +447,7 @@ function ProductView({ product: p }: { product: Product }) {
                       : "border-[#E5E5E0] opacity-60 hover:opacity-100"
                   }`}
                 >
-                  <img src={src} alt="" loading="lazy" className="h-full w-full object-contain p-1" />
+                  <img src={src} alt="" loading="lazy" className="h-full w-full object-contain" />
                 </button>
               ))}
             </div>
@@ -757,43 +805,52 @@ function ProductView({ product: p }: { product: Product }) {
       </div>
 
       {/* Sticky Bottom Action Bar on Mobile with Safe-Area Inset */}
-      <div className="fixed bottom-0 inset-x-0 z-40 border-t border-[#E5E5E0] bg-white p-2.5 sm:p-3 pb-safe md:hidden shadow-lg">
-        <div className="flex items-center justify-between gap-2.5">
-          <div className="flex flex-col min-w-0 pr-1">
-            <span className="text-[10px] text-[#6B6B66] truncate font-medium">
-              {selectedSize ? `مقاس: ${selectedSize}` : "حدد المقاس"}
-            </span>
-            <span className="price-display text-sm font-black text-[#0D0D0D]">
-              {formatPrice(p.price * qty)}
-            </span>
-          </div>
+      {purchaseBarTarget &&
+        createPortal(
+          <div className="fixed bottom-0 inset-x-0 z-40 border-t border-[#E5E5E0] bg-white/95 px-3 py-2.5 pb-safe shadow-lg backdrop-blur-sm sm:px-6 sm:py-3">
+            <div className="mx-auto flex max-w-7xl items-center gap-3">
+              <div className="flex min-w-0 flex-1 flex-col">
+                <span className="hidden truncate text-xs font-semibold text-[#0D0D0D] sm:block">
+                  {p.title}
+                </span>
+                {(needsSize || needsColor) && (
+                  <span className="truncate text-[10px] font-medium text-[#6B6B66]">
+                    {needsSize && (selectedSize ? `المقاس: ${selectedSize}` : "حدد المقاس")}
+                    {needsSize && needsColor && " · "}
+                    {needsColor && (selectedColor ? `اللون: ${selectedColor}` : "حدد اللون")}
+                  </span>
+                )}
+                <span className="price-display text-sm font-black text-[#0D0D0D]">
+                  {formatPrice(p.price * qty)}
+                </span>
+              </div>
 
-          <div className="flex items-center gap-2 flex-1 justify-end">
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={!isReadyToOrder}
-              className={`h-11 px-3.5 border text-xs font-bold transition-all duration-200 active:scale-95 ${
-                isAdded
-                  ? "border-[#1F1F1F] bg-[#1F1F1F] text-emerald-400"
-                  : isReadyToOrder
-                  ? "border-[#0D0D0D] bg-[#F7F7F5] text-[#0D0D0D]"
-                  : "border-[#E5E5E0] bg-white text-[#6B6B66] opacity-60"
-              }`}
-            >
-              {isAdded ? "تمت الإضافة" : "السلة"}
-            </button>
-            <button
-              type="button"
-              onClick={handleScrollToOrderForm}
-              className="h-11 flex-1 max-w-[190px] flex items-center justify-center gap-1.5 text-xs font-black transition-all bg-[#0D0D0D] text-[#F7F7F5] active:scale-95 rounded-xl"
-            >
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-              <span>اطلب الآن</span>
-            </button>
-          </div>
-        </div>
-      </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handlePrimaryPurchase}
+                  className={`flex h-11 min-w-0 items-center justify-center gap-1.5 rounded-md px-3 text-xs font-bold transition-all active:scale-95 sm:px-5 ${
+                    isAdded
+                      ? "bg-[#1F1F1F] text-emerald-400"
+                      : "bg-[#0D0D0D] text-white hover:bg-[#1F1F1F]"
+                  }`}
+                >
+                  {isAdded ? <Check className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
+                  <span className="whitespace-nowrap">{isAdded ? "تمت الإضافة" : purchasePrompt}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleScrollToOrderForm}
+                  className="hidden h-11 items-center justify-center gap-1.5 rounded-md border border-[#0D0D0D] px-4 text-xs font-bold text-[#0D0D0D] transition-colors hover:bg-[#F7F7F5] sm:flex"
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>اطلب الآن</span>
+                </button>
+              </div>
+            </div>
+          </div>,
+          purchaseBarTarget
+        )}
 
       {/* Related Products */}
       {related.data && related.data.length > 0 && (

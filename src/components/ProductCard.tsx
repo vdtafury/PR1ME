@@ -61,7 +61,7 @@ export function ProductCard({ product }: { product: Product }) {
                 onError={(e) => {
                   e.currentTarget.src = "/brand/hero-cairo-streetwear.jpg";
                 }}
-                className={`h-full w-full object-contain object-center p-2.5 sm:p-4 transition-opacity duration-300 ${
+                className={`h-full w-full object-contain object-center transition-opacity duration-300 ${
                   hasGallery ? "md:group-hover:opacity-0" : ""
                 }`}
               />
@@ -74,7 +74,7 @@ export function ProductCard({ product }: { product: Product }) {
                   onError={(e) => {
                     e.currentTarget.src = "/brand/hero-cairo-streetwear.jpg";
                   }}
-                  className="hidden md:block absolute inset-0 h-full w-full object-contain object-center p-2.5 sm:p-4 opacity-0 transition-opacity duration-300 md:group-hover:opacity-100"
+                  className="hidden md:block absolute inset-0 h-full w-full object-contain object-center opacity-0 transition-opacity duration-300 md:group-hover:opacity-100"
                 />
               )}
             </div>

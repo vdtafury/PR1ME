@@ -798,6 +798,7 @@ const COLOR_PRESETS: { name: string; hex: string }[] = [
   { name: "Blue", hex: "#2563eb" },
   { name: "Navy", hex: "#1e3a8a" },
   { name: "Purple", hex: "#7c3aed" },
+  { name: "Burgundy", hex: "#800020" },
 ];
 
 function ColorsPicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
